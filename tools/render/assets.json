@@ -1,0 +1,93 @@
+{
+  "_comment": "The render catalogue. Each entry becomes a colour PNG, a normal PNG and a manifest record. ids are file names; game_prop is the name the game's props layer uses (existing names mean a straight swap, new names are additions for Phase 24).",
+  "props": [
+    { "id": "desk", "kit": "furniture-kit", "model": "desk", "game_prop": "prop_desk", "replaces": true, "sites": ["building-c", "data-centre", "warehouse"], "notes": "1.44 m office desk, drawer pedestal on the right" },
+    { "id": "desk_corner", "kit": "furniture-kit", "model": "deskCorner", "game_prop": "prop_desk_corner", "sites": ["building-c"], "notes": "L-shaped corner desk" },
+    { "id": "desk_small", "kit": "furniture-kit", "model": "table", "game_prop": "prop_desk_small", "replaces": true, "sites": ["building-c", "warehouse"], "notes": "plain table, used as the small desk" },
+    { "id": "chair_desk", "kit": "furniture-kit", "model": "chairDesk", "game_prop": "env_chair", "replaces": true, "sites": ["building-c", "data-centre", "warehouse"], "notes": "swivel office chair" },
+    { "id": "chair", "kit": "furniture-kit", "model": "chair", "game_prop": "env_chair_plain", "sites": ["building-c"], "notes": "kitchen chair" },
+    { "id": "monitor", "kit": "furniture-kit", "model": "computerScreen", "game_prop": "env_monitor", "replaces": true, "sites": ["building-c", "data-centre", "warehouse"] },
+    { "id": "keyboard", "kit": "furniture-kit", "model": "computerKeyboard", "game_prop": "env_keyboard", "sites": ["building-c", "data-centre"] },
+    { "id": "laptop", "kit": "furniture-kit", "model": "laptop", "game_prop": "env_laptop", "sites": ["building-c", "data-centre"] },
+    { "id": "cabinet", "kit": "furniture-kit", "model": "cabinetTelevisionDoors", "game_prop": "prop_cabinet", "replaces": true, "sites": ["building-c", "data-centre", "warehouse"], "notes": "low two-door cabinet, reads as a filing credenza from above" },
+    { "id": "bookcase", "kit": "furniture-kit", "model": "bookcaseClosedWide", "game_prop": "prop_shelf_office", "sites": ["building-c"], "notes": "tall office storage" },
+    { "id": "bin", "kit": "furniture-kit", "model": "trashcan", "game_prop": "prop_bin", "replaces": true, "sites": ["building-c", "data-centre", "warehouse"] },
+    { "id": "plant", "kit": "furniture-kit", "model": "pottedPlant", "game_prop": "env_plant", "sites": ["building-c", "data-centre"] },
+    { "id": "coat_rack", "kit": "furniture-kit", "model": "coatRackStanding", "game_prop": "env_coat_rack", "sites": ["building-c"] },
+    { "id": "sofa", "kit": "furniture-kit", "model": "loungeSofa", "game_prop": "env_sofa", "sites": ["building-c", "data-centre"], "notes": "reception seating" },
+    { "id": "coffee_table", "kit": "furniture-kit", "model": "tableCoffee", "game_prop": "env_coffee_table", "sites": ["building-c", "data-centre"] },
+    { "id": "counter", "kit": "furniture-kit", "model": "kitchenCabinet", "game_prop": "prop_counter", "replaces": true, "sites": ["building-c", "data-centre", "warehouse"], "notes": "base unit with worktop" },
+    { "id": "counter_sink", "kit": "furniture-kit", "model": "kitchenSink", "game_prop": "prop_counter_alt", "replaces": true, "sites": ["building-c", "data-centre", "warehouse"] },
+    { "id": "fridge", "kit": "furniture-kit", "model": "kitchenFridge", "game_prop": "env_fridge", "sites": ["building-c", "warehouse"] },
+    { "id": "coffee_machine", "kit": "furniture-kit", "model": "kitchenCoffeeMachine", "game_prop": "env_coffee_machine", "sites": ["building-c", "warehouse"] },
+    { "id": "table_round", "kit": "furniture-kit", "model": "tableRound", "game_prop": "env_table_round", "sites": ["building-c", "warehouse"] },
+    { "id": "desk_lamp", "kit": "furniture-kit", "model": "lampSquareTable", "game_prop": "env_desk_lamp", "sites": ["building-c", "data-centre"], "notes": "the fixture under each desk pool light" },
+    { "id": "books", "kit": "furniture-kit", "model": "books", "game_prop": "env_books", "sites": ["building-c", "data-centre"] },
+    { "id": "plant_small", "kit": "furniture-kit", "model": "plantSmall2", "game_prop": "env_plant_small", "sites": ["building-c", "data-centre"] },
+    { "id": "box_closed", "kit": "furniture-kit", "model": "cardboardBoxClosed", "game_prop": "env_box", "sites": ["building-c", "warehouse"] },
+    { "id": "box_open", "kit": "furniture-kit", "model": "cardboardBoxOpen", "game_prop": "env_box_open", "sites": ["building-c", "warehouse"] },
+
+    { "id": "crate", "kit": "factory-kit", "model": "box-large", "game_prop": "prop_crate", "replaces": true, "sites": ["building-c", "data-centre", "warehouse"] },
+    { "id": "crate_small", "kit": "factory-kit", "model": "box-small", "game_prop": "prop_crate_small", "sites": ["warehouse"] },
+    { "id": "crate_long", "kit": "factory-kit", "model": "box-long", "game_prop": "prop_crate_long", "sites": ["warehouse"] },
+    { "id": "cone", "kit": "factory-kit", "model": "cone", "game_prop": "env_cone", "sites": ["building-c", "warehouse"] },
+    { "id": "machine", "kit": "factory-kit", "model": "machine", "game_prop": "env_plant_machine", "sites": ["data-centre", "warehouse"], "notes": "plant room unit" },
+    { "id": "hopper", "kit": "factory-kit", "model": "hopper-square", "game_prop": "env_hopper", "sites": ["warehouse"] },
+    { "id": "conveyor", "kit": "factory-kit", "model": "conveyor-long", "game_prop": "env_conveyor", "sites": ["warehouse"] },
+    { "id": "warning_sign", "kit": "factory-kit", "model": "warning-orange", "game_prop": "env_warning_sign", "sites": ["warehouse"] },
+
+    { "id": "shelf", "kit": "mini-market", "model": "shelf-boxes", "game_prop": "prop_shelf", "replaces": true, "sites": ["warehouse", "building-c"], "notes": "stocked racking bay" },
+    { "id": "shelf_alt", "kit": "mini-market", "model": "shelf-bags", "game_prop": "prop_shelf_alt", "replaces": true, "sites": ["warehouse", "building-c"] },
+    { "id": "shelf_end", "kit": "mini-market", "model": "shelf-end", "game_prop": "prop_shelf_end", "sites": ["warehouse"] },
+    { "id": "trolley", "kit": "mini-market", "model": "shopping-cart", "game_prop": "env_trolley", "replaces": true, "sites": ["building-c", "data-centre", "warehouse"] },
+    { "id": "freezer", "kit": "mini-market", "model": "freezer", "game_prop": "env_vending", "sites": ["building-c", "warehouse"], "notes": "reads as a vending or chiller unit" },
+
+    { "id": "car_sedan", "kit": "car-kit", "model": "sedan", "game_prop": "env_car_sedan", "sites": ["building-c", "data-centre", "warehouse"] },
+    { "id": "car_hatchback", "kit": "car-kit", "model": "hatchback-sports", "game_prop": "env_car_hatchback", "sites": ["building-c", "data-centre", "warehouse"] },
+    { "id": "car_suv", "kit": "car-kit", "model": "suv", "game_prop": "env_car_suv", "sites": ["building-c", "data-centre", "warehouse"] },
+    { "id": "van", "kit": "car-kit", "model": "van", "game_prop": "env_van", "sites": ["building-c", "data-centre", "warehouse"], "notes": "the smokers' door van in Building C" },
+    { "id": "van_delivery", "kit": "car-kit", "model": "delivery", "game_prop": "env_van_delivery", "sites": ["warehouse", "data-centre"] },
+
+    { "id": "lamp_post", "kit": "city-kit-roads", "model": "light-square", "game_prop": "env_lamp_post", "sites": ["building-c", "data-centre", "warehouse"], "notes": "car park lamp; its pool of light is a map light, not baked" },
+    { "id": "barrier", "kit": "city-kit-roads", "model": "construction-barrier", "game_prop": "env_barrier", "replaces": true, "sites": ["building-c", "warehouse"] },
+    { "id": "cone_road", "kit": "city-kit-roads", "model": "construction-cone", "game_prop": "env_cone_road", "sites": ["building-c", "data-centre", "warehouse"] },
+    { "id": "dumpster", "kit": "city-kit-roads", "model": "dumpster", "game_prop": "env_dumpster", "sites": ["building-c", "warehouse"], "notes": "wheelie bin sized; the skip is a primitive" },
+    { "id": "container", "kit": "city-kit-industrial", "model": "shipping-container-a", "game_prop": "env_container", "sites": ["warehouse", "data-centre"] },
+    { "id": "tank", "kit": "city-kit-industrial", "model": "detail-tank", "game_prop": "env_tank", "sites": ["data-centre", "warehouse"], "notes": "plant room or yard tank" }
+  ],
+  "primitives": [
+    { "id": "server_rack", "game_prop": "prop_server", "replaces": true, "sites": ["building-c", "data-centre", "warehouse"], "notes": "42U rack, amber and white status LEDs along the front top edge" },
+    { "id": "server_rack_alt", "game_prop": "prop_server_alt", "replaces": true, "sites": ["building-c", "data-centre", "warehouse"], "notes": "same rack, mesh door and a different LED pattern" },
+    { "id": "roller_shutter", "game_prop": "env_roller_shutter", "sites": ["building-c", "data-centre", "warehouse"], "notes": "3 m shutter in plan: housing plus flattened slats" },
+    { "id": "dock_leveller", "game_prop": "env_dock_leveller", "sites": ["building-c", "data-centre", "warehouse"] },
+    { "id": "reception_desk", "game_prop": "env_reception_desk", "sites": ["building-c", "data-centre", "warehouse"] },
+    { "id": "bollard", "game_prop": "env_bollard", "replaces": true, "sites": ["building-c", "data-centre", "warehouse"] },
+    { "id": "skip", "game_prop": "env_skip", "sites": ["building-c", "warehouse"] },
+    { "id": "palisade_fence", "game_prop": "prop_fence", "replaces": true, "sites": ["building-c", "data-centre", "warehouse"], "notes": "one 2.75 m bay with a post at each end" },
+    { "id": "copier", "game_prop": "env_copier", "replaces": true, "sites": ["building-c", "data-centre", "warehouse"] }
+  ],
+  "floors": [
+    { "id": "floor_carpet", "material": "carpet", "texture": "Carpet012", "repeat_m": 2.0, "game_floor_kind": "carpet", "tint": "#2E3440", "tint_amount": 0.12 },
+    { "id": "floor_tile", "material": "hardTile", "texture": "Tiles141", "repeat_m": 2.0, "game_floor_kind": "hardTile", "tint": "#C9C4BA", "tint_amount": 0.1 },
+    { "id": "floor_concrete", "material": "concrete", "texture": "Concrete031", "repeat_m": 3.0, "game_floor_kind": "concrete" },
+    { "id": "floor_tarmac", "material": "tarmac", "texture": "Asphalt033", "repeat_m": 3.0, "game_floor_kind": "tarmac", "notes": "new kind: the car park surface. concrete stays for docks and plant rooms" },
+    { "id": "floor_raised", "material": "raisedFloor", "texture": "Tiles040", "repeat_m": 2.0, "game_floor_kind": "raisedFloor", "tint": "#8A9096", "tint_amount": 0.55, "seams": { "pitch_m": 0.5, "width_m": 0.006, "depth": 0.45 }, "notes": "600 mm panels scaled to a 0.5 m grid so the texture repeats cleanly" }
+  ],
+  "walls": [
+    { "id": "wall_office_plaster", "material": "office_plaster", "texture": "PaintedPlaster017", "repeat_m": 1.0, "tint": "#B9BCC2", "tint_amount": 0.25, "side_height_m": 0.34, "game_wall_material": "office_plaster" },
+    { "id": "wall_glass_partition", "material": "glass_partition", "texture": null, "repeat_m": 1.0, "side_height_m": 0.34, "game_wall_material": "glass_partition" },
+    { "id": "wall_warehouse_block", "material": "warehouse_block", "texture": "Bricks088", "repeat_m": 1.2, "tint": "#8C8E8C", "tint_amount": 0.72, "side_height_m": 0.34, "game_wall_material": "warehouse_block", "notes": "Bricks088 is orange cinder block; tinted hard towards grey so it reads as painted blockwork" },
+    { "id": "wall_data_hall_panel", "material": "data_hall_panel", "texture": "Metal032", "repeat_m": 1.0, "tint": "#CFD3D8", "tint_amount": 0.5, "seams": { "pitch_m": 1.0, "width_m": 0.012, "depth": 0.5 }, "side_height_m": 0.34, "game_wall_material": "data_hall_panel" }
+  ],
+  "characters": [
+    { "id": "guard", "kit": "animated-characters-3", "skin": "humanMaleA", "recolour": "guard", "game_sprite": "guard", "replaces": true, "notes": "humanMaleA with the shirt recoloured to a dark security uniform" },
+    { "id": "staff_a", "kit": "animated-characters-3", "skin": "humanFemaleA", "game_sprite": "staff_a", "replaces": true },
+    { "id": "staff_b", "kit": "animated-characters-3", "skin": "humanMaleA", "recolour": "staff_b", "game_sprite": "staff_b", "replaces": true, "notes": "humanMaleA with a pale blue shirt so the two staff read differently" },
+    { "id": "worker_hivis", "kit": "animated-characters-3", "skin": "humanMaleA", "recolour": "hivis", "game_sprite": "staff_hivis", "notes": "humanMaleA with a hi-vis vest painted onto the skin" }
+  ],
+  "character_animations": {
+    "_comment": "What the downloaded packs actually contain, checked on 1 November 2026: every Animated Characters pack (Protagonists, Survivors, Retro) ships the same characterMedium.fbx rig with idle, jump and run. None has a walk. The walk sheet below therefore uses the run cycle; at a walking step rate it reads as a brisk walk from above.",
+    "walk": { "file": "Animations/run.fbx", "action_contains": "Run", "frames": 16 },
+    "idle": { "file": "Animations/idle.fbx", "action_contains": "Idle", "frames": 8 }
+  }
+}
