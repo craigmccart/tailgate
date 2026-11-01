@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tailgate visual upgrade: design</title>
+<style>
+  :root {
+    --bg: #f3f1eb; --ink: #181b20; --muted: #5c626b;
+    --accent: #8a5d00; --accent-bright: #ffb000;
+    --card: #fffefa; --border: #c8c2b5; --alarm: #a6211b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0e1116; --ink: #c7cdd4; --muted: #8e97a1;
+      --accent: #ffb000; --accent-bright: #ffb000;
+      --card: #151a21; --border: #2c333a; --alarm: #ff3b30;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 2.5rem 1.25rem 5rem;
+    background: var(--bg); color: var(--ink);
+    font: 17px/1.65 "Segoe UI", system-ui, sans-serif;
+  }
+  main { max-width: 70ch; margin: 0 auto; }
+  header {
+    border: 1px solid var(--border); border-top: 5px solid var(--accent-bright);
+    background: var(--card); padding: 1.4rem 1.5rem; margin-bottom: 2rem;
+  }
+  .kicker {
+    color: var(--muted); font-size: .78rem; letter-spacing: .08em;
+    text-transform: uppercase; margin: 0 0 .4rem;
+    font-family: "IBM Plex Mono", Consolas, monospace;
+  }
+  h1, h2, h3 {
+    font-family: "Saira Condensed", "Bahnschrift SemiCondensed", "Arial Narrow", sans-serif;
+    letter-spacing: .01em; text-transform: uppercase;
+  }
+  h1 { color: var(--accent); font-size: 2.3rem; line-height: 1.05; margin: 0 0 .5rem; }
+  h2 { font-size: 1.5rem; margin: 2.6rem 0 .8rem; padding-top: 1.2rem; border-top: 1px solid var(--border); }
+  h3 { font-size: 1.15rem; margin: 1.7rem 0 .45rem; }
+  p, li { margin: 0 0 .9rem; }
+  ul, ol { padding-left: 1.4rem; }
+  .lead { color: var(--muted); font-size: 1.05rem; margin: 0; }
+  code, pre {
+    font-family: "IBM Plex Mono", Consolas, "Cascadia Code", monospace; font-size: .9em;
+    background: var(--card); border: 1px solid var(--border); border-radius: 4px;
+  }
+  code { padding: .1em .35em; }
+  pre { padding: 1rem; overflow-x: auto; }
+  pre code { border: 0; padding: 0; background: none; }
+  table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: .95rem; }
+  th, td { text-align: left; vertical-align: top; padding: .55rem .6rem; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-weight: 600; font-size: .8rem; letter-spacing: .05em; text-transform: uppercase; }
+  .callout {
+    background: var(--card); border-left: 5px solid var(--accent-bright);
+    padding: .9rem 1.1rem; margin: 1.25rem 0;
+  }
+  .who {
+    display: inline-block; font-size: .72rem; font-weight: 700; letter-spacing: .08em;
+    text-transform: uppercase; padding: .1em .5em; border: 1px solid var(--border);
+    border-radius: 3px; color: var(--muted); margin-right: .4rem; vertical-align: middle;
+  }
+  .who.craig { color: var(--accent); border-color: var(--accent); }
+  .small { color: var(--muted); font-size: .88rem; }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+<header>
+  <p class="kicker">Sonofg0tham Security / Tailgate / Design / 1 November 2026</p>
+  <h1>Tailgate visual upgrade</h1>
+  <p class="lead">What the next four phases of Tailgate build, why, and the rules they must keep. Written from a design conversation with Craig on 1 November 2026. A builder should be able to plan from this without going back to him.</p>
+</header>
+
+<h2>Why</h2>
+
+<p>Tailgate's wrapper looks authored. The visitor kiosk, the contract schedule, the engagement briefing and the Engagement Report share one identity and feel like one product.</p>
+
+<p>The playable world does not. It is drawn from 16px tiles scaled up, one flat wall texture, static 33px character sprites, a debug readout and a permanent aim line, on a 960 by 540 canvas stretched to fit the window. Craig's verdict: it looks and plays like something from the 90s.</p>
+
+<p>Tailgate is a public portfolio piece. The world has to stand next to the report screen.</p>
+
+<h2>What done looks like</h2>
+
+<p>Two screenshots, both good enough to lead the README and to send to another security professional.</p>
+
+<ol>
+  <li><strong>The operative.</strong> A photoreal portrait of the game's red teamer on their visitor badge, in the kiosk and on the lanyard pause screen. This is the README hero.</li>
+  <li><strong>A moment of play.</strong> The operative creeping past a guard's torch beam in a rendered, lit, night-time office. Real shadows from walls, a glowing rack room beyond a doorway, rain on the car park behind. It should read as a modern top-down stealth game, in the family of Intravenous or Door Kickers, not a prototype.</li>
+</ol>
+
+<div class="callout">
+  <strong>The test for every change:</strong> would this frame survive in the README next to the Engagement Report? If a change makes the game more readable or more handsome but the report screen now looks like it came from a different game, the change is wrong.
+</div>
+
+<h2>Goals</h2>
+
+<ul>
+  <li>The playable world reads as a rendered, lit place: materials with depth, light that stops at walls, dense believable dressing that explains what each room is for.</li>
+  <li>The game renders at the display's native resolution. No whole-canvas upscaling of the world.</li>
+  <li>The operative has an identity: a face, a name, and a point of view that shows in the briefing and the report.</li>
+  <li>Play feels current: closer camera, an aim line only while aiming, weather, a night grade.</li>
+  <li>Every accessibility property the game already has survives untouched. See Constraints.</li>
+  <li>All art stays CC0 or CC-BY, plus images Craig makes himself. <code>CREDITS.md</code> stays complete.</li>
+</ul>
+
+<h2>Non-goals</h2>
+
+<ul>
+  <li>No change to guard behaviour, door schedules or level layout beyond what Phase 21 already brings. Detection maths changes in exactly one way, agreed in Decision 5: the light guards use becomes wall-aware, which can only make a spot darker.</li>
+  <li>No new mechanics, no new sites, no dialogue system, no cutscenes.</li>
+  <li>No photorealism in play. The operative is a sprite on the floor and a photo on the badge.</li>
+  <li>No 3D at runtime. Anything rendered from 3D is baked to sprites before it reaches the game.</li>
+  <li>No mobile or touch work.</li>
+</ul>
+
+<h2>Anti-goals</h2>
+
+<p>Things that would make this a failure even if every feature technically works.</p>
+
+<ul>
+  <li><strong>Craig can't read it.</strong> He has nystagmus and dyspraxia. Low contrast, flicker, fast camera moves or busy grain would fail the whole project.</li>
+  <li><strong>Red appears outside detection.</strong> Alarm red <code>#FF3B30</code> belongs to detection and alarm states only. A red brake light on a van is a bug.</li>
+  <li><strong>Three art styles in one frame.</strong> The current look mixes pixel tiles, flat vector tiles and side-view industrial tiles. Replacing that with a new mix is no better.</li>
+  <li><strong>The world and the wrapper drift apart.</strong> The HUD and meta screens keep the access-control identity. The world gets rendered, the UI does not get "realistic".</li>
+  <li><strong>Frame rate drops.</strong> The game must hold 60 fps at 1080p on Craig's PC and a steady 30 fps on an integrated-GPU laptop. A pretty game that stutters is a worse portfolio piece than the current one.</li>
+  <li><strong>An asset with no licence line.</strong> An asset not in <code>CREDITS.md</code> is a bug, as it is today.</li>
+</ul>
+
+<h2>Constraints</h2>
+
+<h3>Project rules that still apply</h3>
+
+<ul>
+  <li>Everything in <code>AGENTS.md</code>: one branch per phase, PR with plain-English description and playtest steps, typecheck and lint clean, data-driven tuning, conventional commits, UK English, no em dashes.</li>
+  <li>Palette and fonts are fixed: near-black <code>#0E1116</code>, clearance amber <code>#FFB000</code>, cool grey <code>#C7CDD4</code>, Saira Condensed for display, IBM Plex Mono for readouts.</li>
+  <li>Guard and camera states are never communicated by colour alone. Any new visual signal pairs a colour with a shape or an edge style.</li>
+  <li>The settings that exist today keep working. In the code they are <code>screenShake</code> (the alarm shake and the DETAINED flash: sudden motion), <code>screenEffects</code> (atmosphere: light breathe, feed static, particles), <code>extraBrightness</code> (lifts the darkness floor), <code>hudScale</code>, <code>assistMode</code>.</li>
+</ul>
+
+<h3>Accessibility rules for this work</h3>
+
+<ul>
+  <li>All new atmosphere sits behind <code>screenEffects</code>: rain, grain, grade, vignette, the pointer lookahead and zoom easing. Off means off, not reduced. The existing travel lookahead stays as it is, since Craig plays with it today without complaint; if he finds the new pointer lookahead tiring, it goes off by default.</li>
+  <li>Film grain, if kept, is static per frame in amplitude and never reads as flicker. Amplitude is a number in config, default tiny.</li>
+  <li>The darkness floor (<code>visibilityFloorGlobal</code>) and the player aura stay. Darkness hides detail, it never erases the floor or a wall's silhouette.</li>
+  <li>The camera never snaps. Zoom changes, if any, ease over at least half a second.</li>
+</ul>
+
+<h3>Technical facts the builder inherits</h3>
+
+<table>
+  <tr><th>Thing</th><th>Today</th></tr>
+  <tr><td>Engine</td><td>Phaser 3.90, TypeScript strict, Vite 8. Arcade physics.</td></tr>
+  <tr><td>Canvas</td><td>960 by 540 logical, <code>Scale.FIT</code>, <code>pixelArt: true</code>, <code>roundPixels: true</code>. Every scene lays out in those units.</td></tr>
+  <tr><td>Grid</td><td>32px tiles. Maps are 75 by 50 tiles (2400 by 1600 px). Three maps.</td></tr>
+  <tr><td>Map format</td><td>Tiled JSON, but <strong>no tile layers</strong>. Everything is an object layer of rectangles: zones, walls, props, doors, objectives, lights, decals, effects, spawn.</td></tr>
+  <tr><td>Floors</td><td>Painted in code per zone (<code>materialTextures.ts</code>): seeded noise and blotches on a base colour, then a colour wash per room.</td></tr>
+  <tr><td>Walls</td><td>Each wall rectangle drawn with a textured face and a fake extrusion derived from the venue's edge colour (<code>WorldRenderer.drawWalls</code>).</td></tr>
+  <tr><td>Props and decals</td><td>Single sprites placed by name from the map's props and decals layers. Twelve prop types, five character sprites, four floors, one wall texture in use.</td></tr>
+  <tr><td>Characters</td><td>One static frame each, rotated to face, with code-driven sway and bob (<code>CharacterAnimator.ts</code>). Ellipse shadows drawn in code.</td></tr>
+  <tr><td>Lighting (what you see)</td><td>A screen-fixed dark veil, with soft radial lights erased out of it (<code>LightingRenderer.ts</code>). Lights do not stop at walls.</td></tr>
+  <tr><td>Lighting (what guards see)</td><td>Separate, analytic (<code>LightModel.ts</code>). Must not change.</td></tr>
+  <tr><td>Vision cones</td><td>Already raycast against walls and closed doors (<code>VisionCone.ts</code>). The occlusion code exists and can be reused for lights.</td></tr>
+  <tr><td>Camera</td><td>Follow with deadzone and a small travel lookahead (<code>config/juice.ts</code>). No zoom.</td></tr>
+  <tr><td>Feed treatment</td><td><code>FeedTreatment.ts</code> already lays a cool tint, a static layer and a vignette over the world. The vignette colour is an alert cue: amber at cautious, red at lockdown. The static re-rolls every few hundred milliseconds.</td></tr>
+  <tr><td>Report</td><td>One fixed page. Findings are already capped to protect the summary and menu. No signature block. The run clock starts at 09:31.</td></tr>
+  <tr><td>Run stats</td><td><code>RunStats</code> records what the run used (routes, photos, detections). It does not record denied attempts, breaker use or staff interactions. Staff never notice the player today. Hi-vis exists only in the warehouse.</td></tr>
+  <tr><td>Phase 21</td><td>Draft PR, green, merges cleanly. Rewrites much of <code>BuildingScene.ts</code>, adds <code>FieldHud</code>, guard roster, awareness icons, fades. <strong>Lands before any of this starts.</strong></td></tr>
+  <tr><td>Tools on Craig's PC</td><td>Blender 5.2, Python 3.13, Node 22, RTX 5070 Ti.</td></tr>
+</table>
+
+<h2>Decisions</h2>
+
+<p>Each is marked with who made it. <span class="who craig">Craig</span> means he said it. <span class="who">Claude</span> means it is my call, made so the builder doesn't have to guess, and Craig can overrule it.</p>
+
+<h3>1. The operative</h3>
+
+<p><span class="who craig">Craig</span> The badge photo is a character, not Craig. They are an AI-enabled red teamer, not a traditional coder. They are not malicious. They test the field to help defend against current threats, and the question they put to every client is: did your DevSecOps and SDLC controls work, and what did they miss?</p>
+
+<p><span class="who">Claude</span> In the portrait they look like a visitor: plain clothes that pass at reception, no hood, no balaclava, no terminal glow. Someone you'd walk past. The portrait is framed as an ID photo (head and shoulders, plain background) so it drops into the badge and lanyard without cropping.</p>
+
+<p><span class="who craig">Craig</span> The portrait is generated with an image model through Craig's own ChatGPT account. Claude may drive that account in the browser to create and download the images; Craig approves the final choice. The project's approved-source list in <code>AGENTS.md</code> gains one line: images generated through Craig's account are allowed, credited as his own work. The builder does not source a face from anywhere else.</p>
+
+<p><span class="who">Claude</span> The portrait appears in exactly three places: the kiosk badge card (replacing "BADGE: NONE ISSUED" with a printed visitor badge once an engagement is selected), the lanyard pause screen (replacing the "NO PHOTO" box), and the Engagement Report signature block. The kiosk visitor line and the report byline carry the character's name.</p>
+
+<p><span class="who craig">Craig</span> The operative's surname is <strong>Reyes</strong>. The kiosk and badge print <code>A. REYES</code>. <span class="who">Claude</span> The full name on the report byline is <strong>Alex Reyes</strong>, chosen because it is neutral and prints the same initial. The name lives in one constant in <code>config/kiosk.ts</code> and nowhere else.</p>
+
+<h3>2. The controls angle in the copy</h3>
+
+<p><span class="who craig">Craig</span> The "did the controls work" point of view goes into the game's own text, not just the portrait brief.</p>
+
+<p><span class="who">Claude</span> Two touches, both data-driven from things the game already records. No new systems.</p>
+
+<ul>
+  <li><strong>Briefing.</strong> The Scope block gains one line stating the assessment question, in the briefing's existing voice. Example: "Confirm whether site access controls hold against an unbadged visitor. Report every control that did not."</li>
+  <li><strong>Report.</strong> A new section, "Controls assessed". Each site lists its own controls in a data file, <code>public/data/&lt;level&gt;/controls.json</code>, naming the control and which run stat proves it was bypassed. Verdicts are one of three: <strong>BYPASSED</strong> (the run used that route or tool), <strong>EVADED</strong> (CCTV only: the run crossed camera cover without a loop or the breaker), or <strong>NOT EXERCISED</strong> (the run never touched it). There is no "held", because the game cannot see a failed attempt. <span class="who">Claude</span> Two small additive counters go into <code>RunStats</code>: breaker thrown, and console loop used. That is recording, not a new mechanic. Staff challenge is dropped: there is no such mechanic.</li>
+</ul>
+
+<p>The report copy stays in the dry pentest register it already has. It does not lecture.</p>
+
+<p><span class="who">Claude</span> Layout: the report becomes two pages. Page one is unchanged. Page two carries "Controls assessed" and the signature block with the portrait. Left and right, or the shoulder buttons, flip pages, and a small page marker sits in the footer. Nothing on page one shrinks.</p>
+
+<h3>3. Native resolution</h3>
+
+<p><span class="who">Claude</span> The single biggest cause of the 90s look is a 540p canvas scaled up with nearest-neighbour filtering. The world must render at the display's native resolution, with the rest of the UI keeping its current composition.</p>
+
+<p>Target: the game canvas matches the window's device pixels, <code>pixelArt</code> turns off and textures filter linearly, text renders at the device pixel ratio so it stays sharp.</p>
+
+<p><span class="who">Claude</span> Performance targets are two: Craig's PC (RTX 5070 Ti, 2560 by 1440 monitor at 175% Windows scaling, so the browser's device pixel ratio is 1.75) at native 1440p at 60 fps, and a 1080p integrated-GPU budget, checked by running the game with the render scale capped to 1080p and the GPU throttled in DevTools, since no laptop is on hand. A <code>renderScale</code> setting (default 1.0, meaning native) is added so a slow machine can drop to 0.75 or 0.5 without any layout change. Native is capped at 1440p-equivalent pixel count; a 4K display renders at 1440p and upscales, which is still far sharper than today.</p>
+
+<p>The builder picks the method. Two known routes: raise the logical size and scale every scene's layout, or keep 960 by 540 as the layout unit and give each scene a camera zoom plus text resolution matching the device pixel ratio. The second is less invasive. Whichever is chosen, the kiosk, briefing, report, pause and settings screens must look the same as today, only sharper.</p>
+
+<h3>4. The rendered world</h3>
+
+<p><span class="who craig">Craig</span> The world art is rebuilt as rendered, not drawn. <span class="who">Claude</span> Style: gritty night. Worn carpet, scuffed concrete, cable trays, wet tarmac. Not clean tactical.</p>
+
+<p><span class="who craig">Craig</span> The engagement moves to the evening. The run clock starts around 18:40 instead of 09:31. The fiction becomes after-hours: late staff, cleaners, a last delivery, smokers under a lamp. Mechanics do not change; the staff schedules and door windows already work for an evening shift. The briefing copy and the clock get a small edit in Phase 22 so the frame and the paperwork agree.</p>
+
+<p><span class="who">Claude</span> Source: Kenney's CC0 3D kits (Furniture Kit, Factory Kit, City Kit Industrial and Roads, Car Kit, Mini Market) and Kenney's animated 3D characters, rendered top-down from Blender by a script that lives in the repo under <code>tools/</code>. Blender is on Craig's PC. Research found no CC0 or CC-BY top-down pack that covers office, warehouse and car park in one style; rendering one author's kits is the only cohesive free route.</p>
+
+<p><span class="who">Claude</span> Authoring scale: 96 px per 32 px tile, so three render pixels per world pixel. The arithmetic: at 1080p the 960 by 540 layout is shown at two device pixels per unit, and the closer camera adds about 1.4 times, so one world pixel is about 2.8 screen pixels. Three render pixels per world pixel lands just under one render pixel per screen pixel on 1080p, and still looks crisp at 1440p. Rendering at 96 rather than 64 costs nothing in Blender.</p>
+
+<p><span class="who">Claude</span> Where the grit comes from. Kenney's kits are clean, flat-coloured low-poly. The wear is added in Blender, not sourced: procedural edge wear, dirt in corners and ambient occlusion in the kit materials, plus CC0 surface textures from ambientCG or Poly Haven for carpet, concrete, tarmac and metal. Both libraries are CC0, which the asset rule already permits; <code>AGENTS.md</code>'s approved-sources list gains them. The rest of the grit is light, grade and decals in the game.</p>
+
+<p><span class="who">Claude</span> A style gate before all three sites are dressed: one room, the Building C office with its corridor and a slice of car park through the window, rendered and placed in the game. Craig approves it, or asks for one more round. If the second round is not approved, the plan switches to the 2D fallback (Kenney Top-down Shooter and Racing packs, mixed-style tiles removed) and the Blender work stops.</p>
+
+<p><span class="who">Claude</span> Each rendered asset ships as a colour pass and a normal pass. Floors stay painted in code but gain a tiling grain texture rendered from Blender materials per material kind (carpet, tile, concrete, tarmac, raised floor), so the painted blotches sit on real texture. Walls get a rendered top face and a rendered side face per material (office plaster, glass partition, warehouse block, data hall panel) in place of the fake extrusion.</p>
+
+<p><span class="who">Claude</span> A decal and trim layer is added before more props, as the July review recommended. UK-specific markings are generated in code or SVG, not sourced: hatched bays, double yellows, walkway lines, hazard stripes, security lines, cable runs, bay numbers, door frames, wall signs. Each zone gets two or three details that say what happens there.</p>
+
+<p><span class="who">Claude</span> Characters become sprite sheets with a real walk cycle (feet) rendered from Kenney's animated characters, top-down. The existing sway and bob stay as a layer on top. Guard, two staff and a hi-vis variant are texture swaps of one rig. The player sprite stays the operative's body, not their face.</p>
+
+<p><span class="who">Claude</span> Things the kits don't have are modelled from primitives in the same render scene so they match: server racks with LED strips, a roller shutter and dock leveller, a reception desk, bollards, a skip, palisade fence, a hi-vis vest texture.</p>
+
+<p>Map data changes are additive only: new prop names in the props and decals layers, optional per-wall material properties. Existing maps keep loading.</p>
+
+<h3>5. Light and shadow</h3>
+
+<p><span class="who craig">Craig</span> Torch beams that stop at walls, rack LEDs that glow, pools under lamps. And the screen must not lie about cover: the light guards use (<code>LightModel.ts</code>) gets the same wall occlusion as the light you see. Occlusion only removes light, so this can only make a spot darker and give more cover, never less. The Phase 21 exposure meter stays truthful for free. Phase 23's PR reports what changed in each site's cover and retunes ambient values if a route became trivial.</p>
+
+<p><span class="who">Claude</span> Two presentation layers on top of that shared occlusion.</p>
+
+<ul>
+  <li><strong>Occluded light.</strong> Every light source, static or moving, is drawn as a visibility polygon clipped by walls and closed doors, using the raycast that <code>VisionCone.ts</code> already has. Static lights are baked once per level into a world-sized texture; only guard torches, the player aura and any flickering source are redrawn per frame. This is what gives the Intravenous look and keeps the frame budget.</li>
+  <li><strong>Surface response.</strong> Phaser's Light2D pipeline with the rendered normal passes, so walls, racks and furniture catch light on the side facing it. Ambient is set from the zone's analytic ambient so the two layers agree.</li>
+</ul>
+
+<p>The darkness floor and the player aura are kept as today. Guard torches become a visible, soft-edged beam in the cone's shape. Rack LEDs are small coloured sources (amber and white only).</p>
+
+<h3>6. Feel pass</h3>
+
+<p><span class="who">Claude</span> All numbers live in config files Craig can edit.</p>
+
+<ul>
+  <li><strong>Closer camera.</strong> A world zoom around 1.4 times today's framing, tuned by play so the visible area still shows a patrol's approach. Lookahead biases toward the mouse or right stick as well as travel.</li>
+  <li><strong>Aim line only while aiming.</strong> Shown while the pointer or stick is active, fades after short inactivity, capped at throw range, a short dotted arc rather than a full-screen line. The reticle stays small until a valid landing point exists.</li>
+  <li><strong>Night grade and vignette.</strong> Not a new layer. The existing <code>FeedTreatment</code> is extended: its tint becomes the grade, its vignette keeps its job as the alert cue (amber at cautious, red at lockdown) and gains a soft neutral base. Its static is checked against the no-flicker rule; if it reads as flicker to Craig it becomes a fixed grain or is removed. The HUD and meta screens are not graded.</li>
+  <li><strong>Rain</strong> on exterior zones with a wet sheen on tarmac. Slow, sparse, low alpha.</li>
+  <li><strong>Film grain</strong>, tiny amplitude, no temporal flicker. Default on but behind <code>screenEffects</code>. If it cannot be made comfortable it is dropped, not forced.</li>
+</ul>
+
+<h3>7. Order and phases</h3>
+
+<p><span class="who">Claude</span> One branch and PR per phase, as the project already works. Each phase lands something Craig can see. Each phase gets a "done when" list added to the build phases section of <code>GAME_DESIGN.md</code> as part of the implementation plan, and Craig approves that plan before any phase starts.</p>
+
+<table>
+  <tr><th>Phase</th><th>Lands</th><th>Why this order</th></tr>
+  <tr><td>21 (exists)</td><td>HUD, two guards, awareness, fades. Merge the draft PR.</td><td>Touches most of <code>BuildingScene.ts</code>. Everything below builds on it.</td></tr>
+  <tr><td>22 Frame and feel</td><td>Native resolution, camera, aim line, grade, vignette, rain, grain.</td><td>Pure code, no assets. Fastest visible change and settles the display scale the art is authored for.</td></tr>
+  <tr><td>23 Light and shadow</td><td>Occluded lights, baked static light, torch beams, Light2D with flat normals.</td><td>Still no new assets. Proves the frame budget before art arrives.</td></tr>
+  <tr><td>24 Rendered world</td><td>Blender pipeline in <code>tools/</code>, rendered materials, walls, props, decals, characters, all three sites dressed.</td><td>The long pole. <span class="who craig">Craig</span> The render pipeline starts now, in a session of its own, alongside 22 and 23. It touches only <code>tools/</code> and rendered output until the swap. This is an agreed exception to the "never start a later phase early" rule in <code>AGENTS.md</code>, and that file gets a line saying so.</td></tr>
+  <tr><td>25 The operative</td><td>Portrait in three places, the name, briefing and report copy.</td><td>Depends on Craig's portrait and name. Small, and can slot in earlier if they arrive early.</td></tr>
+</table>
+
+<h2>Left to the builder</h2>
+
+<ul>
+  <li>The exact resolution method (Decision 3) and how text resolution is handled.</li>
+  <li>The Blender script's structure, camera setup, lighting rig for the colour pass, and how normal passes are exported. Also whether to render one sheet per kit or one PNG per prop.</li>
+  <li>How the occluded light polygons are drawn with a soft falloff (triangle fan with per-vertex alpha is one route) and how the static bake is stored.</li>
+  <li>Whether Light2D replaces the veil for world objects or sits under it. The requirement is only that the darkness floor, aura and <code>extraBrightness</code> keep working.</li>
+  <li>Exact zoom, lookahead, grain and rain numbers. All go in config.</li>
+  <li>Which Kenney characters and animations are used, after checking the downloads for walk, idle and carry.</li>
+  <li>How wall materials are named in Tiled.</li>
+</ul>
+
+<h2>Risks</h2>
+
+<ul>
+  <li><strong>Blender time.</strong> A render pipeline is real work. If it stalls, Phases 22 and 23 still deliver a large visible upgrade on the current art, and the fallback is Kenney's 64px Top-down Shooter and Racing packs with the mixed-style tiles removed.</li>
+  <li><strong>Performance.</strong> Per-frame light polygons and Light2D together could exceed budget on a laptop. The static bake is the mitigation; Phase 23's PR must report frame times on both machines.</li>
+  <li><strong>Already known on main:</strong> below about 24 fps the Phase 20 stuck watchdog misfires and guards slow down. Separate task, but it means the frame budget is a gameplay issue, not just polish.</li>
+  <li><strong>Craig's eyes.</strong> Every effect is tested with him before it defaults on. Anything he finds tiring goes off by default.</li>
+  <li><strong>Scope creep into gameplay.</strong> The July review also wants contract-specific findings and time-dependent objectives. Good ideas, out of scope here.</li>
+</ul>
+
+<h2>Open items for Craig</h2>
+
+<ol>
+  <li>Approving a portrait. Claude generates candidates through Craig's ChatGPT account (ID-photo framing, head and shoulders, plain background, at least 600 px tall) and Craig picks one.</li>
+</ol>
+
+<p class="small">This does not block Phases 22 to 24.</p>
+
+</main>
+</body>
+</html>
