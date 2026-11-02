@@ -164,8 +164,11 @@ run merges into the existing manifest. To see the catalogue:
   entries in `assets.json` (texture id, tint, how many metres one repeat covers).
 - Furniture Kit colours: `KIT_RECOLOUR` in `config.py`.
 
-Renders are deterministic (fixed seeds, adaptive sampling off), so re-running
-without changes reproduces the same pixels.
+Renders use fixed seeds with adaptive sampling off, but the GPU denoiser is
+not bit-exact: a re-run without changes shifts a few pixels by 1 or 2 of 256,
+which you cannot see but which makes git treat every PNG as modified. So after
+a small change, render only what changed (`--only desk,chair_desk`) and keep
+the untouched files as they are, rather than committing a full re-run.
 
 ## Style gate
 

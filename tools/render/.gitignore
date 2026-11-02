@@ -4,3 +4,6 @@ kits/
 textures/
 work/
 *.zip
+
+# Python bytecode
+__pycache__/

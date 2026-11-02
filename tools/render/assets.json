@@ -4,7 +4,7 @@
     { "id": "desk", "kit": "furniture-kit", "model": "desk", "game_prop": "prop_desk", "replaces": true, "sites": ["building-c", "data-centre", "warehouse"], "notes": "1.44 m office desk, drawer pedestal on the right" },
     { "id": "desk_corner", "kit": "furniture-kit", "model": "deskCorner", "game_prop": "prop_desk_corner", "sites": ["building-c"], "notes": "L-shaped corner desk" },
     { "id": "desk_small", "kit": "furniture-kit", "model": "table", "game_prop": "prop_desk_small", "replaces": true, "sites": ["building-c", "warehouse"], "notes": "plain table, used as the small desk" },
-    { "id": "chair_desk", "kit": "furniture-kit", "model": "chairDesk", "game_prop": "env_chair", "replaces": true, "sites": ["building-c", "data-centre", "warehouse"], "notes": "swivel office chair" },
+    { "id": "chair_desk", "kit": "furniture-kit", "model": "chairDesk", "game_prop": "env_chair", "replaces": true, "sites": ["building-c", "data-centre", "warehouse"], "recolour": { "carpet": "#6A7584", "metalMedium": "#8E949A" }, "notes": "swivel office chair; seat fabric lifted to a mid grey-blue and the frame lightened so it reads as a chair, not a block, from above" },
     { "id": "chair", "kit": "furniture-kit", "model": "chair", "game_prop": "env_chair_plain", "sites": ["building-c"], "notes": "kitchen chair" },
     { "id": "monitor", "kit": "furniture-kit", "model": "computerScreen", "game_prop": "env_monitor", "replaces": true, "sites": ["building-c", "data-centre", "warehouse"] },
     { "id": "keyboard", "kit": "furniture-kit", "model": "computerKeyboard", "game_prop": "env_keyboard", "sites": ["building-c", "data-centre"] },

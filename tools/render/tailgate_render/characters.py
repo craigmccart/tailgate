@@ -101,6 +101,15 @@ def recolour_skin(source: Path, variant: str, target: Path) -> Path:
             rows, cols = _region(rgba, 0.04, band_top, 0.55, band_top + 0.045)
             rgba[rows, cols, :3] = np.array([0.8, 0.82, 0.85], dtype=np.float32)
         _tint_region(rgba, trousers, (0.25, 0.27, 0.3))
+        # Hard hat. From straight above the head hides the shoulders, so the
+        # vest alone only shows on the sleeves. The crown of the head is the
+        # top band of the head block; paint it hi-vis yellow with a little of
+        # the hair shading kept so the dome still reads as a curved surface.
+        rows, cols = _region(rgba, 0.0, 0.0, 0.59, 0.145)
+        crown = rgba[rows, cols, :3]
+        luma = crown @ np.array([0.299, 0.587, 0.114], dtype=np.float32)
+        shade = 0.82 + 0.6 * luma[..., None]
+        rgba[rows, cols, :3] = np.clip(np.array([0.93, 0.86, 0.14], dtype=np.float32) * shade, 0.0, 1.0)
     _save_rgba(target, rgba)
     return target
 
