@@ -4,6 +4,8 @@ import { HIJACK } from '../config/hijack';
 import { FONTS, PALETTE, PALETTE_HEX } from '../config/palette';
 import type { FeedInfo } from '../systems/CameraSystem';
 import { MenuController } from '../ui/MenuController';
+import { fitUiCamera } from '../ui/uiCamera';
+import { UI_HEIGHT, UI_WIDTH } from '../ui/viewport';
 import type { BuildingScene } from './BuildingScene';
 
 /** The feed viewport, shared with BuildingScene's secondary camera. */
@@ -39,6 +41,7 @@ export class HijackScene extends Phaser.Scene {
   }
 
   create(): void {
+    fitUiCamera(this);
     this.building = this.scene.get('building') as BuildingScene;
     this.feeds = this.building.hijackFeeds().feeds;
     this.feedIndex = 0;
@@ -151,8 +154,8 @@ export class HijackScene extends Phaser.Scene {
 
   /** The dark terminal chrome with a hole where the live feed shows through. */
   private drawChrome(): void {
-    const w = this.scale.width;
-    const h = this.scale.height;
+    const w = UI_WIDTH;
+    const h = UI_HEIGHT;
     const alpha = 0.94;
     // Four slabs around the feed cut-out; the building renders through the gap.
     this.add.rectangle(w / 2, FEED.y / 2, w, FEED.y, PALETTE_HEX.base, alpha);

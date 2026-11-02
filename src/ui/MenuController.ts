@@ -200,7 +200,6 @@ export class MenuController {
         color: PALETTE.amber,
       })
       .setOrigin(0.5)
-      .setScrollFactor(0)
       .setDepth(5);
 
     this.items.forEach((item, i) => {
@@ -213,7 +212,6 @@ export class MenuController {
           color: PALETTE.text,
         })
         .setOrigin(0, 0.5)
-        .setScrollFactor(0)
         .setDepth(5)
         .setInteractive({ useHandCursor: true });
       label.on('pointerover', () => this.setIndex(i));
@@ -231,7 +229,6 @@ export class MenuController {
             color: PALETTE.amber,
           })
           .setOrigin(1, 0.5)
-          .setScrollFactor(0)
           .setDepth(5)
           .setInteractive({ useHandCursor: true });
         // Clicking the value cycles it upward; the left/right controls give both

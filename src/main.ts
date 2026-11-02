@@ -13,9 +13,8 @@ import { PauseScene } from './scenes/PauseScene';
 import { ReportScene } from './scenes/ReportScene';
 import { SettingsScene } from './scenes/SettingsScene';
 import { getSettings } from './state/settings';
-
-export const GAME_WIDTH = 960;
-export const GAME_HEIGHT = 540;
+import { installTextResolution } from './ui/uiCamera';
+import { canvasSizeFor } from './ui/viewport';
 
 /**
  * Canvas text cannot use a web font until the browser has finished loading it,
@@ -34,11 +33,20 @@ async function waitForFonts(): Promise<void> {
 async function boot(): Promise<void> {
   await waitForFonts();
 
+  // The canvas is sized in device pixels so text and lines stay sharp. Every
+  // scene still lays out in 960 by 540 units; a fitted camera does the scaling.
+  const { width, height } = canvasSizeFor({
+    innerWidth: window.innerWidth,
+    innerHeight: window.innerHeight,
+    devicePixelRatio: window.devicePixelRatio,
+    renderScale: 1,
+  });
+
   const game = new Phaser.Game({
     type: Phaser.AUTO,
     parent: 'game',
-    width: GAME_WIDTH,
-    height: GAME_HEIGHT,
+    width,
+    height,
     backgroundColor: PALETTE.base,
     render: {
       pixelArt: true,
@@ -69,6 +77,10 @@ async function boot(): Promise<void> {
       HijackScene,
     ],
   });
+
+  // Scenes are created on a later tick, so the text wrapper is in place before
+  // any text exists.
+  installTextResolution();
 
   // Dev-only handles for manual inspection. Stripped from production builds.
   if (import.meta.env.DEV) {

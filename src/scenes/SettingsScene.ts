@@ -12,6 +12,7 @@ import {
   setScreenShake,
 } from '../state/settings';
 import { MenuController } from '../ui/MenuController';
+import { fitUiCamera } from '../ui/uiCamera';
 
 /** Slider bounds and steps. The visibility floor maps 0..1 onto extraBrightness. */
 const VOLUME_STEP = 0.05;
@@ -42,6 +43,7 @@ export class SettingsScene extends Phaser.Scene {
   }
 
   create(data: SettingsData): void {
+    fitUiCamera(this);
     this.returnScene = data?.returnScene ?? 'menu';
 
     // Dim the paused scene behind, then draw the settings card.

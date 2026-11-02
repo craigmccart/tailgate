@@ -5,6 +5,7 @@ import { initLevelRegistry } from '../state/levels';
 import { getSettings } from '../state/settings';
 import { MenuController } from '../ui/MenuController';
 import { fadeIn, fadeToScene } from '../ui/transitions';
+import { fitUiCamera } from '../ui/uiCamera';
 
 /** The kiosk card geometry, a lighter sheet on the near-black like the report. */
 const CARD = { x: 480, y: 268, w: 580, h: 260 } as const;
@@ -61,6 +62,7 @@ export class MenuScene extends Phaser.Scene {
   }
 
   create(): void {
+    fitUiCamera(this);
     // Scene objects are reused across restarts, so drop any dead tween handles
     // from the last visit before the loop gating below reads them.
     this.loopTweens = [];
