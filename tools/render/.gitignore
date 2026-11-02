@@ -1,0 +1,9 @@
+# Downloaded third-party sources and render scratch. Fetched by fetch_sources.py,
+# never committed: the repo only carries the rendered PNG output and the manifest.
+kits/
+textures/
+work/
+*.zip
+
+# Python bytecode
+__pycache__/

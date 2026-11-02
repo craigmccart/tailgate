@@ -1,0 +1,2667 @@
+{
+  "version": 1,
+  "generated_by": "tools/render/render_assets.py (Blender 5.2.0 LTS)",
+  "scale": {
+    "render_px_per_tile": 96,
+    "game_px_per_tile": 32,
+    "metres_per_tile": 1.0,
+    "px_per_metre": 96.0,
+    "render_px_per_game_px": 3.0,
+    "character_world_scale": 1.5,
+    "note": "Draw a prop at displayWidth = px[0] / render_px_per_game_px game pixels. Characters are rendered character_world_scale times larger than life on purpose."
+  },
+  "normal_maps": {
+    "suffix": "_n",
+    "space": "camera space, which for a straight-down camera is the sprite's tangent space",
+    "convention": "OpenGL: red = +x (screen right), green = +y (screen up, north), blue = towards the viewer. (128, 128, 255) is a flat upward face.",
+    "note": "If the game's y axis points down (Phaser), flip the green channel or invert the light's y when sampling."
+  },
+  "facing": "Characters face +x (screen right) at frame rotation 0, matching Phaser's zero angle. Props keep the kit's own orientation unless rotation_deg says otherwise.",
+  "lighting": "Colour passes use a neutral white sky and a soft white sun 12 degrees north of vertical, with ambient occlusion baked in. No coloured light is baked; the game adds it.",
+  "licence_note": "Every source is CC0 1.0. CREDITS.md carries the same provenance in the repo's SBOM format.",
+  "assets": [
+    {
+      "id": "guard_idle",
+      "kind": "character_sheet",
+      "file": "characters/guard_idle.png",
+      "normal": "characters/guard_idle_n.png",
+      "px": [
+        1088,
+        136
+      ],
+      "frame_px": [
+        136,
+        136
+      ],
+      "frames": 8,
+      "game_frame_px": 45.3,
+      "animation": "idle",
+      "source_animation": "Animations/idle.fbx (Root.001|Root|Idle)",
+      "fps_suggested": 6,
+      "loop": true,
+      "origin": "centre",
+      "facing": "+x",
+      "world_scale": 1.5,
+      "game_sprite": "guard",
+      "replaces_existing": true,
+      "skin": "humanMaleA recoloured (guard)",
+      "source": {
+        "pack": "Animated Characters Retro",
+        "pack_url": "https://kenney.nl/assets/animated-characters-3",
+        "model": "Model/characterMedium.fbx + Animations/idle.fbx + Skins/humanMaleA.png",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": "humanMaleA with the shirt recoloured to a dark security uniform"
+    },
+    {
+      "id": "guard_walk",
+      "kind": "character_sheet",
+      "file": "characters/guard_walk.png",
+      "normal": "characters/guard_walk_n.png",
+      "px": [
+        3072,
+        192
+      ],
+      "frame_px": [
+        192,
+        192
+      ],
+      "frames": 16,
+      "game_frame_px": 64.0,
+      "animation": "walk",
+      "source_animation": "Animations/run.fbx (Root.001|Root|Run)",
+      "fps_suggested": 12,
+      "loop": true,
+      "origin": "centre",
+      "facing": "+x",
+      "world_scale": 1.5,
+      "game_sprite": "guard",
+      "replaces_existing": true,
+      "skin": "humanMaleA recoloured (guard)",
+      "source": {
+        "pack": "Animated Characters Retro",
+        "pack_url": "https://kenney.nl/assets/animated-characters-3",
+        "model": "Model/characterMedium.fbx + Animations/run.fbx + Skins/humanMaleA.png",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": "humanMaleA with the shirt recoloured to a dark security uniform Walk uses the pack's run cycle: no walk exists in any Kenney animated pack."
+    },
+    {
+      "id": "staff_a_idle",
+      "kind": "character_sheet",
+      "file": "characters/staff_a_idle.png",
+      "normal": "characters/staff_a_idle_n.png",
+      "px": [
+        1088,
+        136
+      ],
+      "frame_px": [
+        136,
+        136
+      ],
+      "frames": 8,
+      "game_frame_px": 45.3,
+      "animation": "idle",
+      "source_animation": "Animations/idle.fbx (Root.001|Root|Idle.001)",
+      "fps_suggested": 6,
+      "loop": true,
+      "origin": "centre",
+      "facing": "+x",
+      "world_scale": 1.5,
+      "game_sprite": "staff_a",
+      "replaces_existing": true,
+      "skin": "humanFemaleA",
+      "source": {
+        "pack": "Animated Characters Retro",
+        "pack_url": "https://kenney.nl/assets/animated-characters-3",
+        "model": "Model/characterMedium.fbx + Animations/idle.fbx + Skins/humanFemaleA.png",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": ""
+    },
+    {
+      "id": "staff_a_walk",
+      "kind": "character_sheet",
+      "file": "characters/staff_a_walk.png",
+      "normal": "characters/staff_a_walk_n.png",
+      "px": [
+        3072,
+        192
+      ],
+      "frame_px": [
+        192,
+        192
+      ],
+      "frames": 16,
+      "game_frame_px": 64.0,
+      "animation": "walk",
+      "source_animation": "Animations/run.fbx (Root.001|Root|Run.001)",
+      "fps_suggested": 12,
+      "loop": true,
+      "origin": "centre",
+      "facing": "+x",
+      "world_scale": 1.5,
+      "game_sprite": "staff_a",
+      "replaces_existing": true,
+      "skin": "humanFemaleA",
+      "source": {
+        "pack": "Animated Characters Retro",
+        "pack_url": "https://kenney.nl/assets/animated-characters-3",
+        "model": "Model/characterMedium.fbx + Animations/run.fbx + Skins/humanFemaleA.png",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": "Walk uses the pack's run cycle: no walk exists in any Kenney animated pack."
+    },
+    {
+      "id": "staff_b_idle",
+      "kind": "character_sheet",
+      "file": "characters/staff_b_idle.png",
+      "normal": "characters/staff_b_idle_n.png",
+      "px": [
+        1088,
+        136
+      ],
+      "frame_px": [
+        136,
+        136
+      ],
+      "frames": 8,
+      "game_frame_px": 45.3,
+      "animation": "idle",
+      "source_animation": "Animations/idle.fbx (Root.001|Root|Idle.002)",
+      "fps_suggested": 6,
+      "loop": true,
+      "origin": "centre",
+      "facing": "+x",
+      "world_scale": 1.5,
+      "game_sprite": "staff_b",
+      "replaces_existing": true,
+      "skin": "humanMaleA recoloured (staff_b)",
+      "source": {
+        "pack": "Animated Characters Retro",
+        "pack_url": "https://kenney.nl/assets/animated-characters-3",
+        "model": "Model/characterMedium.fbx + Animations/idle.fbx + Skins/humanMaleA.png",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": "humanMaleA with a pale blue shirt so the two staff read differently"
+    },
+    {
+      "id": "staff_b_walk",
+      "kind": "character_sheet",
+      "file": "characters/staff_b_walk.png",
+      "normal": "characters/staff_b_walk_n.png",
+      "px": [
+        3072,
+        192
+      ],
+      "frame_px": [
+        192,
+        192
+      ],
+      "frames": 16,
+      "game_frame_px": 64.0,
+      "animation": "walk",
+      "source_animation": "Animations/run.fbx (Root.001|Root|Run.002)",
+      "fps_suggested": 12,
+      "loop": true,
+      "origin": "centre",
+      "facing": "+x",
+      "world_scale": 1.5,
+      "game_sprite": "staff_b",
+      "replaces_existing": true,
+      "skin": "humanMaleA recoloured (staff_b)",
+      "source": {
+        "pack": "Animated Characters Retro",
+        "pack_url": "https://kenney.nl/assets/animated-characters-3",
+        "model": "Model/characterMedium.fbx + Animations/run.fbx + Skins/humanMaleA.png",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": "humanMaleA with a pale blue shirt so the two staff read differently Walk uses the pack's run cycle: no walk exists in any Kenney animated pack."
+    },
+    {
+      "id": "worker_hivis_idle",
+      "kind": "character_sheet",
+      "file": "characters/worker_hivis_idle.png",
+      "normal": "characters/worker_hivis_idle_n.png",
+      "px": [
+        1088,
+        136
+      ],
+      "frame_px": [
+        136,
+        136
+      ],
+      "frames": 8,
+      "game_frame_px": 45.3,
+      "animation": "idle",
+      "source_animation": "Animations/idle.fbx (Root.001|Root|Idle.003)",
+      "fps_suggested": 6,
+      "loop": true,
+      "origin": "centre",
+      "facing": "+x",
+      "world_scale": 1.5,
+      "game_sprite": "staff_hivis",
+      "replaces_existing": false,
+      "skin": "humanMaleA recoloured (hivis)",
+      "source": {
+        "pack": "Animated Characters Retro",
+        "pack_url": "https://kenney.nl/assets/animated-characters-3",
+        "model": "Model/characterMedium.fbx + Animations/idle.fbx + Skins/humanMaleA.png",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": "humanMaleA with a hi-vis vest painted onto the skin"
+    },
+    {
+      "id": "worker_hivis_walk",
+      "kind": "character_sheet",
+      "file": "characters/worker_hivis_walk.png",
+      "normal": "characters/worker_hivis_walk_n.png",
+      "px": [
+        3072,
+        192
+      ],
+      "frame_px": [
+        192,
+        192
+      ],
+      "frames": 16,
+      "game_frame_px": 64.0,
+      "animation": "walk",
+      "source_animation": "Animations/run.fbx (Root.001|Root|Run.003)",
+      "fps_suggested": 12,
+      "loop": true,
+      "origin": "centre",
+      "facing": "+x",
+      "world_scale": 1.5,
+      "game_sprite": "staff_hivis",
+      "replaces_existing": false,
+      "skin": "humanMaleA recoloured (hivis)",
+      "source": {
+        "pack": "Animated Characters Retro",
+        "pack_url": "https://kenney.nl/assets/animated-characters-3",
+        "model": "Model/characterMedium.fbx + Animations/run.fbx + Skins/humanMaleA.png",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": "humanMaleA with a hi-vis vest painted onto the skin Walk uses the pack's run cycle: no walk exists in any Kenney animated pack."
+    },
+    {
+      "id": "floor_carpet",
+      "kind": "floor",
+      "file": "floors/floor_carpet.png",
+      "normal": "floors/floor_carpet_n.png",
+      "px": [
+        192,
+        192
+      ],
+      "game_px": [
+        64.0,
+        64.0
+      ],
+      "metres": [
+        2.0,
+        2.0
+      ],
+      "seamless": true,
+      "material": "carpet",
+      "game_floor_kind": "carpet",
+      "source": {
+        "pack": "ambientCG",
+        "pack_url": "https://ambientcg.com/view?id=Carpet012",
+        "model": "Carpet012",
+        "author": "ambientCG (Lennart Demes)",
+        "licence": "CC0 1.0"
+      },
+      "notes": ""
+    },
+    {
+      "id": "floor_concrete",
+      "kind": "floor",
+      "file": "floors/floor_concrete.png",
+      "normal": "floors/floor_concrete_n.png",
+      "px": [
+        288,
+        288
+      ],
+      "game_px": [
+        96.0,
+        96.0
+      ],
+      "metres": [
+        3.0,
+        3.0
+      ],
+      "seamless": true,
+      "material": "concrete",
+      "game_floor_kind": "concrete",
+      "source": {
+        "pack": "ambientCG",
+        "pack_url": "https://ambientcg.com/view?id=Concrete031",
+        "model": "Concrete031",
+        "author": "ambientCG (Lennart Demes)",
+        "licence": "CC0 1.0"
+      },
+      "notes": ""
+    },
+    {
+      "id": "floor_raised",
+      "kind": "floor",
+      "file": "floors/floor_raised.png",
+      "normal": "floors/floor_raised_n.png",
+      "px": [
+        192,
+        192
+      ],
+      "game_px": [
+        64.0,
+        64.0
+      ],
+      "metres": [
+        2.0,
+        2.0
+      ],
+      "seamless": true,
+      "material": "raisedFloor",
+      "game_floor_kind": "raisedFloor",
+      "source": {
+        "pack": "ambientCG",
+        "pack_url": "https://ambientcg.com/view?id=Tiles040",
+        "model": "Tiles040",
+        "author": "ambientCG (Lennart Demes)",
+        "licence": "CC0 1.0"
+      },
+      "notes": "600 mm panels scaled to a 0.5 m grid so the texture repeats cleanly"
+    },
+    {
+      "id": "floor_tarmac",
+      "kind": "floor",
+      "file": "floors/floor_tarmac.png",
+      "normal": "floors/floor_tarmac_n.png",
+      "px": [
+        288,
+        288
+      ],
+      "game_px": [
+        96.0,
+        96.0
+      ],
+      "metres": [
+        3.0,
+        3.0
+      ],
+      "seamless": true,
+      "material": "tarmac",
+      "game_floor_kind": "tarmac",
+      "source": {
+        "pack": "ambientCG",
+        "pack_url": "https://ambientcg.com/view?id=Asphalt033",
+        "model": "Asphalt033",
+        "author": "ambientCG (Lennart Demes)",
+        "licence": "CC0 1.0"
+      },
+      "notes": "new kind: the car park surface. concrete stays for docks and plant rooms"
+    },
+    {
+      "id": "floor_tile",
+      "kind": "floor",
+      "file": "floors/floor_tile.png",
+      "normal": "floors/floor_tile_n.png",
+      "px": [
+        192,
+        192
+      ],
+      "game_px": [
+        64.0,
+        64.0
+      ],
+      "metres": [
+        2.0,
+        2.0
+      ],
+      "seamless": true,
+      "material": "hardTile",
+      "game_floor_kind": "hardTile",
+      "source": {
+        "pack": "ambientCG",
+        "pack_url": "https://ambientcg.com/view?id=Tiles141",
+        "model": "Tiles141",
+        "author": "ambientCG (Lennart Demes)",
+        "licence": "CC0 1.0"
+      },
+      "notes": ""
+    },
+    {
+      "id": "barrier",
+      "kind": "prop",
+      "file": "props/barrier.png",
+      "normal": "props/barrier_n.png",
+      "px": [
+        90,
+        142
+      ],
+      "game_px": [
+        30.0,
+        47.3
+      ],
+      "metres": [
+        0.813,
+        1.35
+      ],
+      "height_m": 0.78,
+      "origin": "centre",
+      "game_prop": "env_barrier",
+      "replaces_existing": true,
+      "sites": [
+        "building-c",
+        "warehouse"
+      ],
+      "source": {
+        "pack": "City Kit (Roads)",
+        "pack_url": "https://kenney.nl/assets/city-kit-roads",
+        "model": "Models/GLB format/construction-barrier.glb",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": ""
+    },
+    {
+      "id": "bin",
+      "kind": "prop",
+      "file": "props/bin.png",
+      "normal": "props/bin_n.png",
+      "px": [
+        52,
+        57
+      ],
+      "game_px": [
+        17.3,
+        19.0
+      ],
+      "metres": [
+        0.415,
+        0.468
+      ],
+      "height_m": 0.856,
+      "origin": "centre",
+      "game_prop": "prop_bin",
+      "replaces_existing": true,
+      "sites": [
+        "building-c",
+        "data-centre",
+        "warehouse"
+      ],
+      "source": {
+        "pack": "Furniture Kit",
+        "pack_url": "https://kenney.nl/assets/furniture-kit",
+        "model": "Models/GLTF format/trashcan.glb",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": ""
+    },
+    {
+      "id": "bollard",
+      "kind": "prop",
+      "file": "props/bollard.png",
+      "normal": "props/bollard_n.png",
+      "px": [
+        39,
+        39
+      ],
+      "game_px": [
+        13.0,
+        13.0
+      ],
+      "metres": [
+        0.28,
+        0.28
+      ],
+      "height_m": 1.04,
+      "origin": "centre",
+      "game_prop": "env_bollard",
+      "replaces_existing": true,
+      "sites": [
+        "building-c",
+        "data-centre",
+        "warehouse"
+      ],
+      "source": {
+        "pack": "Tailgate (original, built from primitives by tools/render)",
+        "pack_url": "https://github.com/craigmccart/tailgate",
+        "model": "bollard modelled from primitives in tools/render/tailgate_render/primitives.py",
+        "author": "CJM Labs",
+        "licence": "CC0 1.0"
+      },
+      "notes": "",
+      "original_work": true
+    },
+    {
+      "id": "bookcase",
+      "kind": "prop",
+      "file": "props/bookcase.png",
+      "normal": "props/bookcase_n.png",
+      "px": [
+        166,
+        60
+      ],
+      "game_px": [
+        55.3,
+        20.0
+      ],
+      "metres": [
+        1.6,
+        0.5
+      ],
+      "height_m": 1.58,
+      "origin": "centre",
+      "game_prop": "prop_shelf_office",
+      "replaces_existing": false,
+      "sites": [
+        "building-c"
+      ],
+      "source": {
+        "pack": "Furniture Kit",
+        "pack_url": "https://kenney.nl/assets/furniture-kit",
+        "model": "Models/GLTF format/bookcaseClosedWide.glb",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": "tall office storage"
+    },
+    {
+      "id": "books",
+      "kind": "prop",
+      "file": "props/books.png",
+      "normal": "props/books_n.png",
+      "px": [
+        41,
+        30
+      ],
+      "game_px": [
+        13.7,
+        10.0
+      ],
+      "metres": [
+        0.301,
+        0.189
+      ],
+      "height_m": 0.208,
+      "origin": "centre",
+      "game_prop": "env_books",
+      "replaces_existing": false,
+      "sites": [
+        "building-c",
+        "data-centre"
+      ],
+      "source": {
+        "pack": "Furniture Kit",
+        "pack_url": "https://kenney.nl/assets/furniture-kit",
+        "model": "Models/GLTF format/books.glb",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": ""
+    },
+    {
+      "id": "box_closed",
+      "kind": "prop",
+      "file": "props/box_closed.png",
+      "normal": "props/box_closed_n.png",
+      "px": [
+        53,
+        53
+      ],
+      "game_px": [
+        17.7,
+        17.7
+      ],
+      "metres": [
+        0.425,
+        0.425
+      ],
+      "height_m": 0.562,
+      "origin": "centre",
+      "game_prop": "env_box",
+      "replaces_existing": false,
+      "sites": [
+        "building-c",
+        "warehouse"
+      ],
+      "source": {
+        "pack": "Furniture Kit",
+        "pack_url": "https://kenney.nl/assets/furniture-kit",
+        "model": "Models/GLTF format/cardboardBoxClosed.glb",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": ""
+    },
+    {
+      "id": "box_open",
+      "kind": "prop",
+      "file": "props/box_open.png",
+      "normal": "props/box_open_n.png",
+      "px": [
+        83,
+        53
+      ],
+      "game_px": [
+        27.7,
+        17.7
+      ],
+      "metres": [
+        0.744,
+        0.425
+      ],
+      "height_m": 0.562,
+      "origin": "centre",
+      "game_prop": "env_box_open",
+      "replaces_existing": false,
+      "sites": [
+        "building-c",
+        "warehouse"
+      ],
+      "source": {
+        "pack": "Furniture Kit",
+        "pack_url": "https://kenney.nl/assets/furniture-kit",
+        "model": "Models/GLTF format/cardboardBoxOpen.glb",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": ""
+    },
+    {
+      "id": "cabinet",
+      "kind": "prop",
+      "file": "props/cabinet.png",
+      "normal": "props/cabinet_n.png",
+      "px": [
+        166,
+        62
+      ],
+      "game_px": [
+        55.3,
+        20.7
+      ],
+      "metres": [
+        1.6,
+        0.52
+      ],
+      "height_m": 0.62,
+      "origin": "centre",
+      "game_prop": "prop_cabinet",
+      "replaces_existing": true,
+      "sites": [
+        "building-c",
+        "data-centre",
+        "warehouse"
+      ],
+      "source": {
+        "pack": "Furniture Kit",
+        "pack_url": "https://kenney.nl/assets/furniture-kit",
+        "model": "Models/GLTF format/cabinetTelevisionDoors.glb",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": "low two-door cabinet, reads as a filing credenza from above"
+    },
+    {
+      "id": "car_hatchback",
+      "kind": "prop",
+      "file": "props/car_hatchback.png",
+      "normal": "props/car_hatchback_n.png",
+      "px": [
+        262,
+        559
+      ],
+      "game_px": [
+        87.3,
+        186.3
+      ],
+      "metres": [
+        2.6,
+        5.7
+      ],
+      "height_m": 2.2,
+      "origin": "centre",
+      "game_prop": "env_car_hatchback",
+      "replaces_existing": false,
+      "sites": [
+        "building-c",
+        "data-centre",
+        "warehouse"
+      ],
+      "source": {
+        "pack": "Car Kit",
+        "pack_url": "https://kenney.nl/assets/car-kit",
+        "model": "Models/GLB format/hatchback-sports.glb",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": ""
+    },
+    {
+      "id": "car_sedan",
+      "kind": "prop",
+      "file": "props/car_sedan.png",
+      "normal": "props/car_sedan_n.png",
+      "px": [
+        300,
+        502
+      ],
+      "game_px": [
+        100.0,
+        167.3
+      ],
+      "metres": [
+        3.0,
+        5.1
+      ],
+      "height_m": 2.6,
+      "origin": "centre",
+      "game_prop": "env_car_sedan",
+      "replaces_existing": false,
+      "sites": [
+        "building-c",
+        "data-centre",
+        "warehouse"
+      ],
+      "source": {
+        "pack": "Car Kit",
+        "pack_url": "https://kenney.nl/assets/car-kit",
+        "model": "Models/GLB format/sedan.glb",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": ""
+    },
+    {
+      "id": "car_suv",
+      "kind": "prop",
+      "file": "props/car_suv.png",
+      "normal": "props/car_suv_n.png",
+      "px": [
+        300,
+        530
+      ],
+      "game_px": [
+        100.0,
+        176.7
+      ],
+      "metres": [
+        3.0,
+        5.4
+      ],
+      "height_m": 2.6,
+      "origin": "centre",
+      "game_prop": "env_car_suv",
+      "replaces_existing": false,
+      "sites": [
+        "building-c",
+        "data-centre",
+        "warehouse"
+      ],
+      "source": {
+        "pack": "Car Kit",
+        "pack_url": "https://kenney.nl/assets/car-kit",
+        "model": "Models/GLB format/suv.glb",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": ""
+    },
+    {
+      "id": "chair",
+      "kind": "prop",
+      "file": "props/chair.png",
+      "normal": "props/chair_n.png",
+      "px": [
+        50,
+        50
+      ],
+      "game_px": [
+        16.7,
+        16.7
+      ],
+      "metres": [
+        0.4,
+        0.4
+      ],
+      "height_m": 0.94,
+      "origin": "centre",
+      "game_prop": "env_chair_plain",
+      "replaces_existing": false,
+      "sites": [
+        "building-c"
+      ],
+      "source": {
+        "pack": "Furniture Kit",
+        "pack_url": "https://kenney.nl/assets/furniture-kit",
+        "model": "Models/GLTF format/chair.glb",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": "kitchen chair"
+    },
+    {
+      "id": "chair_desk",
+      "kind": "prop",
+      "file": "props/chair_desk.png",
+      "normal": "props/chair_desk_n.png",
+      "px": [
+        76,
+        72
+      ],
+      "game_px": [
+        25.3,
+        24.0
+      ],
+      "metres": [
+        0.67,
+        0.629
+      ],
+      "height_m": 1.215,
+      "origin": "centre",
+      "game_prop": "env_chair",
+      "replaces_existing": true,
+      "sites": [
+        "building-c",
+        "data-centre",
+        "warehouse"
+      ],
+      "source": {
+        "pack": "Furniture Kit",
+        "pack_url": "https://kenney.nl/assets/furniture-kit",
+        "model": "Models/GLTF format/chairDesk.glb",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": "swivel office chair; seat fabric lifted to a mid grey-blue and the frame lightened so it reads as a chair, not a block, from above"
+    },
+    {
+      "id": "coat_rack",
+      "kind": "prop",
+      "file": "props/coat_rack.png",
+      "normal": "props/coat_rack_n.png",
+      "px": [
+        64,
+        64
+      ],
+      "game_px": [
+        21.3,
+        21.3
+      ],
+      "metres": [
+        0.546,
+        0.546
+      ],
+      "height_m": 1.54,
+      "origin": "centre",
+      "game_prop": "env_coat_rack",
+      "replaces_existing": false,
+      "sites": [
+        "building-c"
+      ],
+      "source": {
+        "pack": "Furniture Kit",
+        "pack_url": "https://kenney.nl/assets/furniture-kit",
+        "model": "Models/GLTF format/coatRackStanding.glb",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": ""
+    },
+    {
+      "id": "coffee_machine",
+      "kind": "prop",
+      "file": "props/coffee_machine.png",
+      "normal": "props/coffee_machine_n.png",
+      "px": [
+        48,
+        58
+      ],
+      "game_px": [
+        16.0,
+        19.3
+      ],
+      "metres": [
+        0.379,
+        0.48
+      ],
+      "height_m": 0.355,
+      "origin": "centre",
+      "game_prop": "env_coffee_machine",
+      "replaces_existing": false,
+      "sites": [
+        "building-c",
+        "warehouse"
+      ],
+      "source": {
+        "pack": "Furniture Kit",
+        "pack_url": "https://kenney.nl/assets/furniture-kit",
+        "model": "Models/GLTF format/kitchenCoffeeMachine.glb",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": ""
+    },
+    {
+      "id": "coffee_table",
+      "kind": "prop",
+      "file": "props/coffee_table.png",
+      "normal": "props/coffee_table_n.png",
+      "px": [
+        139,
+        89
+      ],
+      "game_px": [
+        46.3,
+        29.7
+      ],
+      "metres": [
+        1.322,
+        0.8
+      ],
+      "height_m": 0.46,
+      "origin": "centre",
+      "game_prop": "env_coffee_table",
+      "replaces_existing": false,
+      "sites": [
+        "building-c",
+        "data-centre"
+      ],
+      "source": {
+        "pack": "Furniture Kit",
+        "pack_url": "https://kenney.nl/assets/furniture-kit",
+        "model": "Models/GLTF format/tableCoffee.glb",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": ""
+    },
+    {
+      "id": "cone",
+      "kind": "prop",
+      "file": "props/cone.png",
+      "normal": "props/cone_n.png",
+      "px": [
+        41,
+        41
+      ],
+      "game_px": [
+        13.7,
+        13.7
+      ],
+      "metres": [
+        0.3,
+        0.3
+      ],
+      "height_m": 0.306,
+      "origin": "centre",
+      "game_prop": "env_cone",
+      "replaces_existing": false,
+      "sites": [
+        "building-c",
+        "warehouse"
+      ],
+      "source": {
+        "pack": "Factory Kit",
+        "pack_url": "https://kenney.nl/assets/factory-kit",
+        "model": "Models/GLB format/cone.glb",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": ""
+    },
+    {
+      "id": "cone_road",
+      "kind": "prop",
+      "file": "props/cone_road.png",
+      "normal": "props/cone_road_n.png",
+      "px": [
+        55,
+        55
+      ],
+      "game_px": [
+        18.3,
+        18.3
+      ],
+      "metres": [
+        0.45,
+        0.45
+      ],
+      "height_m": 0.562,
+      "origin": "centre",
+      "game_prop": "env_cone_road",
+      "replaces_existing": false,
+      "sites": [
+        "building-c",
+        "data-centre",
+        "warehouse"
+      ],
+      "source": {
+        "pack": "City Kit (Roads)",
+        "pack_url": "https://kenney.nl/assets/city-kit-roads",
+        "model": "Models/GLB format/construction-cone.glb",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": ""
+    },
+    {
+      "id": "container",
+      "kind": "prop",
+      "file": "props/container.png",
+      "normal": "props/container_n.png",
+      "px": [
+        262,
+        565
+      ],
+      "game_px": [
+        87.3,
+        188.3
+      ],
+      "metres": [
+        2.608,
+        5.758
+      ],
+      "height_m": 2.437,
+      "origin": "centre",
+      "game_prop": "env_container",
+      "replaces_existing": false,
+      "sites": [
+        "warehouse",
+        "data-centre"
+      ],
+      "source": {
+        "pack": "City Kit (Industrial)",
+        "pack_url": "https://kenney.nl/assets/city-kit-industrial",
+        "model": "Models/GLB format/shipping-container-a.glb",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": ""
+    },
+    {
+      "id": "conveyor",
+      "kind": "prop",
+      "file": "props/conveyor.png",
+      "normal": "props/conveyor_n.png",
+      "px": [
+        204,
+        108
+      ],
+      "game_px": [
+        68.0,
+        36.0
+      ],
+      "metres": [
+        2.0,
+        1.0
+      ],
+      "height_m": 0.4,
+      "origin": "centre",
+      "game_prop": "env_conveyor",
+      "replaces_existing": false,
+      "sites": [
+        "warehouse"
+      ],
+      "source": {
+        "pack": "Factory Kit",
+        "pack_url": "https://kenney.nl/assets/factory-kit",
+        "model": "Models/GLB format/conveyor-long.glb",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": ""
+    },
+    {
+      "id": "copier",
+      "kind": "prop",
+      "file": "props/copier.png",
+      "normal": "props/copier_n.png",
+      "px": [
+        112,
+        78
+      ],
+      "game_px": [
+        37.3,
+        26.0
+      ],
+      "metres": [
+        1.04,
+        0.69
+      ],
+      "height_m": 1.04,
+      "origin": "centre",
+      "game_prop": "env_copier",
+      "replaces_existing": true,
+      "sites": [
+        "building-c",
+        "data-centre",
+        "warehouse"
+      ],
+      "source": {
+        "pack": "Tailgate (original, built from primitives by tools/render)",
+        "pack_url": "https://github.com/craigmccart/tailgate",
+        "model": "copier modelled from primitives in tools/render/tailgate_render/primitives.py",
+        "author": "CJM Labs",
+        "licence": "CC0 1.0"
+      },
+      "notes": "",
+      "original_work": true
+    },
+    {
+      "id": "counter",
+      "kind": "prop",
+      "file": "props/counter.png",
+      "normal": "props/counter_n.png",
+      "px": [
+        95,
+        98
+      ],
+      "game_px": [
+        31.7,
+        32.7
+      ],
+      "metres": [
+        0.86,
+        0.9
+      ],
+      "height_m": 0.9,
+      "origin": "centre",
+      "game_prop": "prop_counter",
+      "replaces_existing": true,
+      "sites": [
+        "building-c",
+        "data-centre",
+        "warehouse"
+      ],
+      "source": {
+        "pack": "Furniture Kit",
+        "pack_url": "https://kenney.nl/assets/furniture-kit",
+        "model": "Models/GLTF format/kitchenCabinet.glb",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": "base unit with worktop"
+    },
+    {
+      "id": "counter_sink",
+      "kind": "prop",
+      "file": "props/counter_sink.png",
+      "normal": "props/counter_sink_n.png",
+      "px": [
+        95,
+        98
+      ],
+      "game_px": [
+        31.7,
+        32.7
+      ],
+      "metres": [
+        0.86,
+        0.9
+      ],
+      "height_m": 0.98,
+      "origin": "centre",
+      "game_prop": "prop_counter_alt",
+      "replaces_existing": true,
+      "sites": [
+        "building-c",
+        "data-centre",
+        "warehouse"
+      ],
+      "source": {
+        "pack": "Furniture Kit",
+        "pack_url": "https://kenney.nl/assets/furniture-kit",
+        "model": "Models/GLTF format/kitchenSink.glb",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": ""
+    },
+    {
+      "id": "crate",
+      "kind": "prop",
+      "file": "props/crate.png",
+      "normal": "props/crate_n.png",
+      "px": [
+        118,
+        108
+      ],
+      "game_px": [
+        39.3,
+        36.0
+      ],
+      "metres": [
+        1.1,
+        1.0
+      ],
+      "height_m": 0.55,
+      "origin": "centre",
+      "game_prop": "prop_crate",
+      "replaces_existing": true,
+      "sites": [
+        "building-c",
+        "data-centre",
+        "warehouse"
+      ],
+      "source": {
+        "pack": "Factory Kit",
+        "pack_url": "https://kenney.nl/assets/factory-kit",
+        "model": "Models/GLB format/box-large.glb",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": ""
+    },
+    {
+      "id": "crate_long",
+      "kind": "prop",
+      "file": "props/crate_long.png",
+      "normal": "props/crate_long_n.png",
+      "px": [
+        118,
+        60
+      ],
+      "game_px": [
+        39.3,
+        20.0
+      ],
+      "metres": [
+        1.1,
+        0.5
+      ],
+      "height_m": 0.55,
+      "origin": "centre",
+      "game_prop": "prop_crate_long",
+      "replaces_existing": false,
+      "sites": [
+        "warehouse"
+      ],
+      "source": {
+        "pack": "Factory Kit",
+        "pack_url": "https://kenney.nl/assets/factory-kit",
+        "model": "Models/GLB format/box-long.glb",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": ""
+    },
+    {
+      "id": "crate_small",
+      "kind": "prop",
+      "file": "props/crate_small.png",
+      "normal": "props/crate_small_n.png",
+      "px": [
+        69,
+        60
+      ],
+      "game_px": [
+        23.0,
+        20.0
+      ],
+      "metres": [
+        0.595,
+        0.5
+      ],
+      "height_m": 0.55,
+      "origin": "centre",
+      "game_prop": "prop_crate_small",
+      "replaces_existing": false,
+      "sites": [
+        "warehouse"
+      ],
+      "source": {
+        "pack": "Factory Kit",
+        "pack_url": "https://kenney.nl/assets/factory-kit",
+        "model": "Models/GLB format/box-small.glb",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": ""
+    },
+    {
+      "id": "desk",
+      "kind": "prop",
+      "file": "props/desk.png",
+      "normal": "props/desk_n.png",
+      "px": [
+        153,
+        87
+      ],
+      "game_px": [
+        51.0,
+        29.0
+      ],
+      "metres": [
+        1.469,
+        0.785
+      ],
+      "height_m": 0.769,
+      "origin": "centre",
+      "game_prop": "prop_desk",
+      "replaces_existing": true,
+      "sites": [
+        "building-c",
+        "data-centre",
+        "warehouse"
+      ],
+      "source": {
+        "pack": "Furniture Kit",
+        "pack_url": "https://kenney.nl/assets/furniture-kit",
+        "model": "Models/GLTF format/desk.glb",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": "1.44 m office desk, drawer pedestal on the right"
+    },
+    {
+      "id": "desk_corner",
+      "kind": "prop",
+      "file": "props/desk_corner.png",
+      "normal": "props/desk_corner_n.png",
+      "px": [
+        199,
+        199
+      ],
+      "game_px": [
+        66.3,
+        66.3
+      ],
+      "metres": [
+        1.949,
+        1.949
+      ],
+      "height_m": 0.769,
+      "origin": "centre",
+      "game_prop": "prop_desk_corner",
+      "replaces_existing": false,
+      "sites": [
+        "building-c"
+      ],
+      "source": {
+        "pack": "Furniture Kit",
+        "pack_url": "https://kenney.nl/assets/furniture-kit",
+        "model": "Models/GLTF format/deskCorner.glb",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": "L-shaped corner desk"
+    },
+    {
+      "id": "desk_lamp",
+      "kind": "prop",
+      "file": "props/desk_lamp.png",
+      "normal": "props/desk_lamp_n.png",
+      "px": [
+        35,
+        35
+      ],
+      "game_px": [
+        11.7,
+        11.7
+      ],
+      "metres": [
+        0.24,
+        0.24
+      ],
+      "height_m": 0.58,
+      "origin": "centre",
+      "game_prop": "env_desk_lamp",
+      "replaces_existing": false,
+      "sites": [
+        "building-c",
+        "data-centre"
+      ],
+      "source": {
+        "pack": "Furniture Kit",
+        "pack_url": "https://kenney.nl/assets/furniture-kit",
+        "model": "Models/GLTF format/lampSquareTable.glb",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": "the fixture under each desk pool light"
+    },
+    {
+      "id": "desk_small",
+      "kind": "prop",
+      "file": "props/desk_small.png",
+      "normal": "props/desk_small_n.png",
+      "px": [
+        174,
+        98
+      ],
+      "game_px": [
+        58.0,
+        32.7
+      ],
+      "metres": [
+        1.683,
+        0.895
+      ],
+      "height_m": 0.653,
+      "origin": "centre",
+      "game_prop": "prop_desk_small",
+      "replaces_existing": true,
+      "sites": [
+        "building-c",
+        "warehouse"
+      ],
+      "source": {
+        "pack": "Furniture Kit",
+        "pack_url": "https://kenney.nl/assets/furniture-kit",
+        "model": "Models/GLTF format/table.glb",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": "plain table, used as the small desk"
+    },
+    {
+      "id": "dock_leveller",
+      "kind": "prop",
+      "file": "props/dock_leveller.png",
+      "normal": "props/dock_leveller_n.png",
+      "px": [
+        219,
+        258
+      ],
+      "game_px": [
+        73.0,
+        86.0
+      ],
+      "metres": [
+        2.16,
+        2.56
+      ],
+      "height_m": 0.09,
+      "origin": "centre",
+      "game_prop": "env_dock_leveller",
+      "replaces_existing": false,
+      "sites": [
+        "building-c",
+        "data-centre",
+        "warehouse"
+      ],
+      "source": {
+        "pack": "Tailgate (original, built from primitives by tools/render)",
+        "pack_url": "https://github.com/craigmccart/tailgate",
+        "model": "dock_leveller modelled from primitives in tools/render/tailgate_render/primitives.py",
+        "author": "CJM Labs",
+        "licence": "CC0 1.0"
+      },
+      "notes": "",
+      "original_work": true
+    },
+    {
+      "id": "dumpster",
+      "kind": "prop",
+      "file": "props/dumpster.png",
+      "normal": "props/dumpster_n.png",
+      "px": [
+        170,
+        225
+      ],
+      "game_px": [
+        56.7,
+        75.0
+      ],
+      "metres": [
+        1.65,
+        2.22
+      ],
+      "height_m": 1.257,
+      "origin": "centre",
+      "game_prop": "env_dumpster",
+      "replaces_existing": false,
+      "sites": [
+        "building-c",
+        "warehouse"
+      ],
+      "source": {
+        "pack": "City Kit (Roads)",
+        "pack_url": "https://kenney.nl/assets/city-kit-roads",
+        "model": "Models/GLB format/dumpster.glb",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": "wheelie bin sized; the skip is a primitive"
+    },
+    {
+      "id": "freezer",
+      "kind": "prop",
+      "file": "props/freezer.png",
+      "normal": "props/freezer_n.png",
+      "px": [
+        127,
+        98
+      ],
+      "game_px": [
+        42.3,
+        32.7
+      ],
+      "metres": [
+        1.2,
+        0.9
+      ],
+      "height_m": 0.525,
+      "origin": "centre",
+      "game_prop": "env_vending",
+      "replaces_existing": false,
+      "sites": [
+        "building-c",
+        "warehouse"
+      ],
+      "source": {
+        "pack": "Mini Market",
+        "pack_url": "https://kenney.nl/assets/mini-market",
+        "model": "Models/GLB format/freezer.glb",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": "reads as a vending or chiller unit"
+    },
+    {
+      "id": "fridge",
+      "kind": "prop",
+      "file": "props/fridge.png",
+      "normal": "props/fridge_n.png",
+      "px": [
+        95,
+        68
+      ],
+      "game_px": [
+        31.7,
+        22.7
+      ],
+      "metres": [
+        0.86,
+        0.584
+      ],
+      "height_m": 1.84,
+      "origin": "centre",
+      "game_prop": "env_fridge",
+      "replaces_existing": false,
+      "sites": [
+        "building-c",
+        "warehouse"
+      ],
+      "source": {
+        "pack": "Furniture Kit",
+        "pack_url": "https://kenney.nl/assets/furniture-kit",
+        "model": "Models/GLTF format/kitchenFridge.glb",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": ""
+    },
+    {
+      "id": "hopper",
+      "kind": "prop",
+      "file": "props/hopper.png",
+      "normal": "props/hopper_n.png",
+      "px": [
+        119,
+        119
+      ],
+      "game_px": [
+        39.7,
+        39.7
+      ],
+      "metres": [
+        1.117,
+        1.117
+      ],
+      "height_m": 1.0,
+      "origin": "centre",
+      "game_prop": "env_hopper",
+      "replaces_existing": false,
+      "sites": [
+        "warehouse"
+      ],
+      "source": {
+        "pack": "Factory Kit",
+        "pack_url": "https://kenney.nl/assets/factory-kit",
+        "model": "Models/GLB format/hopper-square.glb",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": ""
+    },
+    {
+      "id": "keyboard",
+      "kind": "prop",
+      "file": "props/keyboard.png",
+      "normal": "props/keyboard_n.png",
+      "px": [
+        66,
+        35
+      ],
+      "game_px": [
+        22.0,
+        11.7
+      ],
+      "metres": [
+        0.564,
+        0.236
+      ],
+      "height_m": 0.055,
+      "origin": "centre",
+      "game_prop": "env_keyboard",
+      "replaces_existing": false,
+      "sites": [
+        "building-c",
+        "data-centre"
+      ],
+      "source": {
+        "pack": "Furniture Kit",
+        "pack_url": "https://kenney.nl/assets/furniture-kit",
+        "model": "Models/GLTF format/computerKeyboard.glb",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": ""
+    },
+    {
+      "id": "lamp_post",
+      "kind": "prop",
+      "file": "props/lamp_post.png",
+      "normal": "props/lamp_post_n.png",
+      "px": [
+        41,
+        149
+      ],
+      "game_px": [
+        13.7,
+        49.7
+      ],
+      "metres": [
+        0.3,
+        1.425
+      ],
+      "height_m": 3.6,
+      "origin": "centre",
+      "game_prop": "env_lamp_post",
+      "replaces_existing": false,
+      "sites": [
+        "building-c",
+        "data-centre",
+        "warehouse"
+      ],
+      "source": {
+        "pack": "City Kit (Roads)",
+        "pack_url": "https://kenney.nl/assets/city-kit-roads",
+        "model": "Models/GLB format/light-square.glb",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": "car park lamp; its pool of light is a map light, not baked"
+    },
+    {
+      "id": "laptop",
+      "kind": "prop",
+      "file": "props/laptop.png",
+      "normal": "props/laptop_n.png",
+      "px": [
+        63,
+        58
+      ],
+      "game_px": [
+        21.0,
+        19.3
+      ],
+      "metres": [
+        0.528,
+        0.48
+      ],
+      "height_m": 0.324,
+      "origin": "centre",
+      "game_prop": "env_laptop",
+      "replaces_existing": false,
+      "sites": [
+        "building-c",
+        "data-centre"
+      ],
+      "source": {
+        "pack": "Furniture Kit",
+        "pack_url": "https://kenney.nl/assets/furniture-kit",
+        "model": "Models/GLTF format/laptop.glb",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": ""
+    },
+    {
+      "id": "machine",
+      "kind": "prop",
+      "file": "props/machine.png",
+      "normal": "props/machine_n.png",
+      "px": [
+        127,
+        156
+      ],
+      "game_px": [
+        42.3,
+        52.0
+      ],
+      "metres": [
+        1.2,
+        1.5
+      ],
+      "height_m": 1.3,
+      "origin": "centre",
+      "game_prop": "env_plant_machine",
+      "replaces_existing": false,
+      "sites": [
+        "data-centre",
+        "warehouse"
+      ],
+      "source": {
+        "pack": "Factory Kit",
+        "pack_url": "https://kenney.nl/assets/factory-kit",
+        "model": "Models/GLB format/machine.glb",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": "plant room unit"
+    },
+    {
+      "id": "monitor",
+      "kind": "prop",
+      "file": "props/monitor.png",
+      "normal": "props/monitor_n.png",
+      "px": [
+        87,
+        32
+      ],
+      "game_px": [
+        29.0,
+        10.7
+      ],
+      "metres": [
+        0.785,
+        0.208
+      ],
+      "height_m": 0.589,
+      "origin": "centre",
+      "game_prop": "env_monitor",
+      "replaces_existing": true,
+      "sites": [
+        "building-c",
+        "data-centre",
+        "warehouse"
+      ],
+      "source": {
+        "pack": "Furniture Kit",
+        "pack_url": "https://kenney.nl/assets/furniture-kit",
+        "model": "Models/GLTF format/computerScreen.glb",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": ""
+    },
+    {
+      "id": "palisade_fence",
+      "kind": "prop",
+      "file": "props/palisade_fence.png",
+      "normal": "props/palisade_fence_n.png",
+      "px": [
+        286,
+        22
+      ],
+      "game_px": [
+        95.3,
+        7.3
+      ],
+      "metres": [
+        2.85,
+        0.1
+      ],
+      "height_m": 2.4,
+      "origin": "centre",
+      "game_prop": "prop_fence",
+      "replaces_existing": true,
+      "sites": [
+        "building-c",
+        "data-centre",
+        "warehouse"
+      ],
+      "source": {
+        "pack": "Tailgate (original, built from primitives by tools/render)",
+        "pack_url": "https://github.com/craigmccart/tailgate",
+        "model": "palisade_fence modelled from primitives in tools/render/tailgate_render/primitives.py",
+        "author": "CJM Labs",
+        "licence": "CC0 1.0"
+      },
+      "notes": "one 2.75 m bay with a post at each end",
+      "original_work": true
+    },
+    {
+      "id": "plant",
+      "kind": "prop",
+      "file": "props/plant.png",
+      "normal": "props/plant_n.png",
+      "px": [
+        53,
+        58
+      ],
+      "game_px": [
+        17.7,
+        19.3
+      ],
+      "metres": [
+        0.424,
+        0.483
+      ],
+      "height_m": 1.308,
+      "origin": "centre",
+      "game_prop": "env_plant",
+      "replaces_existing": false,
+      "sites": [
+        "building-c",
+        "data-centre"
+      ],
+      "source": {
+        "pack": "Furniture Kit",
+        "pack_url": "https://kenney.nl/assets/furniture-kit",
+        "model": "Models/GLTF format/pottedPlant.glb",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": ""
+    },
+    {
+      "id": "plant_small",
+      "kind": "prop",
+      "file": "props/plant_small.png",
+      "normal": "props/plant_small_n.png",
+      "px": [
+        30,
+        30
+      ],
+      "game_px": [
+        10.0,
+        10.0
+      ],
+      "metres": [
+        0.189,
+        0.189
+      ],
+      "height_m": 0.28,
+      "origin": "centre",
+      "game_prop": "env_plant_small",
+      "replaces_existing": false,
+      "sites": [
+        "building-c",
+        "data-centre"
+      ],
+      "source": {
+        "pack": "Furniture Kit",
+        "pack_url": "https://kenney.nl/assets/furniture-kit",
+        "model": "Models/GLTF format/plantSmall2.glb",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": ""
+    },
+    {
+      "id": "reception_desk",
+      "kind": "prop",
+      "file": "props/reception_desk.png",
+      "normal": "props/reception_desk_n.png",
+      "px": [
+        253,
+        210
+      ],
+      "game_px": [
+        84.3,
+        70.0
+      ],
+      "metres": [
+        2.51,
+        2.06
+      ],
+      "height_m": 1.15,
+      "origin": "centre",
+      "game_prop": "env_reception_desk",
+      "replaces_existing": false,
+      "sites": [
+        "building-c",
+        "data-centre",
+        "warehouse"
+      ],
+      "source": {
+        "pack": "Tailgate (original, built from primitives by tools/render)",
+        "pack_url": "https://github.com/craigmccart/tailgate",
+        "model": "reception_desk modelled from primitives in tools/render/tailgate_render/primitives.py",
+        "author": "CJM Labs",
+        "licence": "CC0 1.0"
+      },
+      "notes": "",
+      "original_work": true
+    },
+    {
+      "id": "roller_shutter",
+      "kind": "prop",
+      "file": "props/roller_shutter.png",
+      "normal": "props/roller_shutter_n.png",
+      "px": [
+        300,
+        166
+      ],
+      "game_px": [
+        100.0,
+        55.3
+      ],
+      "metres": [
+        3.0,
+        1.6
+      ],
+      "height_m": 0.4,
+      "origin": "centre",
+      "game_prop": "env_roller_shutter",
+      "replaces_existing": false,
+      "sites": [
+        "building-c",
+        "data-centre",
+        "warehouse"
+      ],
+      "source": {
+        "pack": "Tailgate (original, built from primitives by tools/render)",
+        "pack_url": "https://github.com/craigmccart/tailgate",
+        "model": "roller_shutter modelled from primitives in tools/render/tailgate_render/primitives.py",
+        "author": "CJM Labs",
+        "licence": "CC0 1.0"
+      },
+      "notes": "3 m shutter in plan: housing plus flattened slats",
+      "original_work": true
+    },
+    {
+      "id": "server_rack",
+      "kind": "prop",
+      "file": "props/server_rack.png",
+      "normal": "props/server_rack_n.png",
+      "px": [
+        72,
+        110
+      ],
+      "game_px": [
+        24.0,
+        36.7
+      ],
+      "metres": [
+        0.62,
+        1.02
+      ],
+      "height_m": 2.061,
+      "origin": "centre",
+      "game_prop": "prop_server",
+      "replaces_existing": true,
+      "sites": [
+        "building-c",
+        "data-centre",
+        "warehouse"
+      ],
+      "source": {
+        "pack": "Tailgate (original, built from primitives by tools/render)",
+        "pack_url": "https://github.com/craigmccart/tailgate",
+        "model": "server_rack modelled from primitives in tools/render/tailgate_render/primitives.py",
+        "author": "CJM Labs",
+        "licence": "CC0 1.0"
+      },
+      "notes": "42U rack, amber and white status LEDs along the front top edge",
+      "original_work": true
+    },
+    {
+      "id": "server_rack_alt",
+      "kind": "prop",
+      "file": "props/server_rack_alt.png",
+      "normal": "props/server_rack_alt_n.png",
+      "px": [
+        72,
+        110
+      ],
+      "game_px": [
+        24.0,
+        36.7
+      ],
+      "metres": [
+        0.62,
+        1.02
+      ],
+      "height_m": 2.061,
+      "origin": "centre",
+      "game_prop": "prop_server_alt",
+      "replaces_existing": true,
+      "sites": [
+        "building-c",
+        "data-centre",
+        "warehouse"
+      ],
+      "source": {
+        "pack": "Tailgate (original, built from primitives by tools/render)",
+        "pack_url": "https://github.com/craigmccart/tailgate",
+        "model": "server_rack_alt modelled from primitives in tools/render/tailgate_render/primitives.py",
+        "author": "CJM Labs",
+        "licence": "CC0 1.0"
+      },
+      "notes": "same rack, mesh door and a different LED pattern",
+      "original_work": true
+    },
+    {
+      "id": "shelf",
+      "kind": "prop",
+      "file": "props/shelf.png",
+      "normal": "props/shelf_n.png",
+      "px": [
+        127,
+        113
+      ],
+      "game_px": [
+        42.3,
+        37.7
+      ],
+      "metres": [
+        1.2,
+        1.05
+      ],
+      "height_m": 1.275,
+      "origin": "centre",
+      "game_prop": "prop_shelf",
+      "replaces_existing": true,
+      "sites": [
+        "warehouse",
+        "building-c"
+      ],
+      "source": {
+        "pack": "Mini Market",
+        "pack_url": "https://kenney.nl/assets/mini-market",
+        "model": "Models/GLB format/shelf-boxes.glb",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": "stocked racking bay"
+    },
+    {
+      "id": "shelf_alt",
+      "kind": "prop",
+      "file": "props/shelf_alt.png",
+      "normal": "props/shelf_alt_n.png",
+      "px": [
+        127,
+        113
+      ],
+      "game_px": [
+        42.3,
+        37.7
+      ],
+      "metres": [
+        1.2,
+        1.05
+      ],
+      "height_m": 1.339,
+      "origin": "centre",
+      "game_prop": "prop_shelf_alt",
+      "replaces_existing": true,
+      "sites": [
+        "warehouse",
+        "building-c"
+      ],
+      "source": {
+        "pack": "Mini Market",
+        "pack_url": "https://kenney.nl/assets/mini-market",
+        "model": "Models/GLB format/shelf-bags.glb",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": ""
+    },
+    {
+      "id": "shelf_end",
+      "kind": "prop",
+      "file": "props/shelf_end.png",
+      "normal": "props/shelf_end_n.png",
+      "px": [
+        127,
+        70
+      ],
+      "game_px": [
+        42.3,
+        23.3
+      ],
+      "metres": [
+        1.2,
+        0.6
+      ],
+      "height_m": 1.575,
+      "origin": "centre",
+      "game_prop": "prop_shelf_end",
+      "replaces_existing": false,
+      "sites": [
+        "warehouse"
+      ],
+      "source": {
+        "pack": "Mini Market",
+        "pack_url": "https://kenney.nl/assets/mini-market",
+        "model": "Models/GLB format/shelf-end.glb",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": ""
+    },
+    {
+      "id": "skip",
+      "kind": "prop",
+      "file": "props/skip.png",
+      "normal": "props/skip_n.png",
+      "px": [
+        242,
+        162
+      ],
+      "game_px": [
+        80.7,
+        54.0
+      ],
+      "metres": [
+        2.4,
+        1.56
+      ],
+      "height_m": 1.23,
+      "origin": "centre",
+      "game_prop": "env_skip",
+      "replaces_existing": false,
+      "sites": [
+        "building-c",
+        "warehouse"
+      ],
+      "source": {
+        "pack": "Tailgate (original, built from primitives by tools/render)",
+        "pack_url": "https://github.com/craigmccart/tailgate",
+        "model": "skip modelled from primitives in tools/render/tailgate_render/primitives.py",
+        "author": "CJM Labs",
+        "licence": "CC0 1.0"
+      },
+      "notes": "",
+      "original_work": true
+    },
+    {
+      "id": "sofa",
+      "kind": "prop",
+      "file": "props/sofa.png",
+      "normal": "props/sofa_n.png",
+      "px": [
+        200,
+        91
+      ],
+      "game_px": [
+        66.7,
+        30.3
+      ],
+      "metres": [
+        1.96,
+        0.82
+      ],
+      "height_m": 0.92,
+      "origin": "centre",
+      "game_prop": "env_sofa",
+      "replaces_existing": false,
+      "sites": [
+        "building-c",
+        "data-centre"
+      ],
+      "source": {
+        "pack": "Furniture Kit",
+        "pack_url": "https://kenney.nl/assets/furniture-kit",
+        "model": "Models/GLTF format/loungeSofa.glb",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": "reception seating"
+    },
+    {
+      "id": "table_round",
+      "kind": "prop",
+      "file": "props/table_round.png",
+      "normal": "props/table_round_n.png",
+      "px": [
+        145,
+        166
+      ],
+      "game_px": [
+        48.3,
+        55.3
+      ],
+      "metres": [
+        1.386,
+        1.6
+      ],
+      "height_m": 0.733,
+      "origin": "centre",
+      "game_prop": "env_table_round",
+      "replaces_existing": false,
+      "sites": [
+        "building-c",
+        "warehouse"
+      ],
+      "source": {
+        "pack": "Furniture Kit",
+        "pack_url": "https://kenney.nl/assets/furniture-kit",
+        "model": "Models/GLTF format/tableRound.glb",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": ""
+    },
+    {
+      "id": "tank",
+      "kind": "prop",
+      "file": "props/tank.png",
+      "normal": "props/tank_n.png",
+      "px": [
+        582,
+        358
+      ],
+      "game_px": [
+        194.0,
+        119.3
+      ],
+      "metres": [
+        5.936,
+        3.607
+      ],
+      "height_m": 2.907,
+      "origin": "centre",
+      "game_prop": "env_tank",
+      "replaces_existing": false,
+      "sites": [
+        "data-centre",
+        "warehouse"
+      ],
+      "source": {
+        "pack": "City Kit (Industrial)",
+        "pack_url": "https://kenney.nl/assets/city-kit-industrial",
+        "model": "Models/GLB format/detail-tank.glb",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": "plant room or yard tank"
+    },
+    {
+      "id": "trolley",
+      "kind": "prop",
+      "file": "props/trolley.png",
+      "normal": "props/trolley_n.png",
+      "px": [
+        55,
+        81
+      ],
+      "game_px": [
+        18.3,
+        27.0
+      ],
+      "metres": [
+        0.45,
+        0.718
+      ],
+      "height_m": 0.586,
+      "origin": "centre",
+      "game_prop": "env_trolley",
+      "replaces_existing": true,
+      "sites": [
+        "building-c",
+        "data-centre",
+        "warehouse"
+      ],
+      "source": {
+        "pack": "Mini Market",
+        "pack_url": "https://kenney.nl/assets/mini-market",
+        "model": "Models/GLB format/shopping-cart.glb",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": ""
+    },
+    {
+      "id": "van",
+      "kind": "prop",
+      "file": "props/van.png",
+      "normal": "props/van_n.png",
+      "px": [
+        300,
+        540
+      ],
+      "game_px": [
+        100.0,
+        180.0
+      ],
+      "metres": [
+        3.0,
+        5.5
+      ],
+      "height_m": 2.7,
+      "origin": "centre",
+      "game_prop": "env_van",
+      "replaces_existing": false,
+      "sites": [
+        "building-c",
+        "data-centre",
+        "warehouse"
+      ],
+      "source": {
+        "pack": "Car Kit",
+        "pack_url": "https://kenney.nl/assets/car-kit",
+        "model": "Models/GLB format/van.glb",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": "the smokers' door van in Building C"
+    },
+    {
+      "id": "van_delivery",
+      "kind": "prop",
+      "file": "props/van_delivery.png",
+      "normal": "props/van_delivery_n.png",
+      "px": [
+        300,
+        636
+      ],
+      "game_px": [
+        100.0,
+        212.0
+      ],
+      "metres": [
+        3.0,
+        6.5
+      ],
+      "height_m": 3.3,
+      "origin": "centre",
+      "game_prop": "env_van_delivery",
+      "replaces_existing": false,
+      "sites": [
+        "warehouse",
+        "data-centre"
+      ],
+      "source": {
+        "pack": "Car Kit",
+        "pack_url": "https://kenney.nl/assets/car-kit",
+        "model": "Models/GLB format/delivery.glb",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": ""
+    },
+    {
+      "id": "warning_sign",
+      "kind": "prop",
+      "file": "props/warning_sign.png",
+      "normal": "props/warning_sign_n.png",
+      "px": [
+        50,
+        50
+      ],
+      "game_px": [
+        16.7,
+        16.7
+      ],
+      "metres": [
+        0.4,
+        0.4
+      ],
+      "height_m": 1.29,
+      "origin": "centre",
+      "game_prop": "env_warning_sign",
+      "replaces_existing": false,
+      "sites": [
+        "warehouse"
+      ],
+      "source": {
+        "pack": "Factory Kit",
+        "pack_url": "https://kenney.nl/assets/factory-kit",
+        "model": "Models/GLB format/warning-orange.glb",
+        "author": "Kenney",
+        "licence": "CC0 1.0"
+      },
+      "notes": ""
+    },
+    {
+      "id": "wall_data_hall_panel_side",
+      "kind": "wall_side",
+      "file": "walls/wall_data_hall_panel_side.png",
+      "normal": "walls/wall_data_hall_panel_side_n.png",
+      "px": [
+        96,
+        33
+      ],
+      "game_px": [
+        32.0,
+        11.0
+      ],
+      "metres": [
+        1.0,
+        0.34
+      ],
+      "seamless": "x",
+      "material": "data_hall_panel",
+      "game_wall_material": "data_hall_panel",
+      "source": {
+        "pack": "ambientCG",
+        "pack_url": "https://ambientcg.com/view?id=Metal032",
+        "model": "Metal032",
+        "author": "ambientCG (Lennart Demes)",
+        "licence": "CC0 1.0"
+      },
+      "notes": "Draw under the wall's south edge as the visible side face, in place of the extrusion band. Normals lean south."
+    },
+    {
+      "id": "wall_glass_partition_side",
+      "kind": "wall_side",
+      "file": "walls/wall_glass_partition_side.png",
+      "normal": "walls/wall_glass_partition_side_n.png",
+      "px": [
+        96,
+        33
+      ],
+      "game_px": [
+        32.0,
+        11.0
+      ],
+      "metres": [
+        1.0,
+        0.34
+      ],
+      "seamless": "x",
+      "material": "glass_partition",
+      "game_wall_material": "glass_partition",
+      "source": {
+        "pack": "Tailgate (original, built from primitives by tools/render)",
+        "pack_url": "https://github.com/craigmccart/tailgate",
+        "model": "procedural glass partition",
+        "author": "CJM Labs",
+        "licence": "CC0 1.0"
+      },
+      "notes": "Draw under the wall's south edge as the visible side face, in place of the extrusion band. Normals lean south."
+    },
+    {
+      "id": "wall_office_plaster_side",
+      "kind": "wall_side",
+      "file": "walls/wall_office_plaster_side.png",
+      "normal": "walls/wall_office_plaster_side_n.png",
+      "px": [
+        96,
+        33
+      ],
+      "game_px": [
+        32.0,
+        11.0
+      ],
+      "metres": [
+        1.0,
+        0.34
+      ],
+      "seamless": "x",
+      "material": "office_plaster",
+      "game_wall_material": "office_plaster",
+      "source": {
+        "pack": "ambientCG",
+        "pack_url": "https://ambientcg.com/view?id=PaintedPlaster017",
+        "model": "PaintedPlaster017",
+        "author": "ambientCG (Lennart Demes)",
+        "licence": "CC0 1.0"
+      },
+      "notes": "Draw under the wall's south edge as the visible side face, in place of the extrusion band. Normals lean south."
+    },
+    {
+      "id": "wall_warehouse_block_side",
+      "kind": "wall_side",
+      "file": "walls/wall_warehouse_block_side.png",
+      "normal": "walls/wall_warehouse_block_side_n.png",
+      "px": [
+        96,
+        33
+      ],
+      "game_px": [
+        32.0,
+        11.0
+      ],
+      "metres": [
+        1.0,
+        0.34
+      ],
+      "seamless": "x",
+      "material": "warehouse_block",
+      "game_wall_material": "warehouse_block",
+      "source": {
+        "pack": "ambientCG",
+        "pack_url": "https://ambientcg.com/view?id=Bricks088",
+        "model": "Bricks088",
+        "author": "ambientCG (Lennart Demes)",
+        "licence": "CC0 1.0"
+      },
+      "notes": "Draw under the wall's south edge as the visible side face, in place of the extrusion band. Normals lean south."
+    },
+    {
+      "id": "wall_data_hall_panel_top",
+      "kind": "wall_top",
+      "file": "walls/wall_data_hall_panel_top.png",
+      "normal": "walls/wall_data_hall_panel_top_n.png",
+      "px": [
+        96,
+        96
+      ],
+      "game_px": [
+        32.0,
+        32.0
+      ],
+      "metres": [
+        1.0,
+        1.0
+      ],
+      "seamless": true,
+      "material": "data_hall_panel",
+      "game_wall_material": "data_hall_panel",
+      "source": {
+        "pack": "ambientCG",
+        "pack_url": "https://ambientcg.com/view?id=Metal032",
+        "model": "Metal032",
+        "author": "ambientCG (Lennart Demes)",
+        "licence": "CC0 1.0"
+      },
+      "notes": ""
+    },
+    {
+      "id": "wall_glass_partition_top",
+      "kind": "wall_top",
+      "file": "walls/wall_glass_partition_top.png",
+      "normal": "walls/wall_glass_partition_top_n.png",
+      "px": [
+        96,
+        96
+      ],
+      "game_px": [
+        32.0,
+        32.0
+      ],
+      "metres": [
+        1.0,
+        1.0
+      ],
+      "seamless": true,
+      "material": "glass_partition",
+      "game_wall_material": "glass_partition",
+      "source": {
+        "pack": "Tailgate (original, built from primitives by tools/render)",
+        "pack_url": "https://github.com/craigmccart/tailgate",
+        "model": "procedural glass partition",
+        "author": "CJM Labs",
+        "licence": "CC0 1.0"
+      },
+      "notes": ""
+    },
+    {
+      "id": "wall_office_plaster_top",
+      "kind": "wall_top",
+      "file": "walls/wall_office_plaster_top.png",
+      "normal": "walls/wall_office_plaster_top_n.png",
+      "px": [
+        96,
+        96
+      ],
+      "game_px": [
+        32.0,
+        32.0
+      ],
+      "metres": [
+        1.0,
+        1.0
+      ],
+      "seamless": true,
+      "material": "office_plaster",
+      "game_wall_material": "office_plaster",
+      "source": {
+        "pack": "ambientCG",
+        "pack_url": "https://ambientcg.com/view?id=PaintedPlaster017",
+        "model": "PaintedPlaster017",
+        "author": "ambientCG (Lennart Demes)",
+        "licence": "CC0 1.0"
+      },
+      "notes": ""
+    },
+    {
+      "id": "wall_warehouse_block_top",
+      "kind": "wall_top",
+      "file": "walls/wall_warehouse_block_top.png",
+      "normal": "walls/wall_warehouse_block_top_n.png",
+      "px": [
+        116,
+        116
+      ],
+      "game_px": [
+        38.7,
+        38.7
+      ],
+      "metres": [
+        1.2,
+        1.2
+      ],
+      "seamless": true,
+      "material": "warehouse_block",
+      "game_wall_material": "warehouse_block",
+      "source": {
+        "pack": "ambientCG",
+        "pack_url": "https://ambientcg.com/view?id=Bricks088",
+        "model": "Bricks088",
+        "author": "ambientCG (Lennart Demes)",
+        "licence": "CC0 1.0"
+      },
+      "notes": "Bricks088 is orange cinder block; tinted hard towards grey so it reads as painted blockwork"
+    }
+  ]
+}

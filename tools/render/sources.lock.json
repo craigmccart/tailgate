@@ -1,0 +1,195 @@
+{
+  "ambientcg_textures": {
+    "Asphalt033": {
+      "archive": "Asphalt033_1K-JPG.zip",
+      "bytes": 9722569,
+      "files": 11,
+      "licence": "CC0 1.0",
+      "page": "https://ambientcg.com/view?id=Asphalt033",
+      "resolution": "1K-JPG",
+      "sha256": "c71801b342dbea594dbdd0bd2ddc0a6d13f813c923fca408b9f5b9ee5e58aba2"
+    },
+    "Bricks088": {
+      "archive": "Bricks088_1K-JPG.zip",
+      "bytes": 9370839,
+      "files": 11,
+      "licence": "CC0 1.0",
+      "page": "https://ambientcg.com/view?id=Bricks088",
+      "resolution": "1K-JPG",
+      "sha256": "3bbbf55bfc7d2fdb4ce058893d6a27085cf9293a1e265804bbf325133227211a"
+    },
+    "Carpet001": {
+      "archive": "Carpet001_1K-JPG.zip",
+      "bytes": 9014518,
+      "files": 10,
+      "licence": "CC0 1.0",
+      "page": "https://ambientcg.com/view?id=Carpet001",
+      "resolution": "1K-JPG",
+      "sha256": "f06d551e40d4d4d31a84df310bad2a1ec70753cd330342c7d8bcff3587fccbd1"
+    },
+    "Carpet012": {
+      "archive": "Carpet012_1K-JPG.zip",
+      "bytes": 10927502,
+      "files": 11,
+      "licence": "CC0 1.0",
+      "page": "https://ambientcg.com/view?id=Carpet012",
+      "resolution": "1K-JPG",
+      "sha256": "f5c459f278a3b50dc5c2bf535b8c3b6fd4bb6fc458c836b64023961b167fe4f6"
+    },
+    "Concrete031": {
+      "archive": "Concrete031_1K-JPG.zip",
+      "bytes": 7823020,
+      "files": 11,
+      "licence": "CC0 1.0",
+      "page": "https://ambientcg.com/view?id=Concrete031",
+      "resolution": "1K-JPG",
+      "sha256": "3068e551435d3cdae3942017799d8871b940c88ebfaf5c2b87376972ae448fd6"
+    },
+    "Concrete034": {
+      "archive": "Concrete034_1K-JPG.zip",
+      "bytes": 3657575,
+      "files": 10,
+      "licence": "CC0 1.0",
+      "page": "https://ambientcg.com/view?id=Concrete034",
+      "resolution": "1K-JPG",
+      "sha256": "5839d284d94ffb8d2a56df742ec522b13dd311c52dbd42b8fd33f0409ceedb81"
+    },
+    "Metal009": {
+      "archive": "Metal009_1K-JPG.zip",
+      "bytes": 4767000,
+      "files": 11,
+      "licence": "CC0 1.0",
+      "page": "https://ambientcg.com/view?id=Metal009",
+      "resolution": "1K-JPG",
+      "sha256": "1b1970219b40fe707e7194b28702f1a65b0d227bbea56da69dfbc8d8b5cfcb5e"
+    },
+    "Metal032": {
+      "archive": "Metal032_1K-JPG.zip",
+      "bytes": 3650556,
+      "files": 11,
+      "licence": "CC0 1.0",
+      "page": "https://ambientcg.com/view?id=Metal032",
+      "resolution": "1K-JPG",
+      "sha256": "9e4f363905a647958c273154fa125d2a6440892d0e583f9b3af24bb08b5afc3c"
+    },
+    "PaintedPlaster017": {
+      "archive": "PaintedPlaster017_1K-JPG.zip",
+      "bytes": 4721132,
+      "files": 10,
+      "licence": "CC0 1.0",
+      "page": "https://ambientcg.com/view?id=PaintedPlaster017",
+      "resolution": "1K-JPG",
+      "sha256": "bae0380d82b6ccac8943b4980417cb3c9de5c896218339c108056f1dfb8e886c"
+    },
+    "Road013A": {
+      "archive": "Road013A_1K-JPG.zip",
+      "bytes": 8055516,
+      "files": 11,
+      "licence": "CC0 1.0",
+      "page": "https://ambientcg.com/view?id=Road013A",
+      "resolution": "1K-JPG",
+      "sha256": "5cb974b0adf4a7a793308c34641fffb99bee1befcc2629799406da5af3bb08d3"
+    },
+    "Tiles040": {
+      "archive": "Tiles040_1K-JPG.zip",
+      "bytes": 6471461,
+      "files": 10,
+      "licence": "CC0 1.0",
+      "page": "https://ambientcg.com/view?id=Tiles040",
+      "resolution": "1K-JPG",
+      "sha256": "432d41c5a6bba5cfeb5fd590baf2d7f220726c5fffc272d350f56399a45c4632"
+    },
+    "Tiles141": {
+      "archive": "Tiles141_1K-JPG.zip",
+      "bytes": 4974199,
+      "files": 10,
+      "licence": "CC0 1.0",
+      "page": "https://ambientcg.com/view?id=Tiles141",
+      "resolution": "1K-JPG",
+      "sha256": "6ee56eba21592b9c02c6ee78dd93c6b585b62a2558d143d53e19457c82379d52"
+    }
+  },
+  "kenney_kits": {
+    "animated-characters-1": {
+      "archive": "kenney_animated-characters-1.zip",
+      "bytes": 581441,
+      "files": 16,
+      "licence": "CC0 1.0",
+      "name": "Animated Characters Protagonists",
+      "page": "https://kenney.nl/assets/animated-characters-1",
+      "sha256": "ec3787de70fa2200256848d74201b10f6b6c3126594e9857bf989753312c2b84"
+    },
+    "animated-characters-2": {
+      "archive": "kenney_animated-characters-2.zip",
+      "bytes": 718027,
+      "files": 17,
+      "licence": "CC0 1.0",
+      "name": "Animated Characters Survivors",
+      "page": "https://kenney.nl/assets/animated-characters-2",
+      "sha256": "fdadced07a0454c9b7f0b46507be6144a072b4d03b4ffa37f225893c76c62845"
+    },
+    "animated-characters-3": {
+      "archive": "kenney_animated-characters-3.zip",
+      "bytes": 706472,
+      "files": 12,
+      "licence": "CC0 1.0",
+      "name": "Animated Characters Retro",
+      "page": "https://kenney.nl/assets/animated-characters-3",
+      "sha256": "1d03f1fb001f3cf629425b69c898df58261a316616220ea25b58bd35298e6882"
+    },
+    "car-kit": {
+      "archive": "kenney_car-kit.zip",
+      "bytes": 4814237,
+      "files": 259,
+      "licence": "CC0 1.0",
+      "name": "Car Kit",
+      "page": "https://kenney.nl/assets/car-kit",
+      "sha256": "fac7dacac5c7874348cf19729af3ef205f3d366493edaf0a827d93f4fdf3d0c4"
+    },
+    "city-kit-industrial": {
+      "archive": "kenney_city-kit-industrial.zip",
+      "bytes": 5045077,
+      "files": 201,
+      "licence": "CC0 1.0",
+      "name": "City Kit (Industrial)",
+      "page": "https://kenney.nl/assets/city-kit-industrial",
+      "sha256": "5b381164e5760f3830a2dbee43b972deee38b2a695d091b56e238ab2910c96d2"
+    },
+    "city-kit-roads": {
+      "archive": "kenney_city-kit-roads.zip",
+      "bytes": 2852289,
+      "files": 487,
+      "licence": "CC0 1.0",
+      "name": "City Kit (Roads)",
+      "page": "https://kenney.nl/assets/city-kit-roads",
+      "sha256": "374a4552115cbd11b4ec5c930ee31a533562dc78a09af249a655d03f7ea3b959"
+    },
+    "factory-kit": {
+      "archive": "kenney_factory-kit.zip",
+      "bytes": 4511890,
+      "files": 727,
+      "licence": "CC0 1.0",
+      "name": "Factory Kit",
+      "page": "https://kenney.nl/assets/factory-kit",
+      "sha256": "7e31fb2308e90304672bd15cd18fa9d9f02c03731a8cbc57a8e3e1c181dfb0a7"
+    },
+    "furniture-kit": {
+      "archive": "kenney_furniture-kit.zip",
+      "bytes": 5130729,
+      "files": 1546,
+      "licence": "CC0 1.0",
+      "name": "Furniture Kit",
+      "page": "https://kenney.nl/assets/furniture-kit",
+      "sha256": "e67652d0932cee41683f74711c03d3e192a2af9979ef8e6b237711f5482d46b0"
+    },
+    "mini-market": {
+      "archive": "kenney_mini-market.zip",
+      "bytes": 1135859,
+      "files": 114,
+      "licence": "CC0 1.0",
+      "name": "Mini Market",
+      "page": "https://kenney.nl/assets/mini-market",
+      "sha256": "6f2e69090e359204ace43e4c98dc3fb8639b75e423109672b5c890d194c45203"
+    }
+  }
+}
