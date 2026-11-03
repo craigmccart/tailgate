@@ -81,6 +81,7 @@ import { refreshTextResolution, uiZoomOf } from '../ui/uiCamera';
 import type { HintSystem } from '../systems/HintSystem';
 import { BuildingMap } from '../world/BuildingMap';
 import { WorldRenderer } from '../world/WorldRenderer';
+import { drawWetSheen } from '../world/wetSurface';
 import type { FieldOverlayScene } from './FieldOverlayScene';
 
 /** How close authorised staff must be to a badge door to open it. */
@@ -124,6 +125,8 @@ export class BuildingScene extends Phaser.Scene {
   private cameraSystem!: CameraSystem;
   private lightModel!: LightModel;
   private lightingRenderer!: LightingRenderer;
+  /** Dust, steam, haze and rain. Kept so update can follow SCREEN EFFECTS for the rain. */
+  private ambient!: AmbientParticles;
   private feedTreatment!: FeedTreatment;
   private audio!: AudioManager;
   private mapZones: ZoneRect[] = [];
@@ -259,6 +262,8 @@ export class BuildingScene extends Phaser.Scene {
     this.navGrid = new NavGrid(map.widthInPixels, map.heightInPixels, map.walls);
     this.world = new WorldRenderer(this, map, this.level.id);
     this.lightModel = new LightModel(map.zones, map.lights);
+    // Wet tarmac wherever a lamp's light reaches the outdoor ground.
+    drawWetSheen(this, map.zones, this.lightModel.sources);
 
     // A detain restarts here: resume from the last checkpoint if there is one.
     // Checkpoints are always indoors, so a checkpoint start begins inside. A
@@ -290,9 +295,9 @@ export class BuildingScene extends Phaser.Scene {
       map.zones.filter((zone) => zone.exterior).map((zone) => zone.name)
     );
     this.spawnHivisPickups(map);
-    // Atmosphere: dust in the pool lights, steam and haze from the map data.
-    // The scene owns the emitters; nothing needs a reference back.
-    new AmbientParticles(this, map.lights, map.effects);
+    // Atmosphere: dust in the pool lights, steam and haze from the map data,
+    // and rain over the exterior zones (switched by SCREEN EFFECTS in update).
+    this.ambient = new AmbientParticles(this, map.lights, map.effects, map.zones);
 
     this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
     this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
@@ -424,6 +429,8 @@ export class BuildingScene extends Phaser.Scene {
     if (!this.overlayReady) {
       return; // the HUD scene is still starting; it attaches within a frame
     }
+    // Rain is motion, so it follows SCREEN EFFECTS, even on frozen frames.
+    this.ambient.setRainEnabled(getSettings().screenEffects);
     if (this.gridKey && Phaser.Input.Keyboard.JustDown(this.gridKey)) {
       this.world.toggleGrid();
     }
