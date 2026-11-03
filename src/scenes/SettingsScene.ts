@@ -129,8 +129,8 @@ export class SettingsScene extends Phaser.Scene {
         { kind: 'action', label: 'BACK', onSelect: () => this.close() },
       ],
       // Nine rows now, so the pitch tightens again to keep the whole list
-      // inside the card.
-      { x: 480, top: 180, rowHeight: 30, width: 420, labelSize: 17, valueSize: 16 },
+      // inside the card, with the same margin above the first row as below the last.
+      { x: 480, top: 186, rowHeight: 30, width: 420, labelSize: 17, valueSize: 16 },
       { onBack: () => this.close() }
     );
 

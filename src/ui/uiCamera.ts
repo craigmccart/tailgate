@@ -79,8 +79,10 @@ export function installTextResolution(): void {
  * the canvas grows, until the scene next restarts. Looks inside containers too.
  * Phaser also fires a resize when only the window moves, so a text already at the
  * right resolution is left alone rather than redrawn for nothing.
+ * fitUiCamera calls this for every menu and HUD scene. The building scene has no
+ * UI camera, so it calls this itself for its world labels.
  */
-function refreshTextResolution(scene: Phaser.Scene): void {
+export function refreshTextResolution(scene: Phaser.Scene): void {
   const zoom = uiZoomOf(scene);
   const visit = (items: Phaser.GameObjects.GameObject[]): void => {
     for (const item of items) {

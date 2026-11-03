@@ -77,7 +77,7 @@ import type { FieldHud, HudFrame } from '../ui/FieldHud';
 import type { ScreenEdgeMarkers } from '../ui/ScreenEdgeMarkers';
 import { fadeIn, fadeOutThen, fadeToScene } from '../ui/transitions';
 import { shakeIntensityFor } from '../ui/cameraShake';
-import { uiZoomOf } from '../ui/uiCamera';
+import { refreshTextResolution, uiZoomOf } from '../ui/uiCamera';
 import type { HintSystem } from '../systems/HintSystem';
 import { BuildingMap } from '../world/BuildingMap';
 import { WorldRenderer } from '../world/WorldRenderer';
@@ -408,6 +408,10 @@ export class BuildingScene extends Phaser.Scene {
     this.fitWorldCamera();
     main.centerOn(centreX, centreY);
     this.lightingRenderer.resize();
+    // Door labels, guard glyphs and barks and floor labels are text in the world,
+    // so re-sharpen them for the new canvas size (the menu scenes do this in
+    // fitUiCamera).
+    refreshTextResolution(this);
     if (this.feedCam) {
       // Keep the same spot centred: the viewport changes size around it.
       const { x, y } = this.feedCam.midPoint;
