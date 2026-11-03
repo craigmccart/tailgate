@@ -18,18 +18,19 @@ export interface CanvasSizeInput {
 }
 
 /**
- * Works out the canvas size in device pixels: the largest 16 by 9 picture that
- * fits the window, scaled by the player's render scale, kept between the
- * 960 by 540 layout unit and MAX_CANVAS_HEIGHT. Both sides come out even so the
- * 16 by 9 shape stays clean.
+ * Works out the canvas size in device pixels. First the full-sharpness size:
+ * the largest 16 by 9 picture that fits the window, capped at
+ * MAX_CANVAS_HEIGHT. Then the player's render scale shrinks that, so 75 percent
+ * is always a real step down, even on a 4K screen that would otherwise sit on
+ * the cap. It never drops below the 960 by 540 layout unit. Both sides come out
+ * even so the 16 by 9 shape stays clean.
  */
 export function canvasSizeFor(input: CanvasSizeInput): { width: number; height: number } {
   const boxWidth = input.innerWidth * input.devicePixelRatio;
   const boxHeight = input.innerHeight * input.devicePixelRatio;
 
-  let height = Math.min(boxHeight, (boxWidth * 9) / 16);
-  height *= input.renderScale;
-  height = Math.min(height, MAX_CANVAS_HEIGHT);
+  const native = Math.min(boxHeight, (boxWidth * 9) / 16, MAX_CANVAS_HEIGHT);
+  let height = native * input.renderScale;
   height = Math.max(height, UI_HEIGHT);
   // Width comes from the unrounded height so rounding never skews the 16 by 9 shape.
   const width = (height * 16) / 9;

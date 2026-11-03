@@ -14,6 +14,10 @@ describe('canvasSizeFor', () => {
     expect(canvasSizeFor({ innerWidth: 3840, innerHeight: 2160, devicePixelRatio: 2, renderScale: 1 }))
       .toEqual({ width: 2560, height: 1440 });
   });
+  it('scales down from the cap on a 4K screen', () => {
+    expect(canvasSizeFor({ innerWidth: 3840, innerHeight: 2160, devicePixelRatio: 2, renderScale: 0.75 }))
+      .toEqual({ width: 1920, height: 1080 });
+  });
   it('halves with render scale 0.5', () => {
     expect(canvasSizeFor({ innerWidth: 1463, innerHeight: 823, devicePixelRatio: 1.75, renderScale: 0.5 }))
       .toEqual({ width: 1280, height: 720 });
