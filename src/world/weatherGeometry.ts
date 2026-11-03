@@ -41,8 +41,10 @@ const MIN_EMIT_INTERVAL_MS = 8;
 /**
  * The rain emitter for one zone: it covers the zone rectangle, and fires
  * often enough to give the configured density for the zone's area. A zone so
- * big that it would need to fire faster than every 8 ms fires every 8 ms with
- * several streaks per emit instead, so it still gets its full density.
+ * big that it would need to fire faster than every 8 ms sends several streaks
+ * per emit instead, and stretches the gap between emits to match, so the
+ * streaks per second come out exactly as configured and every small change
+ * to the density shows.
  */
 export function rainEmitterFor(zone: ZoneRect, cfg: RainConfig): RainEmitterSpec {
   const { x, y, width, height } = zone;
@@ -51,14 +53,10 @@ export function rainEmitterFor(zone: ZoneRect, cfg: RainConfig): RainEmitterSpec
   if (raw >= MIN_EMIT_INTERVAL_MS) {
     return { x, y, width, height, frequencyMs: raw, quantity: 1 };
   }
-  return {
-    x,
-    y,
-    width,
-    height,
-    frequencyMs: MIN_EMIT_INTERVAL_MS,
-    quantity: Math.max(1, Math.round(MIN_EMIT_INTERVAL_MS / raw)),
-  };
+  // The fewest streaks per emit that keep the gap at 8 ms or more; quantity
+  // streaks every raw * quantity ms is still one streak every raw ms.
+  const quantity = Math.ceil(MIN_EMIT_INTERVAL_MS / raw);
+  return { x, y, width, height, frequencyMs: raw * quantity, quantity };
 }
 
 /**

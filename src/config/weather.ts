@@ -6,7 +6,7 @@ import { PALETTE_HEX } from './palette';
  * changes what a guard can see. This is the file Craig edits to make the
  * evening wetter or drier.
  *
- * Comfort note (nystagmus): the rain is faint, thin and quick to fade, and it
+ * Comfort note (nystagmus): the rain is thin and short-lived, and it
  * sits behind the SCREEN EFFECTS setting, so turning that off stops it within
  * a second. The wet shine never moves, so it stays on either way. Both use the
  * cool UI grey; alarm red never appears here.
@@ -20,8 +20,15 @@ export const WEATHER = {
     streakLengthPx: 7,
     /** How far each streak leans off vertical, degrees, to match the wind. */
     streakAngleDeg: 8,
-    /** How see-through a fresh streak is (0 invisible, 1 solid). It fades to nothing as it falls. */
-    alpha: 0.14,
+    /**
+     * How solid a streak is when it appears and when it finishes (0 invisible,
+     * 1 solid); it fades from the first to the second as it falls. The
+     * lighting veil dims the streaks wherever it is dark, so they read faintly
+     * in the dark and clearly under a lamp. These are the numbers to lower for
+     * subtler rain.
+     */
+    alphaStart: 0.45,
+    alphaEnd: 0.15,
     /** How fast rain falls, px per second. */
     speedY: 420,
     /** Sideways wind, px per second. Negative blows the rain to the left. */

@@ -99,7 +99,7 @@ export class AmbientParticles {
         lifespan: cfg.lifespanMs,
         speedX: cfg.driftX,
         speedY: cfg.speedY,
-        alpha: { start: cfg.alpha, end: 0 },
+        alpha: { start: cfg.alphaStart, end: cfg.alphaEnd },
         tint: cfg.tint,
         emitting: false,
       })
