@@ -5,6 +5,31 @@ import { UI_HEIGHT, UI_WIDTH } from '../ui/viewport';
 // import, so it runs under Vitest's node environment. BuildingScene eases its
 // camera offset toward the result.
 
+/** What decides whether the mouse should steer the lean this frame. */
+export interface PointerLiveInput {
+  /** True while the mouse is over the game canvas. */
+  overCanvas: boolean;
+  /** When the mouse last moved, in ms on the page clock, or 0 if it never has. */
+  pointerMoveTimeMs: number;
+  /** When the pad last showed any input, in ms on the same clock, or 0 if never. */
+  lastPadInputTimeMs: number;
+}
+
+/**
+ * True when the mouse is the input the player is using right now: it is over
+ * the canvas, it has moved at least once, and it moved more recently than the
+ * pad was touched. A mouse left parked after the click that focused the tab
+ * therefore stops leaning the view the moment the pad is used, and only takes
+ * over again when it is moved.
+ */
+export function pointerIsLive(input: PointerLiveInput): boolean {
+  return (
+    input.overCanvas &&
+    input.pointerMoveTimeMs > 0 &&
+    input.pointerMoveTimeMs > input.lastPadInputTimeMs
+  );
+}
+
 /** What the camera should lean toward this frame. */
 export interface PointerLookAheadInput {
   /** The mouse in UI units (the 960 by 540 layout), or null when there is no usable mouse. */

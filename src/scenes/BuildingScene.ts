@@ -40,7 +40,7 @@ import {
   type FreezeResult,
 } from '../systems/CameraSystem';
 import { AmbientParticles } from '../systems/AmbientParticles';
-import { pointerLookAhead } from '../systems/cameraLookAhead';
+import { pointerIsLive, pointerLookAhead } from '../systems/cameraLookAhead';
 import type { FeedTreatment } from '../systems/FeedTreatment';
 import { GuardAwareness } from '../systems/GuardAwareness';
 import { GuardRoster, type GuardDef } from '../systems/GuardRoster';
@@ -153,6 +153,12 @@ export class BuildingScene extends Phaser.Scene {
   private padInteractWasDown = false;
   /** Last frame's pad Start state, so pause fires on a fresh press not a hold. */
   private padStartWasDown = false;
+  /**
+   * When the pad last showed any input, in ms on the page clock that also
+   * stamps the mouse's move time, or 0 if not yet this life. A mouse that has
+   * not moved since then is treated as parked and leans nothing.
+   */
+  private lastPadInputTimeMs = 0;
   /** The contract being played, pinned in init before any loading happens. */
   private level!: LevelDef;
   /** The security office console, if this level has one. */
@@ -243,6 +249,7 @@ export class BuildingScene extends Phaser.Scene {
     this.staff = [];
     this.followOffset.set(0, 0);
     this.pointerOffset.set(0, 0);
+    this.lastPadInputTimeMs = 0;
     // The scene instance persists across restart(), so every per-life field
     // must reset here. A camera cue from the previous life must not be blamed
     // on the next banner.
@@ -448,6 +455,12 @@ export class BuildingScene extends Phaser.Scene {
     const gamepadPlugin = this.input.gamepad;
     const pad =
       gamepadPlugin && gamepadPlugin.total > 0 ? gamepadPlugin.getPad(0) : undefined;
+    // Note when the pad was last used, so a parked mouse stops leaning the view
+    // for a pad player. Phaser stamps the mouse's move time from the DOM event's
+    // timeStamp, which is the same clock as performance.now().
+    if (pad && this.padShowsInput(pad)) {
+      this.lastPadInputTimeMs = window.performance.now();
+    }
 
     // Pause on Escape or the pad Start button. Read the edge every frame so the
     // held state never goes stale, but only act when actually in play. While
@@ -677,11 +690,17 @@ export class BuildingScene extends Phaser.Scene {
     this.followOffset.x = Phaser.Math.Linear(this.followOffset.x, targetX, JUICE.camera.lookAheadLerp);
     this.followOffset.y = Phaser.Math.Linear(this.followOffset.y, targetY, JUICE.camera.lookAheadLerp);
 
-    // The mouse only counts once it has moved and while it is over the canvas,
-    // so a keyboard or pad player is not pulled toward the top-left corner.
+    // The mouse only counts once it has moved, while it is over the canvas, and
+    // when it moved more recently than the pad was used. So a keyboard player is
+    // not pulled toward the top-left corner, and a cursor left parked after the
+    // click that focused the tab does not lean a pad player's view.
     const pointer = this.input.activePointer;
     const zoom = uiZoomOf(this);
-    const mouseUsable = this.input.isOver && pointer.moveTime > 0;
+    const mouseUsable = pointerIsLive({
+      overCanvas: this.input.isOver,
+      pointerMoveTimeMs: pointer.moveTime,
+      lastPadInputTimeMs: this.lastPadInputTimeMs,
+    });
     const stick =
       pad !== undefined && pad.rightStick.length() >= THROW.aimDeadzone
         ? { x: pad.rightStick.x, y: pad.rightStick.y }
@@ -710,6 +729,15 @@ export class BuildingScene extends Phaser.Scene {
     // scaled back down to keep the shake as tiny as it was at zoom 1.
     const intensity = shakeIntensityFor(JUICE.shake.intensity, this.cameras.main.zoom);
     this.cameras.main.shake(JUICE.shake.durationMs, intensity);
+  }
+
+  /** True when the pad is in use this frame: a stick pushed past the aim deadzone or any button down. */
+  private padShowsInput(pad: Phaser.Input.Gamepad.Gamepad): boolean {
+    return (
+      pad.leftStick.length() >= THROW.aimDeadzone ||
+      pad.rightStick.length() >= THROW.aimDeadzone ||
+      pad.buttons.some((button) => button.pressed)
+    );
   }
 
   /** True while the interact control is held: E on keyboard, A on the pad. */
