@@ -3,7 +3,8 @@ import { HUD } from '../config/hud';
 import { PALETTE_HEX } from '../config/palette';
 import { READABILITY } from '../config/readability';
 import type { Guard } from '../entities/Guard';
-import { projectToScreenEdge } from './screenEdge';
+import { projectToScreenEdge, worldToUi, type EdgePoint } from './screenEdge';
+import { UI_HEIGHT, UI_WIDTH } from './viewport';
 
 /** A world point the border marker should point at. */
 export interface EdgeTarget {
@@ -21,12 +22,17 @@ export interface EdgeTarget {
  * Shapes carry the meaning, colour seconds it: a hollow amber outline for a
  * curious guard, two solid red arrowheads for a chasing one, a hollow amber
  * diamond for the objective (the same diamond the world marker uses).
+ *
+ * The markers live in the field overlay scene, laid out in 960 by 540 UI
+ * units, while the things they point at live in the building's world. Each
+ * world point is carried across with worldToUi, so the markers stay right at
+ * any world zoom.
  */
 export class ScreenEdgeMarkers {
   private readonly gfx: Phaser.GameObjects.Graphics;
 
   constructor(scene: Phaser.Scene) {
-    this.gfx = scene.add.graphics().setScrollFactor(0).setDepth(998);
+    this.gfx = scene.add.graphics().setDepth(998);
   }
 
   /** The graphics object, so CCTV feed cameras can ignore it. */
@@ -38,28 +44,33 @@ export class ScreenEdgeMarkers {
     this.gfx.clear();
   }
 
+  /**
+   * Redraws the markers. `cam` is the building's world camera and `uiZoom`
+   * the overlay's UI zoom, which together turn a world point into UI units.
+   */
   update(
     cam: Phaser.Cameras.Scene2D.Camera,
-    width: number,
-    height: number,
+    uiZoom: number,
     playerX: number,
     playerY: number,
     guards: readonly Guard[],
     objective: EdgeTarget | null
   ): void {
     this.gfx.clear();
+    const toEdge = (target: EdgeTarget): EdgePoint => {
+      const ui = worldToUi(target.x, target.y, cam, uiZoom);
+      return projectToScreenEdge(ui.x, ui.y, UI_WIDTH, UI_HEIGHT, HUD.edgeInsets);
+    };
     for (const guard of guards) {
-      this.drawGuardChevron(cam, width, height, playerX, playerY, guard);
+      this.drawGuardChevron(toEdge, playerX, playerY, guard);
     }
     if (objective) {
-      this.drawObjective(cam, width, height, objective);
+      this.drawObjective(toEdge(objective));
     }
   }
 
   private drawGuardChevron(
-    cam: Phaser.Cameras.Scene2D.Camera,
-    width: number,
-    height: number,
+    toEdge: (target: EdgeTarget) => EdgePoint,
     playerX: number,
     playerY: number,
     guard: Guard
@@ -71,13 +82,7 @@ export class ScreenEdgeMarkers {
       return;
     }
     const { sizePx } = READABILITY.chevron;
-    const edge = projectToScreenEdge(
-      guard.x - cam.scrollX,
-      guard.y - cam.scrollY,
-      width,
-      height,
-      HUD.edgeInsets
-    );
+    const edge = toEdge(guard);
     if (edge.onScreen) {
       return; // visible: the guard themself is the warning
     }
@@ -103,24 +108,11 @@ export class ScreenEdgeMarkers {
     }
   }
 
-  private drawObjective(
-    cam: Phaser.Cameras.Scene2D.Camera,
-    width: number,
-    height: number,
-    target: EdgeTarget
-  ): void {
-    const { sizePx } = HUD.edgeMarker;
-    const edge = projectToScreenEdge(
-      target.x - cam.scrollX,
-      target.y - cam.scrollY,
-      width,
-      height,
-      HUD.edgeInsets
-    );
+  private drawObjective(edge: EdgePoint): void {
     if (edge.onScreen) {
       return;
     }
-    const r = sizePx;
+    const r = HUD.edgeMarker.sizePx;
     this.gfx.lineStyle(2, PALETTE_HEX.amber, 0.9);
     this.gfx.beginPath();
     this.gfx.moveTo(edge.x, edge.y - r);

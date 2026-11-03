@@ -4,6 +4,7 @@ import { READABILITY } from '../config/readability';
 import { getSettings } from '../state/settings';
 import type { LevelHint } from '../state/levels';
 import { hasSeenHint, markHintSeen } from '../state/progress';
+import { UI_HEIGHT, UI_WIDTH } from '../ui/viewport';
 
 /**
  * First-run contextual hints: consultant's notes that surface once, ever, the
@@ -26,13 +27,12 @@ export class HintSystem {
     this.levelId = levelId;
     this.hints = hints;
     this.text = scene.add
-      .text(scene.scale.width / 2, scene.scale.height - READABILITY.hints.riseFromBottomPx, '', {
+      .text(UI_WIDTH / 2, UI_HEIGHT - READABILITY.hints.riseFromBottomPx, '', {
         fontFamily: FONTS.mono,
         fontSize: `${READABILITY.hints.textSizePx}px`,
         color: PALETTE.text,
       })
       .setOrigin(0.5)
-      .setScrollFactor(0)
       .setDepth(1000)
       .setAlpha(0);
   }

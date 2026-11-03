@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { FEED } from '../config/feed';
 import { getSettings } from '../state/settings';
+import { UI_HEIGHT, UI_WIDTH } from '../ui/viewport';
 
 /** Texture keys for the two generated sheets, built once and reused. */
 const VIGNETTE_KEY = 'feedVignette';
@@ -59,24 +60,21 @@ export class FeedTreatment {
   constructor(scene: Phaser.Scene) {
     FeedTreatment.ensureTextures(scene);
 
-    const w = scene.scale.width;
-    const h = scene.scale.height;
+    const w = UI_WIDTH;
+    const h = UI_HEIGHT;
 
     // Explicit fractional depths keep the stack honest regardless of the order
     // the scene happens to build things in: cast, then static, then vignette.
     this.cast = scene.add
       .rectangle(w / 2, h / 2, w, h, FEED.cast.colour, FEED.cast.alpha)
-      .setScrollFactor(0)
       .setDepth(FEED.depth);
     this.grain = scene.add
       .tileSprite(w / 2, h / 2, w, h, NOISE_KEY)
-      .setScrollFactor(0)
       .setDepth(FEED.depth + 0.1)
       .setAlpha(FEED.grain.alpha);
     this.vignette = scene.add
       .image(w / 2, h / 2, VIGNETTE_KEY)
       .setDisplaySize(w, h)
-      .setScrollFactor(0)
       .setDepth(FEED.depth + 0.2)
       .setAlpha(FEED.vignette.calmAlpha);
 

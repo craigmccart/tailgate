@@ -16,6 +16,12 @@ export const JUICE = {
     lookAheadPx: 48,
     /** Ease rate for the look-ahead offset. Kept below the follow lerp (0.1). */
     lookAheadLerp: 0.045,
+    /**
+     * How close the camera sits to the building. 1 shows the same 960 by 540
+     * patch of the map as before Phase 22; higher brings the world closer while
+     * the HUD stays the same size. Phase 22 Task 4 raises this.
+     */
+    worldZoom: 1,
   },
   shake: {
     /** Length of the alarm screen shake, ms. */

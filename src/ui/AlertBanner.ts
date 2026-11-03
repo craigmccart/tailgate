@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { FONTS, PALETTE, PALETTE_HEX } from '../config/palette';
 import { getSettings } from '../state/settings';
 import { alertBannerCopy, type BannerTone } from './alertBannerCopy';
+import { UI_WIDTH } from './viewport';
 
 /** Banner timing. One-shot, eased, and gone before it can nag. */
 const BANNER = {
@@ -42,7 +43,7 @@ export class AlertBanner {
 
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
-    const cx = scene.scale.width / 2;
+    const cx = UI_WIDTH / 2;
     this.panel = scene.add
       .rectangle(0, 0, BANNER.width, BANNER.height, PALETTE_HEX.sheet, 0.92)
       .setStrokeStyle(1, PALETTE_HEX.amber, 0.9);
@@ -55,7 +56,6 @@ export class AlertBanner {
       .setOrigin(0.5);
     this.group = scene.add
       .container(cx, BANNER.y, [this.panel, this.trim, this.heading, this.detail])
-      .setScrollFactor(0)
       .setDepth(1100)
       .setAlpha(0);
   }

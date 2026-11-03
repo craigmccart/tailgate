@@ -7,6 +7,7 @@ import { PALETTE } from './config/palette';
 import { BriefingScene } from './scenes/BriefingScene';
 import { BuildingScene } from './scenes/BuildingScene';
 import { ContractSelectScene } from './scenes/ContractSelectScene';
+import { FieldOverlayScene } from './scenes/FieldOverlayScene';
 import { HijackScene } from './scenes/HijackScene';
 import { MenuScene } from './scenes/MenuScene';
 import { PauseScene } from './scenes/PauseScene';
@@ -65,12 +66,16 @@ async function boot(): Promise<void> {
       gamepad: true,
     },
     // The kiosk boots first; it opens the contract schedule, which starts the
-    // building. Pause and settings are overlays launched on top.
+    // building. Pause and settings are overlays launched on top. Phaser draws
+    // running scenes in this list's order, not the order they were launched,
+    // so the field overlay (the building's HUD) sits straight after the
+    // building and below pause, settings and the CCTV multiplexer.
     scene: [
       MenuScene,
       ContractSelectScene,
       BriefingScene,
       BuildingScene,
+      FieldOverlayScene,
       ReportScene,
       PauseScene,
       SettingsScene,

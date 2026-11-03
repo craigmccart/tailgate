@@ -59,4 +59,11 @@ export const LIGHTING = {
   rack: { intensity: 0.85, radiusPx: 70 },
   /** How much light the guard's own sightline adds where it can see. */
   guardTorchIntensity: 0.75,
+  /**
+   * Extra darkness drawn past every edge of the screen, in screen pixels. The
+   * veil is placed a moment before the camera finishes moving each frame, so
+   * without this spare edge a bright strip would flash along the side you are
+   * walking towards. Render only, never counted for detection.
+   */
+  veilMarginPx: 48,
 } as const;
