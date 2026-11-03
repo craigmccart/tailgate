@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { getSettings } from '../state/settings';
 import { UI_HEIGHT, UI_WIDTH, canvasSizeFor, uiZoomFor } from './viewport';
 
 // The Phaser-dependent helpers live here, apart from viewport.ts, because
@@ -12,8 +13,9 @@ export function uiZoomOf(scene: Phaser.Scene): number {
 
 /**
  * Points the scene's main camera at the 960 by 540 box and zooms it to fill the
- * canvas, then keeps it that way when the canvas resizes. The resize listener is
- * removed when the scene shuts down. Returns the zoom applied.
+ * canvas, then keeps it that way when the canvas resizes, and re-sharpens the
+ * scene's text to match. The resize listener is removed when the scene shuts
+ * down. Returns the zoom applied.
  */
 export function fitUiCamera(scene: Phaser.Scene): number {
   const fit = (): number => {
@@ -24,6 +26,7 @@ export function fitUiCamera(scene: Phaser.Scene): number {
   };
   const onResize = (): void => {
     fit();
+    refreshTextResolution(scene);
   };
 
   scene.scale.on(Phaser.Scale.Events.RESIZE, onResize);
@@ -44,6 +47,13 @@ type TextFactory = (
 let textResolutionInstalled = false;
 
 /**
+ * Every text whose resolution the wrapper below chose. A resize re-sharpens
+ * exactly these, so a text that picked its own resolution is never touched. It
+ * is a weak set, so destroyed texts do not pile up.
+ */
+const autoResolutionTexts = new WeakSet<Phaser.GameObjects.Text>();
+
+/**
  * Makes every text created with `this.add.text` render at the UI zoom, so it
  * stays sharp on a large canvas. A style that sets its own resolution wins.
  * Safe to call more than once, it only wraps the factory the first time.
@@ -55,24 +65,49 @@ export function installTextResolution(): void {
   const proto = Phaser.GameObjects.GameObjectFactory.prototype;
   const original = proto.text as TextFactory;
   proto.text = function (this: Phaser.GameObjects.GameObjectFactory, x, y, text, style) {
-    const resolved =
-      style?.resolution === undefined ? { ...style, resolution: uiZoomOf(this.scene) } : style;
-    return original.call(this, x, y, text, resolved);
+    const ownResolution = style?.resolution !== undefined;
+    const resolved = ownResolution ? style : { ...style, resolution: uiZoomOf(this.scene) };
+    const made = original.call(this, x, y, text, resolved);
+    if (!ownResolution) autoResolutionTexts.add(made);
+    return made;
   };
 }
 
 /**
- * Resizes the game's canvas to suit the window. Uses setGameSize, not resize:
- * the game runs in FIT scale mode, and setGameSize is the call that refreshes
- * the FIT layout and tells every scene's camera about the new size. The render
- * scale is fixed at 1 until the player setting exists.
+ * Re-renders the scene's wrapper-sized text at the current UI zoom. Without it,
+ * text made while the canvas was small (render scale 50 percent) stays soft after
+ * the canvas grows, until the scene next restarts. Looks inside containers too.
+ * Phaser also fires a resize when only the window moves, so a text already at the
+ * right resolution is left alone rather than redrawn for nothing.
+ */
+function refreshTextResolution(scene: Phaser.Scene): void {
+  const zoom = uiZoomOf(scene);
+  const visit = (items: Phaser.GameObjects.GameObject[]): void => {
+    for (const item of items) {
+      if (item instanceof Phaser.GameObjects.Text) {
+        if (autoResolutionTexts.has(item) && item.style.resolution !== zoom) {
+          item.setResolution(zoom);
+        }
+      } else if (item instanceof Phaser.GameObjects.Container) {
+        visit(item.list);
+      }
+    }
+  };
+  visit(scene.children.list);
+}
+
+/**
+ * Resizes the game's canvas to suit the window and the player's render scale
+ * setting. Uses setGameSize, not resize: the game runs in FIT scale mode, and
+ * setGameSize is the call that refreshes the FIT layout and tells every scene's
+ * camera about the new size. Also called when the browser window changes size.
  */
 export function applyRenderScale(game: Phaser.Game): void {
   const { width, height } = canvasSizeFor({
     innerWidth: window.innerWidth,
     innerHeight: window.innerHeight,
     devicePixelRatio: window.devicePixelRatio,
-    renderScale: 1,
+    renderScale: getSettings().renderScale,
   });
   game.scale.setGameSize(width, height);
 }

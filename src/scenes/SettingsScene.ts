@@ -2,17 +2,19 @@ import Phaser from 'phaser';
 import { setAudioMasterVolume, setAudioMuted } from '../audio/AudioManager';
 import { FONTS, PALETTE, PALETTE_HEX } from '../config/palette';
 import {
+  RENDER_SCALE_STEP,
   getSettings,
   setAssistMode,
   setExtraBrightness,
   setHudScale,
   setMasterVolume,
   setMuted,
+  setRenderScale,
   setScreenEffects,
   setScreenShake,
 } from '../state/settings';
 import { MenuController } from '../ui/MenuController';
-import { fitUiCamera } from '../ui/uiCamera';
+import { applyRenderScale, fitUiCamera } from '../ui/uiCamera';
 
 /** Slider bounds and steps. The visibility floor maps 0..1 onto extraBrightness. */
 const VOLUME_STEP = 0.05;
@@ -110,6 +112,15 @@ export class SettingsScene extends Phaser.Scene {
         },
         {
           kind: 'value',
+          label: 'RENDER SCALE',
+          getDisplay: () => `${Math.round(getSettings().renderScale * 100)}%`,
+          adjust: (d) => this.changeRenderScale(d),
+          // Three steps, and each one rebuilds the canvas, so holding the key
+          // should not keep firing it.
+          repeatable: false,
+        },
+        {
+          kind: 'value',
           label: 'ASSIST MODE',
           getDisplay: () => (getSettings().assistMode ? 'ON' : 'OFF'),
           adjust: () => setAssistMode(!getSettings().assistMode),
@@ -117,9 +128,9 @@ export class SettingsScene extends Phaser.Scene {
         },
         { kind: 'action', label: 'BACK', onSelect: () => this.close() },
       ],
-      // Eight rows now, so the pitch tightens a little to keep the whole list
-      // centred inside the card with even margins top and bottom.
-      { x: 480, top: 187, rowHeight: 34, width: 420, labelSize: 17, valueSize: 16 },
+      // Nine rows now, so the pitch tightens again to keep the whole list
+      // inside the card.
+      { x: 480, top: 180, rowHeight: 30, width: 420, labelSize: 17, valueSize: 16 },
       { onBack: () => this.close() }
     );
 
@@ -144,6 +155,16 @@ export class SettingsScene extends Phaser.Scene {
     const clamped = this.clamp(v, 0, 1);
     setMasterVolume(clamped);
     setAudioMasterVolume(clamped);
+  }
+
+  /**
+   * Steps the render scale and resizes the canvas to match. At either end of the
+   * range the value does not move, so the canvas is left alone.
+   */
+  private changeRenderScale(dir: -1 | 1): void {
+    const before = getSettings().renderScale;
+    setRenderScale(before + dir * RENDER_SCALE_STEP);
+    if (getSettings().renderScale !== before) applyRenderScale(this.game);
   }
 
   /** Flips mute in settings and on the live mix together. */

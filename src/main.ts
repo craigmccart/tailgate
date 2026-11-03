@@ -14,8 +14,16 @@ import { PauseScene } from './scenes/PauseScene';
 import { ReportScene } from './scenes/ReportScene';
 import { SettingsScene } from './scenes/SettingsScene';
 import { getSettings } from './state/settings';
-import { installTextResolution } from './ui/uiCamera';
+import { applyRenderScale, installTextResolution } from './ui/uiCamera';
 import { canvasSizeFor } from './ui/viewport';
+
+/**
+ * How long the browser window must stay still, in milliseconds, before the canvas
+ * is re-fitted to its new size. Dragging a window edge fires a resize event
+ * every frame, so we wait for the dragging to stop rather than resizing the
+ * canvas dozens of times.
+ */
+const WINDOW_RESIZE_SETTLE_MS = 250;
 
 /**
  * Canvas text cannot use a web font until the browser has finished loading it,
@@ -40,7 +48,7 @@ async function boot(): Promise<void> {
     innerWidth: window.innerWidth,
     innerHeight: window.innerHeight,
     devicePixelRatio: window.devicePixelRatio,
-    renderScale: 1,
+    renderScale: getSettings().renderScale,
   });
 
   const game = new Phaser.Game({
@@ -86,6 +94,14 @@ async function boot(): Promise<void> {
   // Scenes are created on a later tick, so the text wrapper is in place before
   // any text exists.
   installTextResolution();
+
+  // Maximising or shrinking the browser window re-fits the canvas to the new
+  // device-pixel size, instead of stretching the size it booted at.
+  let resizeTimer: ReturnType<typeof setTimeout> | undefined;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => applyRenderScale(game), WINDOW_RESIZE_SETTLE_MS);
+  });
 
   // Dev-only handles for manual inspection. Stripped from production builds.
   if (import.meta.env.DEV) {
