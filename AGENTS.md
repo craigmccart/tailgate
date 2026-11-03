@@ -59,7 +59,7 @@ Two decisions that are already made. Do not fall back to Tailwind blue or a gene
 
 ## Asset and licence rules (non-negotiable)
 
-- Only CC0 or CC-BY licensed assets. Nothing marked "free for personal use" or "non-commercial".
+- Only CC0 or CC-BY licensed assets, plus images Craig makes himself (for example through his own ChatGPT account). Nothing marked "free for personal use" or "non-commercial".
 - Every asset added to the repo gets a line in CREDITS.md in the same commit: filename, source URL, author, licence. Treat CREDITS.md as an SBOM for assets. An asset with no CREDITS.md entry is a bug.
 - Approved sources: Kenney.nl (art, CC0), Sonniss GDC audio bundles (SFX), OpenGameArt (check each licence), Kevin MacLeod (music, CC-BY, credit required), ambientCG and Poly Haven (CC0 surface textures), images generated through Craig's own ChatGPT account (credited in CREDITS.md as his own work).
 - No paid APIs, no external services, no CDN-hosted game code.

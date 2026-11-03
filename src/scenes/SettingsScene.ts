@@ -115,7 +115,7 @@ export class SettingsScene extends Phaser.Scene {
           label: 'RENDER SCALE',
           getDisplay: () => `${Math.round(getSettings().renderScale * 100)}%`,
           adjust: (d) => this.changeRenderScale(d),
-          // Three steps, and each one rebuilds the canvas, so holding the key
+          // Three values, and each change rebuilds the canvas, so holding the key
           // should not keep firing it.
           repeatable: false,
         },

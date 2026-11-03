@@ -60,11 +60,6 @@ export class AlertBanner {
       .setAlpha(0);
   }
 
-  /** Every screen-fixed piece, so secondary feed cameras can ignore them. */
-  get screenObjects(): Phaser.GameObjects.GameObject[] {
-    return [this.group];
-  }
-
   /** Shows the change from `previous` to `level`. Replaces any banner still up. */
   show(level: number, previous: number): void {
     const copy = alertBannerCopy(level, previous);

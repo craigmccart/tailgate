@@ -109,6 +109,9 @@ export function refreshTextResolution(scene: Phaser.Scene): void {
  * setting. Uses setGameSize, not resize: the game runs in FIT scale mode, and
  * setGameSize is the call that refreshes the FIT layout and tells every scene's
  * camera about the new size. Also called when the browser window changes size.
+ * If the canvas is already the right size it does nothing: Phaser's own window
+ * listener has re-fitted the page layout, and resizing to the same size would
+ * only clear the canvas and rebuild the lighting veil for no gain.
  */
 export function applyRenderScale(game: Phaser.Game): void {
   const { width, height } = canvasSizeFor({
@@ -117,5 +120,6 @@ export function applyRenderScale(game: Phaser.Game): void {
     devicePixelRatio: window.devicePixelRatio,
     renderScale: getSettings().renderScale,
   });
+  if (width === game.scale.width && height === game.scale.height) return;
   game.scale.setGameSize(width, height);
 }

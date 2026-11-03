@@ -114,20 +114,6 @@ export class FieldHud {
       .setVisible(false);
   }
 
-  /** Every screen-fixed piece, so secondary feed cameras can ignore them. */
-  get screenObjects(): Phaser.GameObjects.GameObject[] {
-    return [
-      this.leftPanel,
-      this.leftTrim,
-      this.leftText,
-      this.bars,
-      this.rightPanel,
-      this.rightText,
-      this.loopPanel,
-      this.loopText,
-    ];
-  }
-
   update(frame: HudFrame): void {
     // The HUD text scale setting applies live, so a change from the pause
     // menu takes effect the moment the player resumes.

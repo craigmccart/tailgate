@@ -83,14 +83,18 @@ export const FEED = {
   },
 
   /**
-   * A barely-there cool cast over the picture. It costs the greys almost
-   * nothing and makes every clearance-amber accent read warmer by contrast,
-   * which is the whole trick. Deliberately desaturated: this is a lens, not an
-   * accent colour, and the identity palette owns the accents.
+   * A faint cool cast over the picture: a flat sheet of this blue-grey laid
+   * over everything at low strength, as a normal blend. It nudges every
+   * colour a few percent towards it, so the picture reads cooler and the
+   * blacks lift very slightly. It is not a darkening layer: the only part of
+   * the treatment that darkens is the vignette, at the corners. Against the
+   * cooler picture every clearance-amber accent reads warmer by contrast,
+   * which is the whole trick. This is a lens, not an accent colour, and the
+   * identity palette owns the accents.
    *
    * Phase 22 evening values (was 0x8296ab at 0.035): a slightly bluer, a
-   * touch stronger cast for the after-hours picture, which is cooler and
-   * darker overall and so makes the amber HUD read warmer still.
+   * touch stronger cast for the after-hours picture, so the amber HUD reads
+   * warmer still.
    */
   cast: {
     colour: 0x6f86a8,

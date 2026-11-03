@@ -35,7 +35,7 @@ export class FeedTreatment {
   private readonly cast: Phaser.GameObjects.Rectangle;
   private readonly grain: Phaser.GameObjects.TileSprite;
   private readonly vignette: Phaser.GameObjects.Image;
-  /** The three sheets as one list, so feed cameras can ignore them wholesale. */
+  /** The three sheets as one list, so they are shown, hidden and destroyed together. */
   private readonly sheets: (
     | Phaser.GameObjects.Rectangle
     | Phaser.GameObjects.TileSprite
@@ -85,15 +85,6 @@ export class FeedTreatment {
     this.applyTint();
 
     this.sheets = [this.cast, this.grain, this.vignette];
-  }
-
-  /**
-   * The screen-fixed sheets, so a CCTV feed camera can ignore them: the
-   * multiplexer draws its own, stronger treatment over that picture and must
-   * not get this one on top of it.
-   */
-  get screenObjects(): readonly Phaser.GameObjects.GameObject[] {
-    return this.sheets;
   }
 
   /**

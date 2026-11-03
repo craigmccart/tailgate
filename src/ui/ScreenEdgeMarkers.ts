@@ -35,11 +35,6 @@ export class ScreenEdgeMarkers {
     this.gfx = scene.add.graphics().setDepth(998);
   }
 
-  /** The graphics object, so CCTV feed cameras can ignore it. */
-  get gameObject(): Phaser.GameObjects.Graphics {
-    return this.gfx;
-  }
-
   clear(): void {
     this.gfx.clear();
   }

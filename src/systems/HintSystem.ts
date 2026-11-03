@@ -37,11 +37,6 @@ export class HintSystem {
       .setAlpha(0);
   }
 
-  /** The text object, so secondary feed cameras can ignore it. */
-  get gameObject(): Phaser.GameObjects.Text {
-    return this.text;
-  }
-
   update(now: number, playerX: number, playerY: number): void {
     this.text.setScale(getSettings().hudScale);
 
