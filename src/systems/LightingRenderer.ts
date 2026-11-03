@@ -7,7 +7,7 @@ import { getSettings } from '../state/settings';
 import type { Guard } from '../entities/Guard';
 import type { Player } from '../entities/Player';
 import type { LightSource } from './LightModel';
-import { veilErasePoint } from './veilGeometry';
+import { veilErasePoint, veilOriginFor } from './veilGeometry';
 
 /** Size of the soft radial light-mask texture used as an erase brush. */
 const MASK_SIZE = 256;
@@ -101,10 +101,11 @@ export class LightingRenderer {
     );
 
     // Lay the veil over the camera's view with the margin spare on every side,
-    // shrunk by the zoom so each texel covers exactly one canvas pixel.
+    // shrunk by the zoom so each texel covers exactly one canvas pixel. The
+    // corner comes from the camera's centre, which a resize re-centre sets at
+    // once; the camera's world view only catches up when it next draws.
     const zoom = cam.zoom;
-    const margin = LIGHTING.veilMarginPx / zoom;
-    const origin = { x: cam.worldView.x - margin, y: cam.worldView.y - margin };
+    const origin = veilOriginFor(cam.midPoint, cam.width, cam.height, zoom, LIGHTING.veilMarginPx);
     this.rt.setPosition(origin.x, origin.y).setScale(1 / zoom);
 
     this.rt.clear();

@@ -75,6 +75,7 @@ import type { AlertBanner } from '../ui/AlertBanner';
 import type { FieldHud, HudFrame } from '../ui/FieldHud';
 import type { ScreenEdgeMarkers } from '../ui/ScreenEdgeMarkers';
 import { fadeIn, fadeOutThen, fadeToScene } from '../ui/transitions';
+import { shakeIntensityFor } from '../ui/cameraShake';
 import { uiZoomOf } from '../ui/uiCamera';
 import type { HintSystem } from '../systems/HintSystem';
 import { BuildingMap } from '../world/BuildingMap';
@@ -395,7 +396,13 @@ export class BuildingScene extends Phaser.Scene {
 
   /** The canvas changed size: re-fit the world camera, the veil and any live feed. */
   private onCanvasResize(): void {
+    // Phaser resizes the camera but keeps its scroll, which would throw the
+    // view off the player by half the size change. Hold the centre instead,
+    // then redraw the veil around that same centre.
+    const main = this.cameras.main;
+    const { x: centreX, y: centreY } = main.midPoint;
     this.fitWorldCamera();
+    main.centerOn(centreX, centreY);
     this.lightingRenderer.resize();
     if (this.feedCam) {
       // Keep the same spot centred: the viewport changes size around it.
@@ -438,7 +445,11 @@ export class BuildingScene extends Phaser.Scene {
     }
 
     if (this.detained || this.missionOver) {
-      return; // frozen during the DETAINED flash or the handover to the report
+      // Frozen during the DETAINED flash or the handover to the report. The
+      // camera's follow still eases on, and the veil is pinned to the world,
+      // so it keeps being laid over the view.
+      this.drawVeil();
+      return;
     }
 
     const now = this.time.now;
@@ -622,13 +633,18 @@ export class BuildingScene extends Phaser.Scene {
 
     // Lighting draws last so it reflects this frame's final positions, then the
     // feed treatment tints the finished picture and carries the alert level.
+    this.drawVeil();
+    this.feedTreatment.update(now, delta, getMission().alertLevel);
+  }
+
+  /** Redraws the lighting veil over the world camera's current view. */
+  private drawVeil(): void {
     this.lightingRenderer.update(
       this.cameras.main,
       this.player,
       this.guards.guards,
       this.lightModel.sources
     );
-    this.feedTreatment.update(now, delta, getMission().alertLevel);
   }
 
   /** Eases the camera to lead the player's travel a touch, for comfort. */
@@ -645,7 +661,10 @@ export class BuildingScene extends Phaser.Scene {
     if (!getSettings().screenShake) {
       return;
     }
-    this.cameras.main.shake(JUICE.shake.durationMs, JUICE.shake.intensity);
+    // Phaser grows a shake by the zoom twice over, so the tuned intensity is
+    // scaled back down to keep the shake as tiny as it was at zoom 1.
+    const intensity = shakeIntensityFor(JUICE.shake.intensity, this.cameras.main.zoom);
+    this.cameras.main.shake(JUICE.shake.durationMs, intensity);
   }
 
   /** True while the interact control is held: E on keyboard, A on the pad. */

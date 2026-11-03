@@ -24,3 +24,30 @@ export function veilErasePoint(
     scale: zoom,
   };
 }
+
+/**
+ * The world point under the veil's top-left corner: half the camera's view
+ * plus the margin, measured back from the camera's centre and turned from
+ * canvas pixels into world units by the zoom. Working from the centre rather
+ * than the camera's world view matters straight after a resize, when the
+ * centre has just been set but the world view is not refreshed until the
+ * camera next draws.
+ *
+ * @param centre the world point at the middle of the camera's view
+ * @param viewWidthPx the camera's width in canvas pixels
+ * @param viewHeightPx the camera's height in canvas pixels
+ * @param zoom the world camera's zoom
+ * @param marginPx the spare veil past each screen edge, in canvas pixels
+ */
+export function veilOriginFor(
+  centre: { x: number; y: number },
+  viewWidthPx: number,
+  viewHeightPx: number,
+  zoom: number,
+  marginPx: number
+): { x: number; y: number } {
+  return {
+    x: centre.x - (viewWidthPx / 2 + marginPx) / zoom,
+    y: centre.y - (viewHeightPx / 2 + marginPx) / zoom,
+  };
+}
