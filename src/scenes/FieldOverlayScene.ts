@@ -37,8 +37,12 @@ type FadeListener = (
  * moving or resizing any of this.
  *
  * The overlay has no logic of its own. The building launches it, receives the
- * objects through attachOverlay, and drives them from its own update, so a
- * paused building simply leaves the overlay showing its last frame.
+ * objects through attachOverlay, and drives them from its own update. When the
+ * building pauses it pauses this scene too, so the overlay's own tweens (an
+ * alert banner, a hint easing in) hold still behind the pause badge. A paused
+ * scene still draws, so the HUD keeps showing its last frame, and its resize
+ * listener belongs to the game's scale manager, so a render scale change made
+ * from the pause menu still re-fits it.
  */
 export class FieldOverlayScene extends Phaser.Scene {
   hud!: FieldHud;

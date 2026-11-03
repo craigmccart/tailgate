@@ -380,10 +380,28 @@ export class BuildingScene extends Phaser.Scene {
     // manager belongs to the whole game), so the world camera, the veil and
     // any live CCTV feed re-fit whenever it does.
     this.scale.on(Phaser.Scale.Events.RESIZE, this.onCanvasResize, this);
+    // Pausing the building pauses the overlay with it, so the overlay's own
+    // tweens (an alert banner, a hint easing in) hold still behind the pause
+    // badge instead of playing out unseen. A paused scene still draws, so the
+    // HUD stays on screen.
+    const pauseOverlay = (): void => {
+      if (this.scene.isActive('fieldOverlay')) {
+        this.scene.pause('fieldOverlay');
+      }
+    };
+    const resumeOverlay = (): void => {
+      if (this.scene.isPaused('fieldOverlay')) {
+        this.scene.resume('fieldOverlay');
+      }
+    };
+    this.events.on(Phaser.Scenes.Events.PAUSE, pauseOverlay);
+    this.events.on(Phaser.Scenes.Events.RESUME, resumeOverlay);
     // Leaving the building, by detain restart, exfil or quit, takes the
-    // overlay with it; the next create launches a fresh one.
+    // overlay with it, paused or not; the next create launches a fresh one.
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.scale.off(Phaser.Scale.Events.RESIZE, this.onCanvasResize, this);
+      this.events.off(Phaser.Scenes.Events.PAUSE, pauseOverlay);
+      this.events.off(Phaser.Scenes.Events.RESUME, resumeOverlay);
       this.overlayReady = false;
       this.scene.stop('fieldOverlay');
     });
