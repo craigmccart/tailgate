@@ -99,7 +99,9 @@ export class AmbientParticles {
         lifespan: cfg.lifespanMs,
         speedX: cfg.driftX,
         speedY: cfg.speedY,
-        alpha: { start: cfg.alphaStart, end: cfg.alphaEnd },
+        // Fade in from nothing, up to the peak, down to the tail, out to
+        // nothing, spread evenly over the streak's life, so it never pops.
+        alpha: { values: [0, cfg.alphaPeak, cfg.alphaTail, 0], interpolation: 'linear' },
         tint: cfg.tint,
         emitting: false,
       })

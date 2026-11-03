@@ -21,19 +21,31 @@ export const WEATHER = {
     /** How far each streak leans off vertical, degrees, to match the wind. */
     streakAngleDeg: 8,
     /**
-     * How solid a streak is when it appears and when it finishes (0 invisible,
-     * 1 solid); it fades from the first to the second as it falls. The
-     * lighting veil dims the streaks wherever it is dark, so they read faintly
-     * in the dark and clearly under a lamp. These are the numbers to lower for
-     * subtler rain.
+     * How solid a streak gets (0 invisible, 1 solid). Each streak starts
+     * invisible, fades up to the peak a third of the way through its life,
+     * eases down to the tail by two thirds, then fades back to invisible. The
+     * fade in and out means no streak ever pops on or off, which is kinder on
+     * the eyes. The lighting veil dims the streaks wherever it is dark, so they
+     * read faintly in the dark and clearly under a lamp. These are the numbers
+     * to lower for subtler rain.
      */
-    alphaStart: 0.45,
-    alphaEnd: 0.15,
-    /** How fast rain falls, px per second. */
-    speedY: 420,
-    /** Sideways wind, px per second. Negative blows the rain to the left. */
-    driftX: -40,
-    /** How long one streak lives before it has faded out, ms. */
+    alphaPeak: 0.45,
+    alphaTail: 0.3,
+    /**
+     * How fast rain falls, px per second. This is the number to lower for
+     * slower, calmer rain.
+     */
+    speedY: 260,
+    /**
+     * Sideways wind, px per second. Negative blows the rain to the left.
+     * Closer to 0 is calmer.
+     */
+    driftX: -25,
+    /**
+     * How long one streak lives, ms, from fading in to fully faded out. At the
+     * fall speed above a streak drops about 110 px in that time, under a third
+     * of the view's height.
+     */
     lifespanMs: 420,
     /**
      * How heavy the rain is: new streaks per second for every 100 by 100 px
