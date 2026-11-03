@@ -147,6 +147,10 @@ export class ThrowController {
     }
 
     const pointer = scene.input.activePointer;
+    // Phaser only refreshes worldX and worldY when the mouse moves. The camera
+    // keeps easing after that (travel and pointer look-ahead), so work the
+    // world point out afresh through the camera, or the aim would trail the cursor.
+    pointer.updateWorldPoint(scene.cameras.main);
     const aim = new Phaser.Math.Vector2(pointer.worldX, pointer.worldY);
     const to = aim.clone().subtract(player);
     if (to.length() > THROW.maxRangePx) {

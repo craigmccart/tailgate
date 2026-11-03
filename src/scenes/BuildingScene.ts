@@ -40,6 +40,7 @@ import {
   type FreezeResult,
 } from '../systems/CameraSystem';
 import { AmbientParticles } from '../systems/AmbientParticles';
+import { pointerLookAhead } from '../systems/cameraLookAhead';
 import type { FeedTreatment } from '../systems/FeedTreatment';
 import { GuardAwareness } from '../systems/GuardAwareness';
 import { GuardRoster, type GuardDef } from '../systems/GuardRoster';
@@ -130,6 +131,8 @@ export class BuildingScene extends Phaser.Scene {
   /** The walkable map guards path across. Rebuilt with the level on every restart. */
   private navGrid!: NavGrid;
   private followOffset = new Phaser.Math.Vector2(0, 0);
+  /** The eased lean toward the mouse or right stick, added to the travel look-ahead. */
+  private pointerOffset = new Phaser.Math.Vector2(0, 0);
   private promptText!: Phaser.GameObjects.Text;
   private guardDebug!: Phaser.GameObjects.Graphics;
   private guardDebugOn = false;
@@ -236,6 +239,7 @@ export class BuildingScene extends Phaser.Scene {
     this.doors = [];
     this.staff = [];
     this.followOffset.set(0, 0);
+    this.pointerOffset.set(0, 0);
     // The scene instance persists across restart(), so every per-life field
     // must reset here. A camera cue from the previous life must not be blamed
     // on the next banner.
@@ -468,7 +472,7 @@ export class BuildingScene extends Phaser.Scene {
       delta
     );
     this.player.applyMotion(intent, delta);
-    this.updateLookAhead(intent.direction);
+    this.updateLookAhead(intent.direction, pad);
 
     this.updateAlertLevel(now);
     // Lockdown slams the console session shut mid-use.
@@ -647,13 +651,43 @@ export class BuildingScene extends Phaser.Scene {
     );
   }
 
-  /** Eases the camera to lead the player's travel a touch, for comfort. */
-  private updateLookAhead(dir: Phaser.Math.Vector2): void {
+  /**
+   * Eases the camera to lead the player's travel a touch, for comfort, and to
+   * lean toward the mouse or right stick. The two are separate eased offsets
+   * that add together. The lean is switched off by the SCREEN EFFECTS setting,
+   * and switching it off eases back rather than snapping.
+   */
+  private updateLookAhead(
+    dir: Phaser.Math.Vector2,
+    pad: Phaser.Input.Gamepad.Gamepad | undefined
+  ): void {
     const targetX = dir.x * JUICE.camera.lookAheadPx;
     const targetY = dir.y * JUICE.camera.lookAheadPx;
     this.followOffset.x = Phaser.Math.Linear(this.followOffset.x, targetX, JUICE.camera.lookAheadLerp);
     this.followOffset.y = Phaser.Math.Linear(this.followOffset.y, targetY, JUICE.camera.lookAheadLerp);
-    this.cameras.main.setFollowOffset(-this.followOffset.x, -this.followOffset.y);
+
+    // The mouse only counts once it has moved and while it is over the canvas,
+    // so a keyboard or pad player is not pulled toward the top-left corner.
+    const pointer = this.input.activePointer;
+    const zoom = uiZoomOf(this);
+    const mouseUsable = this.input.isOver && pointer.moveTime > 0;
+    const stick =
+      pad !== undefined && pad.rightStick.length() >= THROW.aimDeadzone
+        ? { x: pad.rightStick.x, y: pad.rightStick.y }
+        : null;
+    const lean = pointerLookAhead({
+      pointerUi: mouseUsable ? { x: pointer.x / zoom, y: pointer.y / zoom } : null,
+      stick,
+      enabled: getSettings().screenEffects,
+      maxPx: JUICE.camera.pointerLookAheadPx,
+    });
+    this.pointerOffset.x = Phaser.Math.Linear(this.pointerOffset.x, lean.x, JUICE.camera.pointerLookAheadLerp);
+    this.pointerOffset.y = Phaser.Math.Linear(this.pointerOffset.y, lean.y, JUICE.camera.pointerLookAheadLerp);
+
+    this.cameras.main.setFollowOffset(
+      -(this.followOffset.x + this.pointerOffset.x),
+      -(this.followOffset.y + this.pointerOffset.y)
+    );
   }
 
   /** Fires the alarm screen shake, unless the player has turned shake off. */
