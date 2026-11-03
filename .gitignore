@@ -21,3 +21,6 @@ Thumbs.db
 .vercel
 .env*
 .playwright-mcp/
+
+# Screenshot and review scratch output (plan assumes this is ignored)
+output/

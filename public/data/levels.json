@@ -27,10 +27,10 @@
           "Detentions are reported to the client. Keep them off the invoice."
         ],
         "intel": [
-          "Staff prop the south fire door open on smoking breaks. Its lamp shows green while it stands open.",
+          "Late staff prop the south fire door open on smoking breaks. Its lamp shows green while it stands open.",
           "Reception staff badge colleagues through without a second look. Stay within two seconds of a badge-holder.",
-          "Deliveries leave the dock shutter unattended in repeating windows.",
-          "Site CCTV reports to a security office console that is rarely watched."
+          "The last deliveries of the evening leave the dock shutter unattended in repeating windows.",
+          "Site CCTV reports to a security office console that is rarely watched after hours."
         ]
       },
       "hints": [
@@ -108,7 +108,7 @@
           "Keep clear of vehicle routes on the dispatch apron."
         ],
         "intel": [
-          "Heavy staff traffic on the floor. Contractor hi-vis is accepted at a distance without question.",
+          "Heavy staff traffic on the floor through the evening shift. Contractor hi-vis is accepted at a distance without question.",
           "The vest means nothing up close, inside the cage or the office, or once security is alarmed.",
           "Racking blocks sightlines both ways. The floor is a maze that works for whoever moves quietly.",
           "Spare vests hang in the break room and on the dispatch dock."

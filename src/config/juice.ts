@@ -16,6 +16,27 @@ export const JUICE = {
     lookAheadPx: 48,
     /** Ease rate for the look-ahead offset. Kept below the follow lerp (0.1). */
     lookAheadLerp: 0.045,
+    /**
+     * How close the camera sits to the building. 1 is the original view. 1.4 is
+     * the Phase 22 setting: the screen shows about 70 percent of the old width
+     * and height (1 divided by 1.4), so everything looks 40 percent bigger,
+     * closer and more detailed. The HUD stays the same size. Higher is closer
+     * still, but you see less of a guard's approach, so go up in small steps.
+     */
+    worldZoom: 1.4,
+    /**
+     * How far the view leans toward the mouse, or the right stick on a pad, in
+     * world px. The full lean is reached with the mouse at the top or bottom
+     * edge of the screen. It is added on top of the travel look-ahead above and
+     * is switched off by the SCREEN EFFECTS setting. Set 0 to disable cleanly.
+     */
+    pointerLookAheadPx: 56,
+    /**
+     * Ease rate for that lean, per frame. Deliberately slower than the travel
+     * look-ahead (0.045), so the view takes a little over a second to settle
+     * and never slides under you. Lower is gentler.
+     */
+    pointerLookAheadLerp: 0.04,
   },
   shake: {
     /** Length of the alarm screen shake, ms. */

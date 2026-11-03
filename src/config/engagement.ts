@@ -6,6 +6,8 @@
 export const ENGAGEMENT = {
   /** The in-fiction date the assessment is dated. */
   date: '05 JULY 2026',
+  /** When the consultant attends site, printed on the briefing: after hours. */
+  attendance: '18:30, AFTER HOURS',
   /** The consultancy's name, as it signs its paperwork. */
   consultant: 'S0N0FG0THAM CONSULTING',
 } as const;

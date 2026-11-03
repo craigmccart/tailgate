@@ -7,6 +7,7 @@ import { resetMission } from '../state/mission';
 import { resetRunStats } from '../state/runStats';
 import { MenuController, type MenuItem } from '../ui/MenuController';
 import { fadeIn, fadeToScene } from '../ui/transitions';
+import { fitUiCamera } from '../ui/uiCamera';
 
 /** The gamepad X button (standard mapping), the "view briefing" control. */
 const PAD_X = 2;
@@ -55,6 +56,7 @@ export class ContractSelectScene extends Phaser.Scene {
   }
 
   create(): void {
+    fitUiCamera(this);
     fadeIn(this);
     // Scene instances are reused across restarts, so last visit's game objects
     // must not linger in these lists.

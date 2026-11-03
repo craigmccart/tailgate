@@ -3,6 +3,7 @@ import { HUD } from '../config/hud';
 import { FONTS, PALETTE, PALETTE_HEX } from '../config/palette';
 import { getSettings } from '../state/settings';
 import type { SpeedState } from '../input/InputState';
+import { UI_WIDTH } from './viewport';
 
 /** Everything the HUD shows this frame. The scene builds it from live state. */
 export interface HudFrame {
@@ -58,22 +59,18 @@ export class FieldHud {
   private readonly rightText: Phaser.GameObjects.Text;
   private readonly loopPanel: Phaser.GameObjects.Rectangle;
   private readonly loopText: Phaser.GameObjects.Text;
-  private readonly screenWidth: number;
 
   constructor(scene: Phaser.Scene) {
     const { marginPx, padX, padY, fontPx, leftWidthPx, fillAlpha } = HUD.chip;
-    this.screenWidth = scene.scale.width;
 
     this.leftPanel = scene.add
       .rectangle(marginPx, marginPx, leftWidthPx, 88, PALETTE_HEX.sheet, fillAlpha)
       .setOrigin(0, 0)
-      .setScrollFactor(0)
       .setDepth(999)
       .setStrokeStyle(1, PALETTE_HEX.amber, 0.35);
     this.leftTrim = scene.add
       .rectangle(marginPx, marginPx, 3, 88, PALETTE_HEX.amber, 0.35)
       .setOrigin(0, 0)
-      .setScrollFactor(0)
       .setDepth(999);
     this.leftText = scene.add
       .text(marginPx + padX + 2, marginPx + padY, '', {
@@ -82,14 +79,12 @@ export class FieldHud {
         color: PALETTE.text,
         lineSpacing: HUD.chip.rowPx - fontPx - 2,
       })
-      .setScrollFactor(0)
       .setDepth(1000);
-    this.bars = scene.add.graphics().setScrollFactor(0).setDepth(1000);
+    this.bars = scene.add.graphics().setDepth(1000);
 
     this.rightPanel = scene.add
-      .rectangle(this.screenWidth - marginPx, marginPx, 200, 60, PALETTE_HEX.sheet, fillAlpha)
+      .rectangle(UI_WIDTH - marginPx, marginPx, 200, 60, PALETTE_HEX.sheet, fillAlpha)
       .setOrigin(1, 0)
-      .setScrollFactor(0)
       .setDepth(999)
       .setStrokeStyle(1, PALETTE_HEX.amber, 0.35);
     this.rightText = scene.add
@@ -99,7 +94,6 @@ export class FieldHud {
         color: PALETTE.text,
         lineSpacing: HUD.chip.rowPx - fontPx - 2,
       })
-      .setScrollFactor(0)
       .setDepth(1000);
 
     // The loop chip: only visible while a camera feed is looped, so the
@@ -107,7 +101,6 @@ export class FieldHud {
     this.loopPanel = scene.add
       .rectangle(marginPx, marginPx, leftWidthPx, 24, PALETTE_HEX.sheet, fillAlpha)
       .setOrigin(0, 0)
-      .setScrollFactor(0)
       .setDepth(999)
       .setStrokeStyle(1, PALETTE_HEX.amber, 0.95)
       .setVisible(false);
@@ -117,23 +110,8 @@ export class FieldHud {
         fontSize: '13px',
         color: PALETTE.amber,
       })
-      .setScrollFactor(0)
       .setDepth(1000)
       .setVisible(false);
-  }
-
-  /** Every screen-fixed piece, so secondary feed cameras can ignore them. */
-  get screenObjects(): Phaser.GameObjects.GameObject[] {
-    return [
-      this.leftPanel,
-      this.leftTrim,
-      this.leftText,
-      this.bars,
-      this.rightPanel,
-      this.rightText,
-      this.loopPanel,
-      this.loopText,
-    ];
   }
 
   update(frame: HudFrame): void {
@@ -207,7 +185,7 @@ export class FieldHud {
     const width = this.rightText.displayWidth + padX * 2 + 4;
     const height = this.rightText.displayHeight + padY * 2;
     this.rightPanel.setSize(width, height);
-    this.rightText.setX(this.screenWidth - marginPx - width + padX + 2);
+    this.rightText.setX(UI_WIDTH - marginPx - width + padX + 2);
   }
 
   private updateLoops(frame: HudFrame, scale: number): void {

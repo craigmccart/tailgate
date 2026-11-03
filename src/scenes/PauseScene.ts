@@ -7,6 +7,7 @@ import { resetMission } from '../state/mission';
 import { resetRunStats } from '../state/runStats';
 import { getSettings } from '../state/settings';
 import { MenuController } from '../ui/MenuController';
+import { fitUiCamera } from '../ui/uiCamera';
 
 /** The badge card geometry, drawn portrait like a real access lanyard. */
 const CARD = { x: 480, y: 296, w: 384, h: 448 } as const;
@@ -42,6 +43,7 @@ export class PauseScene extends Phaser.Scene {
   }
 
   create(): void {
+    fitUiCamera(this);
     // Dim the frozen game behind the badge.
     this.add.rectangle(480, 270, 960, 540, PALETTE_HEX.base, 0.72);
     this.drawLanyard();

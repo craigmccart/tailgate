@@ -24,12 +24,22 @@ export const FEED = {
 
   /** The soft corner vignette, like a lens that has seen a few years of service. */
   vignette: {
-    /** Peak opacity at the corners while the site is calm. */
-    calmAlpha: 0.14,
-    /** Peak opacity at cautious. Barely deeper, and warmer (see the tints). */
-    cautiousAlpha: 0.16,
-    /** Peak opacity at lockdown. The edges close in a little. */
-    lockdownAlpha: 0.22,
+    /**
+     * Peak opacity at the corners while the site is calm. Phase 22 evening
+     * value (was 0.14): the engagement now runs after hours, so the corners
+     * close in a little more for a darker picture.
+     */
+    calmAlpha: 0.2,
+    /**
+     * Peak opacity at cautious. Phase 22 evening value (was 0.16). Still
+     * barely deeper than calm, and warmer (see the tints).
+     */
+    cautiousAlpha: 0.22,
+    /**
+     * Peak opacity at lockdown. Phase 22 evening value (was 0.22). The edges
+     * close in a little.
+     */
+    lockdownAlpha: 0.28,
     /**
      * Vignette colour per alert level. Calm is the near-black base. Cautious is
      * that base nudged towards clearance amber, so the edges warm without ever
@@ -73,14 +83,22 @@ export const FEED = {
   },
 
   /**
-   * A barely-there cool cast over the picture. It costs the greys almost
-   * nothing and makes every clearance-amber accent read warmer by contrast,
-   * which is the whole trick. Deliberately desaturated: this is a lens, not an
-   * accent colour, and the identity palette owns the accents.
+   * A faint cool cast over the picture: a flat sheet of this blue-grey laid
+   * over everything at low strength, as a normal blend. It nudges every
+   * colour a few percent towards it, so the picture reads cooler and the
+   * blacks lift very slightly. It is not a darkening layer: the only part of
+   * the treatment that darkens is the vignette, at the corners. Against the
+   * cooler picture every clearance-amber accent reads warmer by contrast,
+   * which is the whole trick. This is a lens, not an accent colour, and the
+   * identity palette owns the accents.
+   *
+   * Phase 22 evening values (was 0x8296ab at 0.035): a slightly bluer, a
+   * touch stronger cast for the after-hours picture, so the amber HUD reads
+   * warmer still.
    */
   cast: {
-    colour: 0x8296ab,
-    alpha: 0.035,
+    colour: 0x6f86a8,
+    alpha: 0.06,
   },
 
   /**

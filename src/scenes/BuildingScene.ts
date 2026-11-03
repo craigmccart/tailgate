@@ -20,7 +20,7 @@ import { NoiseRings } from '../systems/NoiseRings';
 import { JUICE } from '../config/juice';
 import { LIGHTING } from '../config/lighting';
 import { MOVEMENT } from '../config/movement';
-import { FONTS, PALETTE, PALETTE_HEX } from '../config/palette';
+import { PALETTE_HEX } from '../config/palette';
 import { THROW } from '../config/throw';
 import { IMAGE_ASSETS, RENDER } from '../config/tiles';
 import { NOISE_RING_TINT } from '../config/zones';
@@ -40,7 +40,8 @@ import {
   type FreezeResult,
 } from '../systems/CameraSystem';
 import { AmbientParticles } from '../systems/AmbientParticles';
-import { FeedTreatment } from '../systems/FeedTreatment';
+import { pointerIsLive, pointerLookAhead } from '../systems/cameraLookAhead';
+import type { FeedTreatment } from '../systems/FeedTreatment';
 import { GuardAwareness } from '../systems/GuardAwareness';
 import { GuardRoster, type GuardDef } from '../systems/GuardRoster';
 import { LightModel } from '../systems/LightModel';
@@ -71,13 +72,17 @@ import {
 } from '../state/runStats';
 import { ObjectiveSystem } from '../systems/ObjectiveSystem';
 import { ThrowController } from '../systems/ThrowController';
-import { AlertBanner } from '../ui/AlertBanner';
-import { FieldHud, type HudFrame } from '../ui/FieldHud';
-import { ScreenEdgeMarkers } from '../ui/ScreenEdgeMarkers';
+import type { AlertBanner } from '../ui/AlertBanner';
+import type { FieldHud, HudFrame } from '../ui/FieldHud';
+import type { ScreenEdgeMarkers } from '../ui/ScreenEdgeMarkers';
 import { fadeIn, fadeOutThen, fadeToScene } from '../ui/transitions';
-import { HintSystem } from '../systems/HintSystem';
+import { shakeIntensityFor } from '../ui/cameraShake';
+import { refreshTextResolution, uiZoomOf } from '../ui/uiCamera';
+import type { HintSystem } from '../systems/HintSystem';
 import { BuildingMap } from '../world/BuildingMap';
 import { WorldRenderer } from '../world/WorldRenderer';
+import { drawWetSheen } from '../world/wetSurface';
+import type { FieldOverlayScene } from './FieldOverlayScene';
 
 /** How close authorised staff must be to a badge door to open it. */
 const STAFF_BADGE_DISTANCE = 75;
@@ -120,6 +125,8 @@ export class BuildingScene extends Phaser.Scene {
   private cameraSystem!: CameraSystem;
   private lightModel!: LightModel;
   private lightingRenderer!: LightingRenderer;
+  /** Dust, steam, haze and rain. Kept so update can follow SCREEN EFFECTS for the rain. */
+  private ambient!: AmbientParticles;
   private feedTreatment!: FeedTreatment;
   private audio!: AudioManager;
   private mapZones: ZoneRect[] = [];
@@ -127,6 +134,8 @@ export class BuildingScene extends Phaser.Scene {
   /** The walkable map guards path across. Rebuilt with the level on every restart. */
   private navGrid!: NavGrid;
   private followOffset = new Phaser.Math.Vector2(0, 0);
+  /** The eased lean toward the mouse or right stick, added to the travel look-ahead. */
+  private pointerOffset = new Phaser.Math.Vector2(0, 0);
   private promptText!: Phaser.GameObjects.Text;
   private guardDebug!: Phaser.GameObjects.Graphics;
   private guardDebugOn = false;
@@ -144,6 +153,12 @@ export class BuildingScene extends Phaser.Scene {
   private padInteractWasDown = false;
   /** Last frame's pad Start state, so pause fires on a fresh press not a hold. */
   private padStartWasDown = false;
+  /**
+   * When the pad last showed any input, in ms on the page clock that also
+   * stamps the mouse's move time, or 0 if not yet this life. A mouse that has
+   * not moved since then is treated as parked and leans nothing.
+   */
+  private lastPadInputTimeMs = 0;
   /** The contract being played, pinned in init before any loading happens. */
   private level!: LevelDef;
   /** The security office console, if this level has one. */
@@ -181,6 +196,13 @@ export class BuildingScene extends Phaser.Scene {
   private hintSystem!: HintSystem;
   /** The secondary camera rendering the live feed inside the multiplexer. */
   private feedCam?: Phaser.Cameras.Scene2D.Camera;
+  /**
+   * The field overlay scene drawn over this one, which owns every screen-fixed
+   * object: the HUD, prompt, alert banner, hints, edge markers and feed
+   * treatment. It hands them over in attachOverlay; until then update waits.
+   */
+  private overlay!: FieldOverlayScene;
+  private overlayReady = false;
 
   constructor() {
     super('building');
@@ -220,18 +242,26 @@ export class BuildingScene extends Phaser.Scene {
   }
 
   create(): void {
+    // Zoom the world camera before anything makes text, so door labels, guard
+    // glyphs and floor labels are drawn at the zoom they are shown at.
+    this.fitWorldCamera();
     this.detained = false;
     this.missionOver = false;
     this.appliedAlertLevel = -1;
     this.doors = [];
     this.staff = [];
     this.followOffset.set(0, 0);
+    this.pointerOffset.set(0, 0);
+    this.lastPadInputTimeMs = 0;
     // The scene instance persists across restart(), so every per-life field
     // must reset here. A camera cue from the previous life must not be blamed
     // on the next banner.
     this.lastCameraCue = null;
     this.lastDoorId = null;
     this.playerStepMs = 0;
+    // The HUD belongs to the overlay scene launched at the end of create;
+    // update holds off until the overlay has handed its objects over.
+    this.overlayReady = false;
 
     const map = new BuildingMap(this, this.mapKey);
     this.mapZones = map.zones;
@@ -242,6 +272,8 @@ export class BuildingScene extends Phaser.Scene {
     this.navGrid = new NavGrid(map.widthInPixels, map.heightInPixels, map.walls);
     this.world = new WorldRenderer(this, map, this.level.id);
     this.lightModel = new LightModel(map.zones, map.lights);
+    // Wet tarmac wherever a lamp's light reaches the outdoor ground.
+    drawWetSheen(this, map.zones, this.lightModel.sources);
 
     // A detain restarts here: resume from the last checkpoint if there is one.
     // Checkpoints are always indoors, so a checkpoint start begins inside. A
@@ -273,9 +305,9 @@ export class BuildingScene extends Phaser.Scene {
       map.zones.filter((zone) => zone.exterior).map((zone) => zone.name)
     );
     this.spawnHivisPickups(map);
-    // Atmosphere: dust in the pool lights, steam and haze from the map data.
-    // The scene owns the emitters; nothing needs a reference back.
-    new AmbientParticles(this, map.lights, map.effects);
+    // Atmosphere: dust in the pool lights, steam and haze from the map data,
+    // and rain over the exterior zones (switched by SCREEN EFFECTS in update).
+    this.ambient = new AmbientParticles(this, map.lights, map.effects, map.zones);
 
     this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
     this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
@@ -289,14 +321,10 @@ export class BuildingScene extends Phaser.Scene {
 
     this.keys = this.buildKeyboard();
     this.controller = new MovementController(this.player);
-    this.hud = new FieldHud(this);
     this.guardDebug = this.add.graphics().setDepth(50);
     this.playerRing = this.add.graphics().setDepth(30);
-    this.edgeMarkers = new ScreenEdgeMarkers(this);
-    this.alertBanner = new AlertBanner(this);
     this.noiseRings = new NoiseRings(this);
     this.awareness = new GuardAwareness(this);
-    this.hintSystem = new HintSystem(this, this.level.id, this.level.hints ?? []);
     this.throwController = new ThrowController(
       this,
       (x, y) => this.onNoise(x, y),
@@ -304,26 +332,11 @@ export class BuildingScene extends Phaser.Scene {
       () => this.audio.playFoley('bolt-throw', 0.55),
       (x, y) => this.playWorldFoley('metal-impact', x, y, 600)
     );
-
-    // The mission prompt, bottom centre, screen fixed.
-    this.promptText = this.add
-      .text(this.scale.width / 2, this.scale.height - 28, '', {
-        fontFamily: FONTS.mono,
-        fontSize: '15px',
-        color: PALETTE.amber,
-      })
-      .setOrigin(0.5)
-      .setScrollFactor(0)
-      .setDepth(1000);
     this.refreshDisguiseCast();
 
     // Lighting and audio. The renderer draws last each frame; audio arms its
     // autoplay unlock on the first input and makes no sound before that.
     this.lightingRenderer = new LightingRenderer(this);
-    // The security-feed look over the finished picture: cool cast, faint static
-    // and an alert-coloured vignette, all above the veil and below the HUD.
-    this.feedTreatment = new FeedTreatment(this);
-    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.feedTreatment.destroy());
     this.audio = new AudioManager();
     setAudioGameplayPaused(false);
     this.audio.init(this);
@@ -362,9 +375,89 @@ export class BuildingScene extends Phaser.Scene {
 
     // Every arrival on site, first start or detain restart, comes up from black.
     fadeIn(this);
+
+    // The canvas can change size at any time, even while paused (the scale
+    // manager belongs to the whole game), so the world camera, the veil and
+    // any live CCTV feed re-fit whenever it does.
+    this.scale.on(Phaser.Scale.Events.RESIZE, this.onCanvasResize, this);
+    // Pausing the building pauses the overlay with it, so the overlay's own
+    // tweens (an alert banner, a hint easing in) hold still behind the pause
+    // badge instead of playing out unseen. A paused scene still draws, so the
+    // HUD stays on screen.
+    const pauseOverlay = (): void => {
+      if (this.scene.isActive('fieldOverlay')) {
+        this.scene.pause('fieldOverlay');
+      }
+    };
+    const resumeOverlay = (): void => {
+      if (this.scene.isPaused('fieldOverlay')) {
+        this.scene.resume('fieldOverlay');
+      }
+    };
+    this.events.on(Phaser.Scenes.Events.PAUSE, pauseOverlay);
+    this.events.on(Phaser.Scenes.Events.RESUME, resumeOverlay);
+    // Leaving the building, by detain restart, exfil or quit, takes the
+    // overlay with it, paused or not; the next create launches a fresh one.
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.scale.off(Phaser.Scale.Events.RESIZE, this.onCanvasResize, this);
+      this.events.off(Phaser.Scenes.Events.PAUSE, pauseOverlay);
+      this.events.off(Phaser.Scenes.Events.RESUME, resumeOverlay);
+      this.overlayReady = false;
+      this.scene.stop('fieldOverlay');
+    });
+    // Everything fixed to the screen lives in the overlay scene on top, so the
+    // world camera can zoom under it. The overlay calls attachOverlay back.
+    this.scene.launch('fieldOverlay', { levelId: this.level.id, hints: this.level.hints ?? [] });
+  }
+
+  /**
+   * Called by the field overlay once its objects exist. The building keeps
+   * driving them from update, exactly as when they lived in this scene.
+   */
+  attachOverlay(overlay: FieldOverlayScene): void {
+    this.overlay = overlay;
+    this.hud = overlay.hud;
+    this.promptText = overlay.promptText;
+    this.alertBanner = overlay.alertBanner;
+    this.hintSystem = overlay.hintSystem;
+    this.edgeMarkers = overlay.edgeMarkers;
+    this.feedTreatment = overlay.feedTreatment;
+    this.overlayReady = true;
+  }
+
+  /** Zooms the world camera so the building fills the canvas at the tuned closeness. */
+  private fitWorldCamera(): void {
+    this.cameras.main.setZoom(uiZoomOf(this) * JUICE.camera.worldZoom);
+  }
+
+  /** The canvas changed size: re-fit the world camera, the veil and any live feed. */
+  private onCanvasResize(): void {
+    // Phaser resizes the camera but keeps its scroll, which would throw the
+    // view off the player by half the size change. Hold the centre instead,
+    // then redraw the veil around that same centre.
+    const main = this.cameras.main;
+    const { x: centreX, y: centreY } = main.midPoint;
+    this.fitWorldCamera();
+    main.centerOn(centreX, centreY);
+    this.lightingRenderer.resize();
+    // Door labels, guard glyphs and barks and floor labels are text in the world,
+    // so re-sharpen them at the new world zoom (the menu scenes do this in
+    // fitUiCamera).
+    refreshTextResolution(this);
+    if (this.feedCam) {
+      // Keep the same spot centred: the viewport changes size around it.
+      const { x, y } = this.feedCam.midPoint;
+      this.fitFeedView(this.feedCam);
+      this.feedCam.centerOn(x, y);
+    }
   }
 
   update(_time: number, delta: number): void {
+    if (!this.overlayReady) {
+      return; // the HUD scene is still starting; it attaches within a frame
+    }
+    // Rain is motion, so it follows SCREEN EFFECTS, even on frozen frames.
+    this.ambient.setRainEnabled(getSettings().screenEffects);
     if (this.gridKey && Phaser.Input.Keyboard.JustDown(this.gridKey)) {
       this.world.toggleGrid();
     }
@@ -382,6 +475,12 @@ export class BuildingScene extends Phaser.Scene {
     const gamepadPlugin = this.input.gamepad;
     const pad =
       gamepadPlugin && gamepadPlugin.total > 0 ? gamepadPlugin.getPad(0) : undefined;
+    // Note when the pad was last used, so a parked mouse stops leaning the view
+    // for a pad player. Phaser stamps the mouse's move time from the DOM event's
+    // timeStamp, which is the same clock as performance.now().
+    if (pad && this.padShowsInput(pad)) {
+      this.lastPadInputTimeMs = window.performance.now();
+    }
 
     // Pause on Escape or the pad Start button. Read the edge every frame so the
     // held state never goes stale, but only act when actually in play. While
@@ -394,7 +493,11 @@ export class BuildingScene extends Phaser.Scene {
     }
 
     if (this.detained || this.missionOver) {
-      return; // frozen during the DETAINED flash or the handover to the report
+      // Frozen during the DETAINED flash or the handover to the report. The
+      // camera's follow still eases on, and the veil is pinned to the world,
+      // so it keeps being laid over the view.
+      this.drawVeil();
+      return;
     }
 
     const now = this.time.now;
@@ -413,7 +516,7 @@ export class BuildingScene extends Phaser.Scene {
       delta
     );
     this.player.applyMotion(intent, delta);
-    this.updateLookAhead(intent.direction);
+    this.updateLookAhead(intent.direction, pad);
 
     this.updateAlertLevel(now);
     // Lockdown slams the console session shut mid-use.
@@ -563,8 +666,7 @@ export class BuildingScene extends Phaser.Scene {
 
     this.edgeMarkers.update(
       this.cameras.main,
-      this.scale.width,
-      this.scale.height,
+      uiZoomOf(this),
       this.player.x,
       this.player.y,
       this.guards.guards,
@@ -579,22 +681,63 @@ export class BuildingScene extends Phaser.Scene {
 
     // Lighting draws last so it reflects this frame's final positions, then the
     // feed treatment tints the finished picture and carries the alert level.
+    this.drawVeil();
+    this.feedTreatment.update(now, delta, getMission().alertLevel);
+  }
+
+  /** Redraws the lighting veil over the world camera's current view. */
+  private drawVeil(): void {
     this.lightingRenderer.update(
       this.cameras.main,
       this.player,
       this.guards.guards,
       this.lightModel.sources
     );
-    this.feedTreatment.update(now, delta, getMission().alertLevel);
   }
 
-  /** Eases the camera to lead the player's travel a touch, for comfort. */
-  private updateLookAhead(dir: Phaser.Math.Vector2): void {
+  /**
+   * Eases the camera to lead the player's travel a touch, for comfort, and to
+   * lean toward the mouse or right stick. The two are separate eased offsets
+   * that add together. The lean is switched off by the SCREEN EFFECTS setting,
+   * and switching it off eases back rather than snapping.
+   */
+  private updateLookAhead(
+    dir: Phaser.Math.Vector2,
+    pad: Phaser.Input.Gamepad.Gamepad | undefined
+  ): void {
     const targetX = dir.x * JUICE.camera.lookAheadPx;
     const targetY = dir.y * JUICE.camera.lookAheadPx;
     this.followOffset.x = Phaser.Math.Linear(this.followOffset.x, targetX, JUICE.camera.lookAheadLerp);
     this.followOffset.y = Phaser.Math.Linear(this.followOffset.y, targetY, JUICE.camera.lookAheadLerp);
-    this.cameras.main.setFollowOffset(-this.followOffset.x, -this.followOffset.y);
+
+    // The mouse only counts once it has moved, while it is over the canvas, and
+    // when it moved more recently than the pad was used. So a keyboard player is
+    // not pulled toward the top-left corner, and a cursor left parked after the
+    // click that focused the tab does not lean a pad player's view.
+    const pointer = this.input.activePointer;
+    const zoom = uiZoomOf(this);
+    const mouseUsable = pointerIsLive({
+      overCanvas: this.input.isOver,
+      pointerMoveTimeMs: pointer.moveTime,
+      lastPadInputTimeMs: this.lastPadInputTimeMs,
+    });
+    const stick =
+      pad !== undefined && pad.rightStick.length() >= THROW.aimDeadzone
+        ? { x: pad.rightStick.x, y: pad.rightStick.y }
+        : null;
+    const lean = pointerLookAhead({
+      pointerUi: mouseUsable ? { x: pointer.x / zoom, y: pointer.y / zoom } : null,
+      stick,
+      enabled: getSettings().screenEffects,
+      maxPx: JUICE.camera.pointerLookAheadPx,
+    });
+    this.pointerOffset.x = Phaser.Math.Linear(this.pointerOffset.x, lean.x, JUICE.camera.pointerLookAheadLerp);
+    this.pointerOffset.y = Phaser.Math.Linear(this.pointerOffset.y, lean.y, JUICE.camera.pointerLookAheadLerp);
+
+    this.cameras.main.setFollowOffset(
+      -(this.followOffset.x + this.pointerOffset.x),
+      -(this.followOffset.y + this.pointerOffset.y)
+    );
   }
 
   /** Fires the alarm screen shake, unless the player has turned shake off. */
@@ -602,7 +745,19 @@ export class BuildingScene extends Phaser.Scene {
     if (!getSettings().screenShake) {
       return;
     }
-    this.cameras.main.shake(JUICE.shake.durationMs, JUICE.shake.intensity);
+    // Phaser grows a shake by the zoom twice over, so the tuned intensity is
+    // scaled back down to keep the shake as tiny as it was at zoom 1.
+    const intensity = shakeIntensityFor(JUICE.shake.intensity, this.cameras.main.zoom);
+    this.cameras.main.shake(JUICE.shake.durationMs, intensity);
+  }
+
+  /** True when the pad is in use this frame: a stick pushed past the aim deadzone or any button down. */
+  private padShowsInput(pad: Phaser.Input.Gamepad.Gamepad): boolean {
+    return (
+      pad.leftStick.length() >= THROW.aimDeadzone ||
+      pad.rightStick.length() >= THROW.aimDeadzone ||
+      pad.buttons.some((button) => button.pressed)
+    );
   }
 
   /** True while the interact control is held: E on keyboard, A on the pad. */
@@ -675,6 +830,10 @@ export class BuildingScene extends Phaser.Scene {
   private openConsole(): void {
     this.consoleOpen = true;
     this.audio.playConsoleCue('open');
+    // The overlay draws above this scene, so left showing it would paint the
+    // HUD and the feed treatment over the live CCTV picture in the cut-out.
+    // The multiplexer owns the screen while it is open, so the overlay hides.
+    this.scene.setVisible(false, 'fieldOverlay');
     this.scene.launch('hijack');
   }
 
@@ -691,6 +850,7 @@ export class BuildingScene extends Phaser.Scene {
       this.audio.playConsoleCue(cue);
     }
     this.scene.stop('hijack');
+    this.scene.setVisible(true, 'fieldOverlay');
     this.destroyFeedView();
   }
 
@@ -738,15 +898,16 @@ export class BuildingScene extends Phaser.Scene {
 
   /**
    * The feed view is a second scene camera with a small viewport, scrolled to
-   * whichever CCTV the multiplexer is showing. It skips the screen-fixed veil
-   * and HUD: a camera shows the room, not the consultant's readouts.
+   * whichever CCTV the multiplexer is showing. It skips the lighting veil and
+   * the player's own overlays: a camera shows the room, not the consultant's
+   * readouts. The HUD lives in the overlay scene, so it never needs skipping.
    */
   private ensureFeedView(): void {
     if (this.feedCam) {
       return;
     }
-    const { x, y, width, height } = HIJACK.feed;
-    this.feedCam = this.cameras.add(x, y, width, height);
+    this.feedCam = this.cameras.add();
+    this.fitFeedView(this.feedCam);
     this.feedCam.setBounds(
       0,
       0,
@@ -755,16 +916,22 @@ export class BuildingScene extends Phaser.Scene {
     );
     this.feedCam.ignore([
       this.lightingRenderer.veil,
-      ...this.feedTreatment.screenObjects,
-      this.promptText,
-      ...this.hud.screenObjects,
-      ...this.alertBanner.screenObjects,
       this.guardDebug,
-      this.edgeMarkers.gameObject,
       this.noiseRings.gameObject,
       this.playerRing,
-      this.hintSystem.gameObject,
     ]);
+  }
+
+  /**
+   * Lines the feed camera up with the multiplexer's cut-out. The cut-out is in
+   * 960 by 540 UI units, so its box and the zoom both scale by the UI zoom,
+   * which keeps the same 600 by 320 patch of world on screen at any canvas size.
+   */
+  private fitFeedView(cam: Phaser.Cameras.Scene2D.Camera): void {
+    const zoom = uiZoomOf(this);
+    const { x, y, width, height } = HIJACK.feed;
+    cam.setViewport(x * zoom, y * zoom, width * zoom, height * zoom);
+    cam.setZoom(zoom);
   }
 
   private destroyFeedView(): void {
@@ -1133,39 +1300,12 @@ export class BuildingScene extends Phaser.Scene {
     this.physics.pause();
     this.edgeMarkers.clear();
 
-    const cx = this.scale.width / 2;
-    const cy = this.scale.height / 2;
-
     // Sudden-motion effects (flash + shake) obey the screen-shake setting.
+    // Both stay on the world camera; the HUD and the card above it hold still.
     if (getSettings().screenShake) {
       this.cameras.main.flash(JUICE.detained.flashMs, 255, 59, 48);
     }
     this.triggerAlarmShake();
-
-    const vignette = this.add
-      .rectangle(cx, cy, this.scale.width, this.scale.height, PALETTE_HEX.alarm, 0)
-      .setScrollFactor(0)
-      .setDepth(1999);
-    this.tweens.add({
-      targets: vignette,
-      alpha: JUICE.detained.vignetteAlpha,
-      duration: JUICE.detained.vignetteFadeMs,
-      ease: 'Quad.easeOut',
-    });
-
-    this.add
-      .rectangle(cx, cy + 10, 560, 168, PALETTE_HEX.base, 0.82)
-      .setScrollFactor(0)
-      .setDepth(2000);
-    this.add
-      .text(cx, cy - 24, 'DETAINED', {
-        fontFamily: FONTS.display,
-        fontSize: '64px',
-        color: PALETTE.alarm,
-      })
-      .setOrigin(0.5)
-      .setScrollFactor(0)
-      .setDepth(2001);
 
     // Why, and where the run picks up: the two questions the blind playtest
     // could not answer. A camera ping this recent gets named as the tip-off.
@@ -1176,18 +1316,8 @@ export class BuildingScene extends Phaser.Scene {
       ? `CAUGHT BY PATROL, TIPPED OFF BY CAM ${cue.id.toUpperCase()}`
       : 'CAUGHT BY SECURITY PATROL';
     const resumeAt = getMission().checkpoint?.label ?? 'THE VAN';
-    const lines = ['ESCORTED FROM SITE', cause, `RESUMING AT: ${resumeAt}`];
-    lines.forEach((line, i) => {
-      this.add
-        .text(cx, cy + 22 + i * 20, line, {
-          fontFamily: FONTS.mono,
-          fontSize: '13px',
-          color: PALETTE.text,
-        })
-        .setOrigin(0.5)
-        .setScrollFactor(0)
-        .setDepth(2001);
-    });
+    // The card itself is screen fixed, so the overlay draws it.
+    this.overlay.showDetained(cause, resumeAt);
 
     this.time.delayedCall(READABILITY.detain.bannerMs, () =>
       fadeOutThen(this, () => this.scene.restart())

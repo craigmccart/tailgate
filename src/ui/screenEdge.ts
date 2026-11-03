@@ -21,6 +21,30 @@ export interface EdgeInsets {
   bottom: number;
 }
 
+/** The two camera facts worldToUi needs. A Phaser camera has both. */
+export interface WorldViewCamera {
+  /** The world point at the view's top-left corner. */
+  worldView: { x: number; y: number };
+  zoom: number;
+}
+
+/**
+ * Where a world point sits in the 960 by 540 UI box, for a world camera at any
+ * zoom. Uses the camera's world view rather than its scroll, because the two
+ * only agree when the zoom is 1.
+ */
+export function worldToUi(
+  worldX: number,
+  worldY: number,
+  cam: WorldViewCamera,
+  uiZoom: number
+): { x: number; y: number } {
+  return {
+    x: ((worldX - cam.worldView.x) * cam.zoom) / uiZoom,
+    y: ((worldY - cam.worldView.y) * cam.zoom) / uiZoom,
+  };
+}
+
 /**
  * Clamps the ray from the screen centre to (sx, sy) onto the border, inset
  * per side so markers stay clear of the HUD chips at the top and the prompt

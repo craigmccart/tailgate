@@ -1,5 +1,17 @@
 import { describe, expect, it } from 'vitest';
-import { projectToScreenEdge } from './screenEdge';
+import { projectToScreenEdge, worldToUi } from './screenEdge';
+
+describe('worldToUi', () => {
+  it('is the offset from the view corner when the world zoom matches the UI zoom', () => {
+    const cam = { worldView: { x: 100, y: 50 }, zoom: 2.5 };
+    expect(worldToUi(400, 300, cam, 2.5)).toEqual({ x: 300, y: 250 });
+  });
+
+  it('stretches the offset by the extra world zoom', () => {
+    const cam = { worldView: { x: 200, y: 100 }, zoom: 3 };
+    expect(worldToUi(300, 200, cam, 2)).toEqual({ x: 150, y: 150 });
+  });
+});
 
 describe('projectToScreenEdge', () => {
   it('reports an on-screen point as on screen and leaves it where it is', () => {
