@@ -59,13 +59,14 @@ export const WEATHER = {
   },
   /**
    * The wet shine: a faint, stretched oval of light on the outdoor ground
-   * under any lamp whose light reaches it, cut off at the zone's edge. It is
-   * drawn once when the level loads and never moves.
+   * under any lamp whose light reaches it, brightest in the middle and fading
+   * to nothing at its rim, cut off at the zone's edge. It is drawn once when
+   * the level loads and never moves.
    */
   wetSheen: {
     /** Just above the light pools (2), below the route cues (3), so props and people sit on top. */
     depth: 2.5,
-    /** How strong the shine is (0 invisible, 1 solid). Keep it faint. */
+    /** How strong the shine is in the middle of each oval (0 invisible, 1 solid). Keep it faint. */
     alpha: 0.05,
     /** Oval width as a share of the lamp's full reach across. */
     widthFactor: 0.9,
