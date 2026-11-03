@@ -54,9 +54,13 @@ let textResolutionInstalled = false;
 const autoResolutionTexts = new WeakSet<Phaser.GameObjects.Text>();
 
 /**
- * Makes every text created with `this.add.text` render at the UI zoom, so it
- * stays sharp on a large canvas. A style that sets its own resolution wins.
- * Safe to call more than once, it only wraps the factory the first time.
+ * Makes every text created with `this.add.text` render at its scene's main
+ * camera zoom, so it is drawn at the size it is shown and stays sharp on a
+ * large canvas. For the menu and HUD scenes that is the UI zoom, because they
+ * fit their UI camera before making any text. In the building it is the closer
+ * world zoom, so door labels and guard barks are not stretched pixel by pixel.
+ * A style that sets its own resolution wins. Safe to call more than once, it
+ * only wraps the factory the first time.
  */
 export function installTextResolution(): void {
   if (textResolutionInstalled) return;
@@ -66,7 +70,7 @@ export function installTextResolution(): void {
   const original = proto.text as TextFactory;
   proto.text = function (this: Phaser.GameObjects.GameObjectFactory, x, y, text, style) {
     const ownResolution = style?.resolution !== undefined;
-    const resolved = ownResolution ? style : { ...style, resolution: uiZoomOf(this.scene) };
+    const resolved = ownResolution ? style : { ...style, resolution: this.scene.cameras.main.zoom };
     const made = original.call(this, x, y, text, resolved);
     if (!ownResolution) autoResolutionTexts.add(made);
     return made;
@@ -74,16 +78,18 @@ export function installTextResolution(): void {
 }
 
 /**
- * Re-renders the scene's wrapper-sized text at the current UI zoom. Without it,
- * text made while the canvas was small (render scale 50 percent) stays soft after
- * the canvas grows, until the scene next restarts. Looks inside containers too.
- * Phaser also fires a resize when only the window moves, so a text already at the
- * right resolution is left alone rather than redrawn for nothing.
+ * Re-renders the scene's wrapper-sized text at its main camera's current zoom.
+ * Without it, text made while the canvas was small (render scale 50 percent)
+ * stays soft after the canvas grows, until the scene next restarts. Looks inside
+ * containers too. Call it after the camera has been re-zoomed. Phaser also fires
+ * a resize when only the window moves, so a text already at the right resolution
+ * is left alone rather than redrawn for nothing.
  * fitUiCamera calls this for every menu and HUD scene. The building scene has no
- * UI camera, so it calls this itself for its world labels.
+ * UI camera, so it calls this itself for its world labels, after re-zooming its
+ * world camera.
  */
 export function refreshTextResolution(scene: Phaser.Scene): void {
-  const zoom = uiZoomOf(scene);
+  const zoom = scene.cameras.main.zoom;
   const visit = (items: Phaser.GameObjects.GameObject[]): void => {
     for (const item of items) {
       if (item instanceof Phaser.GameObjects.Text) {

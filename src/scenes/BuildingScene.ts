@@ -242,6 +242,9 @@ export class BuildingScene extends Phaser.Scene {
   }
 
   create(): void {
+    // Zoom the world camera before anything makes text, so door labels, guard
+    // glyphs and floor labels are drawn at the zoom they are shown at.
+    this.fitWorldCamera();
     this.detained = false;
     this.missionOver = false;
     this.appliedAlertLevel = -1;
@@ -315,7 +318,6 @@ export class BuildingScene extends Phaser.Scene {
       MOVEMENT.camera.lerp
     );
     this.cameras.main.setDeadzone(JUICE.camera.deadzoneW, JUICE.camera.deadzoneH);
-    this.fitWorldCamera();
 
     this.keys = this.buildKeyboard();
     this.controller = new MovementController(this.player);
@@ -421,7 +423,7 @@ export class BuildingScene extends Phaser.Scene {
     main.centerOn(centreX, centreY);
     this.lightingRenderer.resize();
     // Door labels, guard glyphs and barks and floor labels are text in the world,
-    // so re-sharpen them for the new canvas size (the menu scenes do this in
+    // so re-sharpen them at the new world zoom (the menu scenes do this in
     // fitUiCamera).
     refreshTextResolution(this);
     if (this.feedCam) {
