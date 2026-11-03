@@ -19,6 +19,8 @@ export const OBJECTIVES = {
   /**
    * The in-fiction clock the Engagement Report uses. The mission "starts" at
    * this time of day and findings are stamped with start + elapsed play time.
+   * Phase 22: the engagement now runs after hours, so the clock starts in the
+   * evening (it was 09:31) and a long run wraps past midnight.
    */
-  reportClockStart: { hour: 9, minute: 31 },
+  reportClockStart: { hour: 18, minute: 40 },
 } as const;

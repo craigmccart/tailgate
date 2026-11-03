@@ -78,10 +78,12 @@ export class BriefingScene extends Phaser.Scene {
     y += 40;
 
     this.mono(left, y, `CLIENT:     ${this.level.client}`, 11, PALETTE.text);
-    this.mono(left + 440, y, `REF:  ${this.level.ref}`, 11, PALETTE.text);
+    this.mono(left + 440, y, `REF:    ${this.level.ref}`, 11, PALETTE.text);
     y += 15;
     this.mono(left, y, `SITE:       ${this.level.site}`, 11, PALETTE.text);
-    this.mono(left + 440, y, `DATE: ${ENGAGEMENT.date}`, 11, PALETTE.text);
+    this.mono(left + 440, y, `DATE:   ${ENGAGEMENT.date}`, 11, PALETTE.text);
+    y += 15;
+    this.mono(left + 440, y, `ATTEND: ${ENGAGEMENT.attendance}`, 11, PALETTE.text);
     y += 24;
 
     y = this.section(left, y, 'SCOPE', [this.level.scope]);
