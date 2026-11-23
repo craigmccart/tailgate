@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { pointerIsLive, pointerLookAhead } from './cameraLookAhead';
+import { padInputTimeAtStart, pointerIsLive, pointerLookAhead } from './cameraLookAhead';
 
 const centre = { x: 480, y: 270 };
 
@@ -61,5 +61,17 @@ describe('pointerIsLive', () => {
   });
   it('is false when the pad was used after the last mouse move', () => {
     expect(pointerIsLive({ overCanvas: true, pointerMoveTimeMs: 4000, lastPadInputTimeMs: 5000 })).toBe(false);
+  });
+});
+
+describe('padInputTimeAtStart', () => {
+  it('counts a connected pad as just used, so a parked mouse leans nothing', () => {
+    expect(padInputTimeAtStart({ previousMs: 0, padConnected: true, nowMs: 9000 })).toBe(9000);
+  });
+  it('keeps the last pad use across a restart when no pad is connected', () => {
+    expect(padInputTimeAtStart({ previousMs: 4000, padConnected: false, nowMs: 9000 })).toBe(4000);
+  });
+  it('stays at zero for a mouse player who has never used a pad', () => {
+    expect(padInputTimeAtStart({ previousMs: 0, padConnected: false, nowMs: 9000 })).toBe(0);
   });
 });

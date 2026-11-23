@@ -40,7 +40,7 @@ import {
   type FreezeResult,
 } from '../systems/CameraSystem';
 import { AmbientParticles } from '../systems/AmbientParticles';
-import { pointerIsLive, pointerLookAhead } from '../systems/cameraLookAhead';
+import { padInputTimeAtStart, pointerIsLive, pointerLookAhead } from '../systems/cameraLookAhead';
 import type { FeedTreatment } from '../systems/FeedTreatment';
 import { GuardAwareness } from '../systems/GuardAwareness';
 import { GuardRoster, type GuardDef } from '../systems/GuardRoster';
@@ -155,8 +155,9 @@ export class BuildingScene extends Phaser.Scene {
   private padStartWasDown = false;
   /**
    * When the pad last showed any input, in ms on the page clock that also
-   * stamps the mouse's move time, or 0 if not yet this life. A mouse that has
-   * not moved since then is treated as parked and leans nothing.
+   * stamps the mouse's move time, or 0 if it never has. A mouse that has not
+   * moved since then is treated as parked and leans nothing. Unlike the other
+   * per-life fields it is not reset on a restart (see create).
    */
   private lastPadInputTimeMs = 0;
   /** The contract being played, pinned in init before any loading happens. */
@@ -252,7 +253,14 @@ export class BuildingScene extends Phaser.Scene {
     this.staff = [];
     this.followOffset.set(0, 0);
     this.pointerOffset.set(0, 0);
-    this.lastPadInputTimeMs = 0;
+    // Deliberately not reset to 0: the mouse's move time survives a restart, so
+    // a reset would let a parked cursor lean a pad player's view again after
+    // every detain. A connected pad counts as just used.
+    this.lastPadInputTimeMs = padInputTimeAtStart({
+      previousMs: this.lastPadInputTimeMs,
+      padConnected: (this.input.gamepad?.total ?? 0) > 0,
+      nowMs: window.performance.now(),
+    });
     // The scene instance persists across restart(), so every per-life field
     // must reset here. A camera cue from the previous life must not be blamed
     // on the next banner.

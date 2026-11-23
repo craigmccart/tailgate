@@ -30,6 +30,27 @@ export function pointerIsLive(input: PointerLiveInput): boolean {
   );
 }
 
+/** What decides the pad timestamp a new life in the building starts from. */
+export interface PadStartInput {
+  /** The pad timestamp the previous life ended with, or 0 if the pad was never used. */
+  previousMs: number;
+  /** True when a pad is connected as the building starts. */
+  padConnected: boolean;
+  /** The page clock now, in ms. */
+  nowMs: number;
+}
+
+/**
+ * The pad timestamp to start a life with. A connected pad counts as just used,
+ * so a cursor left parked on the canvas (after clicking into the tab, or from
+ * before a detain) does not lean a pad player's view when the building starts.
+ * Without a pad the last value carries over a restart, so nothing changes for a
+ * mouse player: their lean starts as soon as they move the mouse.
+ */
+export function padInputTimeAtStart(input: PadStartInput): number {
+  return input.padConnected ? input.nowMs : input.previousMs;
+}
+
 /** What the camera should lean toward this frame. */
 export interface PointerLookAheadInput {
   /** The mouse in UI units (the 960 by 540 layout), or null when there is no usable mouse. */
