@@ -36,7 +36,11 @@ export function rayToSegment(
   return Infinity;
 }
 
-/** Distance from (ox,oy) along unit (dx,dy) to the nearest rect edge, capped at maxDist. */
+/**
+ * Distance from (ox,oy) along unit (dx,dy) to the nearest rect edge, capped at
+ * maxDist. Vision cones and torch beams call this for every ray, every frame,
+ * so it tests the four edges one by one and makes no arrays.
+ */
 export function rayDistanceToRects(
   ox: number,
   oy: number,
@@ -49,17 +53,22 @@ export function rayDistanceToRects(
   for (const w of rects) {
     const right = w.x + w.width;
     const bottom = w.y + w.height;
-    const edges: [number, number, number, number][] = [
-      [w.x, w.y, right, w.y],
-      [right, w.y, right, bottom],
-      [right, bottom, w.x, bottom],
-      [w.x, bottom, w.x, w.y],
-    ];
-    for (const [ax, ay, bx, by] of edges) {
-      const t = rayToSegment(ox, oy, dx, dy, ax, ay, bx, by);
-      if (t < nearest) {
-        nearest = t;
-      }
+    // Top, right, bottom then left edge, each in the same direction as before.
+    let t = rayToSegment(ox, oy, dx, dy, w.x, w.y, right, w.y);
+    if (t < nearest) {
+      nearest = t;
+    }
+    t = rayToSegment(ox, oy, dx, dy, right, w.y, right, bottom);
+    if (t < nearest) {
+      nearest = t;
+    }
+    t = rayToSegment(ox, oy, dx, dy, right, bottom, w.x, bottom);
+    if (t < nearest) {
+      nearest = t;
+    }
+    t = rayToSegment(ox, oy, dx, dy, w.x, bottom, w.x, w.y);
+    if (t < nearest) {
+      nearest = t;
     }
   }
   return nearest;
@@ -70,29 +79,51 @@ export function rectContains(rect: Rect, x: number, y: number): boolean {
   return x >= rect.x && x <= rect.x + rect.width && y >= rect.y && y <= rect.y + rect.height;
 }
 
-/** Slab (Liang-Barsky) test: does the segment touch the rect at all, edges and corners included? */
+/**
+ * How far apart, as a share of the segment, the two slabs may disagree and
+ * still count as touching. A segment through a rect's exact corner can come
+ * out a hair outside it from float rounding alone, and touching must always
+ * count as blocked. Far too small to matter anywhere else.
+ */
+const TOUCH_TOLERANCE = 1e-9;
+
+/**
+ * Slab (Liang-Barsky) test: does the segment touch the rect at all, edges and
+ * corners included? Plain numbers only, no arrays, because baking and the
+ * detection light run this many thousands of times.
+ */
 function segmentTouchesRect(ax: number, ay: number, bx: number, by: number, r: Rect): boolean {
   let tMin = 0;
   let tMax = 1;
-  const axes: [number, number, number, number][] = [
-    [ax, bx - ax, r.x, r.x + r.width],
-    [ay, by - ay, r.y, r.y + r.height],
-  ];
-  for (const [start, delta, lo, hi] of axes) {
-    if (delta === 0) {
-      if (start < lo || start > hi) {
-        return false; // parallel to this slab and outside it
-      }
-      continue;
+
+  // The x slab, between the rect's left and right sides.
+  const dx = bx - ax;
+  if (dx === 0) {
+    if (ax < r.x || ax > r.x + r.width) {
+      return false; // parallel to this slab and outside it
     }
-    let t1 = (lo - start) / delta;
-    let t2 = (hi - start) / delta;
-    if (t1 > t2) {
-      [t1, t2] = [t2, t1];
+  } else {
+    const t1 = (r.x - ax) / dx;
+    const t2 = (r.x + r.width - ax) / dx;
+    tMin = Math.max(tMin, Math.min(t1, t2));
+    tMax = Math.min(tMax, Math.max(t1, t2));
+    if (tMin > tMax + TOUCH_TOLERANCE) {
+      return false;
     }
-    tMin = Math.max(tMin, t1);
-    tMax = Math.min(tMax, t2);
-    if (tMin > tMax) {
+  }
+
+  // The y slab, between the rect's top and bottom.
+  const dy = by - ay;
+  if (dy === 0) {
+    if (ay < r.y || ay > r.y + r.height) {
+      return false; // parallel to this slab and outside it
+    }
+  } else {
+    const t1 = (r.y - ay) / dy;
+    const t2 = (r.y + r.height - ay) / dy;
+    tMin = Math.max(tMin, Math.min(t1, t2));
+    tMax = Math.min(tMax, Math.max(t1, t2));
+    if (tMin > tMax + TOUCH_TOLERANCE) {
       return false;
     }
   }

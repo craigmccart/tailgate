@@ -19,11 +19,18 @@ export class VisionCone {
   private readonly walls: Phaser.Geom.Rectangle[];
   /** Extra occluders that change frame to frame, e.g. currently-closed doors. */
   private dynamicOccluders: Phaser.Geom.Rectangle[] = [];
+  /**
+   * Walls plus closed doors in one list, for the rays the cone is drawn with.
+   * Built here and in setDynamicOccluders rather than once per ray, so drawing
+   * the cone makes no new arrays.
+   */
+  private rayOccluders: readonly Phaser.Geom.Rectangle[];
   private readonly range = CONE_RANGE_PX;
   private readonly halfFov = Phaser.Math.DegToRad(DETECTION.cone.fovDegrees) / 2;
 
   constructor(scene: Phaser.Scene, walls: WallRect[]) {
     this.walls = walls.map((w) => new Phaser.Geom.Rectangle(w.x, w.y, w.width, w.height));
+    this.rayOccluders = this.walls;
     // Depth 26 keeps cones above the lighting veil (25) so guard and camera
     // state stays fully readable in the dark, per the accessibility rule.
     this.gfx = scene.add.graphics().setDepth(26);
@@ -35,6 +42,7 @@ export class VisionCone {
    */
   setDynamicOccluders(rects: WallRect[]): void {
     this.dynamicOccluders = rects.map((r) => new Phaser.Geom.Rectangle(r.x, r.y, r.width, r.height));
+    this.rayOccluders = [...this.walls, ...this.dynamicOccluders];
   }
 
   /** True if (tx,ty) is inside the cone and not hidden behind a wall. */
@@ -66,7 +74,7 @@ export class VisionCone {
 
   /** Distance from (ox,oy) along unit (dx,dy) to the nearest wall, capped at range. */
   private rayDistance(ox: number, oy: number, dx: number, dy: number): number {
-    return rayDistanceToRects(ox, oy, dx, dy, [...this.walls, ...this.dynamicOccluders], this.range);
+    return rayDistanceToRects(ox, oy, dx, dy, this.rayOccluders, this.range);
   }
 
   /**
