@@ -12,6 +12,9 @@
  *    because that is the light guards count. A few extra rays just outside
  *    each edge fade it to nothing, so the edge is soft. The screen can then
  *    only show a little more light than guards count, never less.
+ *
+ * easeAngle swings the drawn beam smoothly round when a guard turns, rather
+ * than letting it jump.
  */
 
 import { rayDistanceToRects, type Rect } from './occlusion';
@@ -115,4 +118,30 @@ export function torchBeamTriangles(input: TorchBeamInput): BeamTriangle[] {
     });
   }
   return triangles;
+}
+
+const TWO_PI = Math.PI * 2;
+
+/** Wraps an angle into the range minus pi up to pi. */
+const wrapAngle = (a: number): number => a - TWO_PI * Math.floor((a + Math.PI) / TWO_PI);
+
+/**
+ * Moves an angle part of the way toward a target, the short way round. It is
+ * an exponential ease: every easeMs / 3 of time closes about 63 percent of the
+ * gap still left, so after easeMs about 95 percent of the turn is done, at any
+ * frame rate. It never overshoots. An ease time of 0 or less snaps straight to
+ * the target, and no time passing leaves the angle where it is.
+ */
+export function easeAngle(current: number, target: number, dtMs: number, easeMs: number): number {
+  if (easeMs <= 0) {
+    return target;
+  }
+  if (dtMs <= 0) {
+    return current;
+  }
+  const share = 1 - Math.exp(-dtMs / (easeMs / 3));
+  if (share >= 1) {
+    return target;
+  }
+  return wrapAngle(current + wrapAngle(target - current) * share);
 }

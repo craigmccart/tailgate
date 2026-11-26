@@ -88,8 +88,12 @@ export const LIGHTING = {
    *    beam's soft edge reaches as it fades to nothing. The cone itself stays
    *    at full strength, because guards count full torch light there. 0 gives
    *    hard edges; larger is softer.
+   *  - turnEaseMs: how quickly a guard's torch beam swings round when the
+   *    guard turns, in milliseconds. 0 snaps it round at once. Only the beam
+   *    on screen swings; what the guard sees, and the vision cone drawn over
+   *    it, turn at once as before.
    */
-  torchBeam: { intensity: 0.525, edgeFeatherDeg: 8 },
+  torchBeam: { intensity: 0.525, edgeFeatherDeg: 8, turnEaseMs: 120 },
   /**
    * Phase 23: the little LED glow on each server rack, drawn above the darkness
    * so it shines in the dark. Amber or white, never red. Render only.

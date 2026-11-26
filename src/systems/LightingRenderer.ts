@@ -10,7 +10,7 @@ import type { LightBakeCache } from './LightBakeCache';
 import type { LightSource } from './LightModel';
 import { FALLOFF_KNEE_LEVEL, FALLOFF_KNEE_T } from './lightBake';
 import type { Rect } from './occlusion';
-import { torchBeamTriangles } from './torchBeam';
+import { easeAngle, torchBeamTriangles } from './torchBeam';
 import { veilErasePoint, veilOriginFor } from './veilGeometry';
 
 /** Size of the soft radial light-mask texture used as an erase brush. */
@@ -75,6 +75,15 @@ export class LightingRenderer {
   private readonly beamGfx: Phaser.GameObjects.Graphics;
   private readonly bakes: LightBakeCache;
   private lastFrame: VeilFrame | null = null;
+  /**
+   * The facing each guard's beam is drawn at. It swings toward the guard's
+   * true facing over LIGHTING.torchBeam.turnEaseMs, so a guard turning on the
+   * spot never flashes the floor bright in one frame. Render only: detection
+   * and the vision cone always use the true facing.
+   */
+  private readonly beamFacings = new WeakMap<Guard, number>();
+  /** The scene time the beams were last drawn at, or null before the first draw. */
+  private lastBeamMs: number | null = null;
 
   constructor(scene: Phaser.Scene, bakes: LightBakeCache) {
     this.scene = scene;
@@ -164,7 +173,7 @@ export class LightingRenderer {
     }
 
     // Each guard's torch lights its own vision cone, up to the first wall.
-    this.eraseBeams(guards, beamOccluders, at);
+    this.eraseBeams(guards, beamOccluders, at, nowMs);
 
     // The player is always lit. Render only, never fed to detection.
     this.eraseLight(at(player.x, player.y), LIGHTING.playerAuraRadiusPx, LIGHTING.playerAuraStrength);
@@ -217,17 +226,23 @@ export class LightingRenderer {
   private eraseBeams(
     guards: readonly Guard[],
     occluders: readonly Rect[],
-    at: (worldX: number, worldY: number) => { x: number; y: number; scale: number }
+    at: (worldX: number, worldY: number) => { x: number; y: number; scale: number },
+    nowMs: number
   ): void {
+    // The real time since the last draw. A redraw with no time passed, such
+    // as a resize, leaves every beam where it was.
+    const dtMs = this.lastBeamMs === null ? 0 : Math.max(0, nowMs - this.lastBeamMs);
+    this.lastBeamMs = nowMs;
     this.beamGfx.clear();
     if (guards.length === 0) {
       return;
     }
     for (const guard of guards) {
+      const facing = this.beamFacing(guard, dtMs);
       const triangles = torchBeamTriangles({
         x: guard.x,
         y: guard.y,
-        facing: guard.facingAngle,
+        facing,
         halfFovRad: BEAM_HALF_FOV_RAD,
         rangePx: CONE_RANGE_PX,
         rays: DETECTION.cone.renderRays,
@@ -258,6 +273,20 @@ export class LightingRenderer {
       }
     }
     this.rt.erase(this.beamGfx);
+  }
+
+  /**
+   * Swings one guard's drawn beam toward the guard's true facing, the short
+   * way round, and returns where it now points. A guard seen for the first
+   * time starts at its true facing.
+   */
+  private beamFacing(guard: Guard, dtMs: number): number {
+    const target = guard.facingAngle;
+    const shown = this.beamFacings.get(guard);
+    const next =
+      shown === undefined ? target : easeAngle(shown, target, dtMs, LIGHTING.torchBeam.turnEaseMs);
+    this.beamFacings.set(guard, next);
+    return next;
   }
 
   /**
