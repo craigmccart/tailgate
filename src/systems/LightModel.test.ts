@@ -3,6 +3,7 @@ import buildingCMapRaw from '../../public/maps/building-c.json?raw';
 import dataCentreMapRaw from '../../public/maps/data-centre.json?raw';
 import warehouseMapRaw from '../../public/maps/warehouse.json?raw';
 import type { LightRect, ZoneRect } from '../world/BuildingMap';
+import { parseMapData } from '../world/mapData';
 import { LightModel } from './LightModel';
 import { rectContains, type Rect } from './occlusion';
 
@@ -12,76 +13,11 @@ import { rectContains, type Rect } from './occlusion';
  * player: the property test below proves that on all three real maps.
  */
 
-interface TiledProperty {
-  name: string;
-  value: unknown;
-}
-
-interface TiledObject {
-  name?: string;
-  type?: string;
-  class?: string;
-  x?: number;
-  y?: number;
-  width?: number;
-  height?: number;
-  properties?: TiledProperty[];
-}
-
-interface TiledMap {
-  width: number;
-  height: number;
-  tilewidth: number;
-  tileheight: number;
-  layers: { name: string; objects?: TiledObject[] }[];
-}
-
-interface LoadedMap {
-  zones: ZoneRect[];
-  lights: LightRect[];
-  walls: Rect[];
-  doors: Rect[];
-  widthPx: number;
-  heightPx: number;
-}
-
 const LEVELS = [
   ['building-c', buildingCMapRaw],
   ['data-centre', dataCentreMapRaw],
   ['warehouse', warehouseMapRaw],
 ] as const;
-
-/** Parses Tiled JSON the same way src/world/BuildingMap.ts does. */
-function loadMap(raw: string): LoadedMap {
-  const map = JSON.parse(raw) as TiledMap;
-  const objects = (layer: string): TiledObject[] =>
-    map.layers.find((l) => l.name === layer)?.objects ?? [];
-  const flag = (o: TiledObject, name: string): boolean =>
-    o.properties?.find((p) => p.name === name)?.value === true;
-  const rect = (o: TiledObject): Rect => ({
-    x: o.x ?? 0,
-    y: o.y ?? 0,
-    width: o.width ?? 0,
-    height: o.height ?? 0,
-  });
-  return {
-    zones: objects('zones').map((o) => ({
-      name: o.name ?? '',
-      ...rect(o),
-      restricted: flag(o, 'restricted'),
-      exterior: flag(o, 'exterior'),
-    })),
-    lights: objects('lights').map((o) => ({
-      id: o.name ?? '',
-      kind: o.type ?? o.class ?? 'pool',
-      ...rect(o),
-    })),
-    walls: objects('walls').map(rect),
-    doors: objects('doors').map(rect),
-    widthPx: map.width * map.tilewidth,
-    heightPx: map.height * map.tileheight,
-  };
-}
 
 // AMBIENT_FALLBACK is 0.4 and LIGHTING.pool is { intensity: 0.9, radiusPx: 140 }.
 const zone: ZoneRect = {
@@ -131,7 +67,7 @@ describe('LightModel occlusion', () => {
 
   // Sampled at 32 px grid corners (0, 32, 64 ...), skipping any inside a wall.
   it.each(LEVELS)('%s: occlusion only ever darkens', (_name, raw) => {
-    const m = loadMap(raw);
+    const m = parseMapData(raw);
     const occluded = new LightModel(m.zones, m.lights, m.walls);
     const open = new LightModel(m.zones, m.lights, m.walls, { occlusion: false });
     occluded.setClosedDoors(m.doors);
@@ -150,7 +86,7 @@ describe('LightModel occlusion', () => {
   });
 
   it('data centre: every rack light inside a rack row still lights an aisle beside it', () => {
-    const m = loadMap(dataCentreMapRaw);
+    const m = parseMapData(dataCentreMapRaw);
     const model = new LightModel(m.zones, m.lights, m.walls);
     const ambientOnly = new LightModel(m.zones, [], m.walls);
     let checked = 0;
