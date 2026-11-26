@@ -1,34 +1,10 @@
 import Phaser from 'phaser';
 import { CONE_RANGE_PX, DETECTION } from '../config/detection';
 import type { WallRect } from '../world/BuildingMap';
+import { rayDistanceToRects } from './occlusion';
 
 /** How the cone outline is drawn, so guard state never reads by colour alone. */
 export type ConeEdge = 'solid' | 'dashed' | 'pulsing';
-
-/** Nearest distance a ray travels from (ox,oy) along unit (dx,dy) before a segment, or Infinity. */
-function rayToSegment(
-  ox: number,
-  oy: number,
-  dx: number,
-  dy: number,
-  ax: number,
-  ay: number,
-  bx: number,
-  by: number
-): number {
-  const sx = bx - ax;
-  const sy = by - ay;
-  const denom = dx * sy - dy * sx;
-  if (Math.abs(denom) < 1e-9) {
-    return Infinity; // parallel
-  }
-  const t = ((ax - ox) * sy - (ay - oy) * sx) / denom; // distance along the ray
-  const u = ((ax - ox) * dy - (ay - oy) * dx) / denom; // position along the segment
-  if (t >= 0 && u >= 0 && u <= 1) {
-    return t;
-  }
-  return Infinity;
-}
 
 /**
  * A guard's vision cone: 7 tiles range and a 70 degree field of view, fully
@@ -90,24 +66,7 @@ export class VisionCone {
 
   /** Distance from (ox,oy) along unit (dx,dy) to the nearest wall, capped at range. */
   private rayDistance(ox: number, oy: number, dx: number, dy: number): number {
-    let nearest = this.range;
-    for (const w of [...this.walls, ...this.dynamicOccluders]) {
-      const right = w.x + w.width;
-      const bottom = w.y + w.height;
-      const edges: [number, number, number, number][] = [
-        [w.x, w.y, right, w.y],
-        [right, w.y, right, bottom],
-        [right, bottom, w.x, bottom],
-        [w.x, bottom, w.x, w.y],
-      ];
-      for (const [ax, ay, bx, by] of edges) {
-        const t = rayToSegment(ox, oy, dx, dy, ax, ay, bx, by);
-        if (t < nearest) {
-          nearest = t;
-        }
-      }
-    }
-    return nearest;
+    return rayDistanceToRects(ox, oy, dx, dy, [...this.walls, ...this.dynamicOccluders], this.range);
   }
 
   /**
