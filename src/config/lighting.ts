@@ -10,6 +10,8 @@
  * that value if low-contrast scenes are hard to parse.
  */
 
+import { PALETTE_HEX } from './palette';
+
 /** Per-zone base analytic light level, 0 (pitch black) to 1 (fully lit). */
 export const AMBIENT_LIGHT: Record<string, number> = {
   // Building C
@@ -94,4 +96,13 @@ export const LIGHTING = {
    *  - depth: draw order. 25 is the darkness, 26 the vision cones, so 25.5 sits between.
    */
   rackGlow: { radiusPx: 9, alpha: 0.6, depth: 25.5 },
+  /**
+   * Phase 23 spike: Phaser's Light2D "surface" lighting, behind a developer-only
+   * key (K). It is OFF in shipped builds until Phase 24's normal maps give it
+   * something to do; with flat surfaces it only repeats the veil and leaks
+   * through walls. It exists now to measure its frame cost.
+   *  - ambient: the base colour surfaces get where no light reaches.
+   *  - intensityScale: multiplies each light's own strength. 1 matches the data.
+   */
+  surfaceLight: { ambient: PALETTE_HEX.text, intensityScale: 1 },
 } as const;

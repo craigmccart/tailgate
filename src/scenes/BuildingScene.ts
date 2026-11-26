@@ -48,6 +48,7 @@ import { LightBakeCache } from '../systems/LightBakeCache';
 import { LightModel } from '../systems/LightModel';
 import { LightingRenderer } from '../systems/LightingRenderer';
 import { addRackGlows } from '../systems/rackGlows';
+import { SurfaceLight } from '../systems/surfaceLight';
 import { NavGrid } from '../systems/NavGrid';
 import type { Rect } from '../systems/occlusion';
 import type { PickupPoint, WallRect, ZoneRect } from '../world/BuildingMap';
@@ -158,6 +159,9 @@ export class BuildingScene extends Phaser.Scene {
   private gridKey?: Phaser.Input.Keyboard.Key;
   private guardDebugKey?: Phaser.Input.Keyboard.Key;
   private lightingKey?: Phaser.Input.Keyboard.Key;
+  private surfaceKey?: Phaser.Input.Keyboard.Key;
+  private surfaceLight?: SurfaceLight;
+  private surfaceLightOn = false;
   private interactKey?: Phaser.Input.Keyboard.Key;
   private pauseKey?: Phaser.Input.Keyboard.Key;
   /** Last frame's pad A state, so the breaker sees a fresh press not a hold. */
@@ -381,6 +385,14 @@ export class BuildingScene extends Phaser.Scene {
       this.gridKey = this.input.keyboard?.addKey('G');
       this.guardDebugKey = this.input.keyboard?.addKey('H');
       this.lightingKey = this.input.keyboard?.addKey('L');
+      // K: Light2D surface lighting, to measure its frame cost (Phase 23 spike).
+      this.surfaceKey = this.input.keyboard?.addKey('K');
+      this.surfaceLight = new SurfaceLight(this, this.lightModel.sources, [
+        ...this.world.surfaceObjects,
+        this.player.sprite,
+        ...this.guards.guards.map((guard) => guard.sprite),
+      ]);
+      this.surfaceLightOn = false;
     }
     this.interactKey = this.input.keyboard?.addKey('E');
     this.pauseKey = this.input.keyboard?.addKey('ESC');
@@ -498,6 +510,10 @@ export class BuildingScene extends Phaser.Scene {
     if (this.lightingKey && Phaser.Input.Keyboard.JustDown(this.lightingKey)) {
       this.lightingHidden = !this.lightingHidden;
       this.lightingRenderer.setVisible(!this.lightingHidden);
+    }
+    if (this.surfaceKey && Phaser.Input.Keyboard.JustDown(this.surfaceKey)) {
+      this.surfaceLightOn = !this.surfaceLightOn;
+      this.surfaceLight?.setEnabled(this.surfaceLightOn);
     }
 
     const gamepadPlugin = this.input.gamepad;
