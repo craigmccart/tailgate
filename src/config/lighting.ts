@@ -66,4 +66,14 @@ export const LIGHTING = {
    * walking towards. Render only, never counted for detection.
    */
   veilMarginPx: 48,
+  /**
+   * Phase 23: each lamp is drawn once into its own small picture with the wall
+   * shadows already in it, so the light you see stops at walls and closed
+   * doors. Render only, never counted for detection.
+   *  - texelPx: world pixels per pixel of that picture. Lower is crisper
+   *    shadow edges but slower to draw when a door moves; 2 looks smooth.
+   *  - crossfadeMs: when a door near a lamp opens or shuts, how long the old
+   *    shadows take to melt into the new ones, so the light never jumps.
+   */
+  bake: { texelPx: 2, crossfadeMs: 300 },
 } as const;

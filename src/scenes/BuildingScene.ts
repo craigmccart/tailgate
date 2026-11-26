@@ -44,6 +44,7 @@ import { padInputTimeAtStart, pointerIsLive, pointerLookAhead } from '../systems
 import type { FeedTreatment } from '../systems/FeedTreatment';
 import { GuardAwareness } from '../systems/GuardAwareness';
 import { GuardRoster, type GuardDef } from '../systems/GuardRoster';
+import { LightBakeCache } from '../systems/LightBakeCache';
 import { LightModel } from '../systems/LightModel';
 import { LightingRenderer } from '../systems/LightingRenderer';
 import { NavGrid } from '../systems/NavGrid';
@@ -124,6 +125,8 @@ export class BuildingScene extends Phaser.Scene {
   private objectives!: ObjectiveSystem;
   private cameraSystem!: CameraSystem;
   private lightModel!: LightModel;
+  /** Each static light baked with its wall shadows, for the veil to draw. */
+  private bakeCache!: LightBakeCache;
   private lightingRenderer!: LightingRenderer;
   /** Dust, steam, haze and rain. Kept so update can follow SCREEN EFFECTS for the rain. */
   private ambient!: AmbientParticles;
@@ -280,6 +283,10 @@ export class BuildingScene extends Phaser.Scene {
     this.navGrid = new NavGrid(map.widthInPixels, map.heightInPixels, map.walls);
     this.world = new WorldRenderer(this, map, this.level.id);
     this.lightModel = new LightModel(map.zones, map.lights, map.walls);
+    // The light the player sees stops at the same walls. Its textures are
+    // freed on SHUTDOWN, so a detain restart bakes afresh and nothing leaks.
+    this.bakeCache = new LightBakeCache(this, this.lightModel.sources, map.walls);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.bakeCache.destroy());
     // Wet tarmac wherever a lamp's light reaches the outdoor ground.
     drawWetSheen(this, map.zones, this.lightModel.sources);
 
@@ -344,7 +351,7 @@ export class BuildingScene extends Phaser.Scene {
 
     // Lighting and audio. The renderer draws last each frame; audio arms its
     // autoplay unlock on the first input and makes no sound before that.
-    this.lightingRenderer = new LightingRenderer(this);
+    this.lightingRenderer = new LightingRenderer(this, this.bakeCache);
     this.audio = new AudioManager();
     setAudioGameplayPaused(false);
     this.audio.init(this);
@@ -538,6 +545,7 @@ export class BuildingScene extends Phaser.Scene {
     // Shared occluder set for the guards, cameras and audio this frame.
     const closedDoors = this.doors.filter((d) => !d.isOpen).map((d) => d.rect);
     this.lightModel.setClosedDoors(closedDoors);
+    this.bakeCache.setClosedDoors(closedDoors, now);
 
     // Every guard's sightline lights where it looks; darkness elsewhere is
     // cover, so sample the light at the player and feed it into perception.
@@ -696,12 +704,7 @@ export class BuildingScene extends Phaser.Scene {
 
   /** Redraws the lighting veil over the world camera's current view. */
   private drawVeil(): void {
-    this.lightingRenderer.update(
-      this.cameras.main,
-      this.player,
-      this.guards.guards,
-      this.lightModel.sources
-    );
+    this.lightingRenderer.update(this.cameras.main, this.player, this.guards.guards);
   }
 
   /**

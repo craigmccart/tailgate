@@ -6,7 +6,9 @@ import { PALETTE_HEX } from '../config/palette';
 import { getSettings } from '../state/settings';
 import type { Guard } from '../entities/Guard';
 import type { Player } from '../entities/Player';
+import type { LightBakeCache } from './LightBakeCache';
 import type { LightSource } from './LightModel';
+import { FALLOFF_KNEE_LEVEL, FALLOFF_KNEE_T } from './lightBake';
 import { veilErasePoint, veilOriginFor } from './veilGeometry';
 
 /** Size of the soft radial light-mask texture used as an erase brush. */
@@ -18,15 +20,19 @@ interface VeilFrame {
   cam: Phaser.Cameras.Scene2D.Camera;
   player: Player;
   guards: readonly Guard[];
-  sources: readonly LightSource[];
 }
 
 /**
  * The visual side of lighting. A RenderTexture is filled with a dark veil each
- * frame, then soft radial lights are ERASED out of it, punching holes where
- * the world shows through: room pools, a harsh loading-dock flood, tight
- * server rack LEDs, plus a soft aura that always follows the player so the
- * character and nearby walls are never lost (the accessibility floor).
+ * frame, then soft lights are ERASED out of it, punching holes where the world
+ * shows through: room pools, a harsh loading-dock flood, tight server rack
+ * LEDs, plus a soft aura that always follows the player so the character and
+ * nearby walls are never lost (the accessibility floor).
+ *
+ * Phase 23: the static lights come from LightBakeCache, one baked picture per
+ * light with its wall and closed-door shadows already drawn in, so the light
+ * on screen stops where the guards' light does. The guard glows and the
+ * player aura still use the plain round brush, and the aura is never shaded.
  *
  * The veil lives in the world, not on the screen, so the world camera can
  * zoom. It holds one texel per canvas pixel, covers the camera's view plus a
@@ -45,10 +51,14 @@ export class LightingRenderer {
   private readonly scene: Phaser.Scene;
   private readonly rt: Phaser.GameObjects.RenderTexture;
   private readonly brush: Phaser.GameObjects.Image;
+  /** A second free brush that takes on each baked light's texture in turn. */
+  private readonly bakeBrush: Phaser.GameObjects.Image;
+  private readonly bakes: LightBakeCache;
   private lastFrame: VeilFrame | null = null;
 
-  constructor(scene: Phaser.Scene) {
+  constructor(scene: Phaser.Scene, bakes: LightBakeCache) {
     this.scene = scene;
+    this.bakes = bakes;
     LightingRenderer.ensureMask(scene);
 
     const size = this.veilSize();
@@ -56,16 +66,13 @@ export class LightingRenderer {
 
     // A free brush (not on the display list), reused for every erased light.
     this.brush = scene.make.image({ x: 0, y: 0, key: MASK_KEY, add: false }).setOrigin(0.5);
+    // Baked pictures are placed by their top-left corner, so this one keeps origin 0.
+    this.bakeBrush = scene.make.image({ x: 0, y: 0, key: MASK_KEY, add: false }).setOrigin(0);
   }
 
   /** Redraws the veil and erases the current lights. Called last each frame. */
-  update(
-    cam: Phaser.Cameras.Scene2D.Camera,
-    player: Player,
-    guards: readonly Guard[],
-    sources: readonly LightSource[]
-  ): void {
-    this.lastFrame = { cam, player, guards, sources };
+  update(cam: Phaser.Cameras.Scene2D.Camera, player: Player, guards: readonly Guard[]): void {
+    this.lastFrame = { cam, player, guards };
     this.draw(this.lastFrame);
   }
 
@@ -92,7 +99,7 @@ export class LightingRenderer {
     return this.rt;
   }
 
-  private draw({ cam, player, guards, sources }: VeilFrame): void {
+  private draw({ cam, player, guards }: VeilFrame): void {
     const settings = getSettings();
     const veil = Phaser.Math.Clamp(
       1 - LIGHTING.visibilityFloorGlobal - settings.extraBrightness,
@@ -114,14 +121,16 @@ export class LightingRenderer {
     const nowMs = this.scene.time.now;
     const at = (worldX: number, worldY: number) => veilErasePoint(worldX, worldY, origin, zoom);
 
-    for (const s of sources) {
+    for (const entry of this.bakes.entries(nowMs)) {
       // The breathe is atmosphere, so it rides on the screen-effects setting.
       // The source's own intensity is never written to: LightModel hands out a
       // readonly list and detection must keep seeing the authored numbers.
-      const intensity = settings.screenEffects
-        ? s.intensity * this.breatheFactor(s, nowMs)
-        : s.intensity;
-      this.eraseLight(at(s.x, s.y), s.radiusPx, intensity);
+      const breathe = settings.screenEffects ? this.breatheFactor(entry.source, nowMs) : 1;
+      this.eraseBaked(
+        at(entry.worldX, entry.worldY),
+        entry.key,
+        entry.source.intensity * breathe * entry.fade
+      );
     }
 
     // Each guard's own sightline glows softly, so its cone reads as a torch beam.
@@ -171,6 +180,21 @@ export class LightingRenderer {
     this.rt.erase(this.brush, point.x, point.y);
   }
 
+  /**
+   * Erases one baked light, its top-left corner at a veil point. Each texel of
+   * the picture covers LIGHTING.bake.texelPx world pixels, grown by the zoom.
+   */
+  private eraseBaked(
+    point: { x: number; y: number; scale: number },
+    key: string,
+    alpha: number
+  ): void {
+    this.bakeBrush.setTexture(key);
+    this.bakeBrush.setScale(point.scale * LIGHTING.bake.texelPx);
+    this.bakeBrush.setAlpha(Phaser.Math.Clamp(alpha, 0, 1));
+    this.rt.erase(this.bakeBrush, point.x, point.y);
+  }
+
   /** Builds the soft radial gradient brush texture once (guarded for restart). */
   private static ensureMask(scene: Phaser.Scene): void {
     if (scene.textures.exists(MASK_KEY)) {
@@ -184,7 +208,8 @@ export class LightingRenderer {
     const r = MASK_SIZE / 2;
     const gradient = ctx.createRadialGradient(r, r, 0, r, r, r);
     gradient.addColorStop(0, 'rgba(255,255,255,1)');
-    gradient.addColorStop(0.55, 'rgba(255,255,255,0.65)');
+    // The knee is shared with lightFalloff, so baked lights fade off the same way.
+    gradient.addColorStop(FALLOFF_KNEE_T, `rgba(255,255,255,${FALLOFF_KNEE_LEVEL})`);
     gradient.addColorStop(1, 'rgba(255,255,255,0)');
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, MASK_SIZE, MASK_SIZE);
