@@ -279,7 +279,7 @@ export class BuildingScene extends Phaser.Scene {
     // anything that navigates exists.
     this.navGrid = new NavGrid(map.widthInPixels, map.heightInPixels, map.walls);
     this.world = new WorldRenderer(this, map, this.level.id);
-    this.lightModel = new LightModel(map.zones, map.lights);
+    this.lightModel = new LightModel(map.zones, map.lights, map.walls);
     // Wet tarmac wherever a lamp's light reaches the outdoor ground.
     drawWetSheen(this, map.zones, this.lightModel.sources);
 
@@ -537,6 +537,7 @@ export class BuildingScene extends Phaser.Scene {
 
     // Shared occluder set for the guards, cameras and audio this frame.
     const closedDoors = this.doors.filter((d) => !d.isOpen).map((d) => d.rect);
+    this.lightModel.setClosedDoors(closedDoors);
 
     // Every guard's sightline lights where it looks; darkness elsewhere is
     // cover, so sample the light at the player and feed it into perception.
