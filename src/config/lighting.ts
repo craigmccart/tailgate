@@ -76,4 +76,14 @@ export const LIGHTING = {
    *    shadows take to melt into the new ones, so the light never jumps.
    */
   bake: { texelPx: 2, crossfadeMs: 300 },
+  /**
+   * Phase 23: how each guard's torch looks on screen. The beam fills the
+   * guard's vision cone, stops at walls and closed doors, and fades to nothing
+   * at full range. Render only, never counted for detection.
+   *  - intensity: how bright the beam is at the guard, 0 to 1. 0.525 matches
+   *    the old round glow, so the beam is as bright as before.
+   *  - edgeFeatherDeg: how many degrees at each side of the beam fade softly
+   *    to nothing. 0 gives hard edges; larger is softer.
+   */
+  torchBeam: { intensity: 0.525, edgeFeatherDeg: 8 },
 } as const;

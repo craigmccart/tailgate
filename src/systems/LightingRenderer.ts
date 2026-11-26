@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { CONE_RANGE_PX } from '../config/detection';
+import { CONE_RANGE_PX, DETECTION } from '../config/detection';
 import { FEED } from '../config/feed';
 import { LIGHTING } from '../config/lighting';
 import { PALETTE_HEX } from '../config/palette';
@@ -9,17 +9,31 @@ import type { Player } from '../entities/Player';
 import type { LightBakeCache } from './LightBakeCache';
 import type { LightSource } from './LightModel';
 import { FALLOFF_KNEE_LEVEL, FALLOFF_KNEE_T } from './lightBake';
+import type { Rect } from './occlusion';
+import { torchBeamTriangles } from './torchBeam';
 import { veilErasePoint, veilOriginFor } from './veilGeometry';
 
 /** Size of the soft radial light-mask texture used as an erase brush. */
 const MASK_SIZE = 256;
 const MASK_KEY = 'lightMask';
 
+const degToRad = (deg: number): number => deg * (Math.PI / 180);
+/** The torch beam fills the vision cone, so it shares the cone's shape. */
+const BEAM_HALF_FOV_RAD = degToRad(DETECTION.cone.fovDegrees) / 2;
+const BEAM_EDGE_FEATHER_RAD = degToRad(LIGHTING.torchBeam.edgeFeatherDeg);
+/**
+ * Erasing only reads alpha, so the beam's fill colour never shows on screen.
+ * White matches the round brush, which is white too.
+ */
+const ERASE_TINT = 0xffffff;
+
 /** What the veil was last drawn from, so a resize can redraw the same picture. */
 interface VeilFrame {
   cam: Phaser.Cameras.Scene2D.Camera;
   player: Player;
   guards: readonly Guard[];
+  /** The walls plus the doors that were closed, which stop the torch beams. */
+  beamOccluders: readonly Rect[];
 }
 
 /**
@@ -31,8 +45,10 @@ interface VeilFrame {
  *
  * Phase 23: the static lights come from LightBakeCache, baked pictures with
  * their wall and closed-door shadows already drawn in, so the light on screen
- * stops where the guards' light does. The guard glows and the
- * player aura still use the plain round brush, and the aura is never shaded.
+ * stops where the guards' light does. Each guard's torch is a soft beam the
+ * shape of its vision cone, stopped by the same walls and closed doors, fading
+ * along its length and at its edges. The player aura still uses the plain
+ * round brush, and the aura is never shaded.
  *
  * The veil lives in the world, not on the screen, so the world camera can
  * zoom. It holds one texel per canvas pixel, covers the camera's view plus a
@@ -53,6 +69,8 @@ export class LightingRenderer {
   private readonly brush: Phaser.GameObjects.Image;
   /** A second free brush that takes on each baked light's texture in turn. */
   private readonly bakeBrush: Phaser.GameObjects.Image;
+  /** A free Graphics the torch beams are drawn into each frame, then erased with. */
+  private readonly beamGfx: Phaser.GameObjects.Graphics;
   private readonly bakes: LightBakeCache;
   private lastFrame: VeilFrame | null = null;
 
@@ -68,11 +86,21 @@ export class LightingRenderer {
     this.brush = scene.make.image({ x: 0, y: 0, key: MASK_KEY, add: false }).setOrigin(0.5);
     // Baked pictures are placed by their top-left corner, so this one keeps origin 0.
     this.bakeBrush = scene.make.image({ x: 0, y: 0, key: MASK_KEY, add: false }).setOrigin(0);
+    // Not on the display list either. It sits at 0,0 and is drawn in veil pixels.
+    this.beamGfx = scene.make.graphics({}, false);
   }
 
-  /** Redraws the veil and erases the current lights. Called last each frame. */
-  update(cam: Phaser.Cameras.Scene2D.Camera, player: Player, guards: readonly Guard[]): void {
-    this.lastFrame = { cam, player, guards };
+  /**
+   * Redraws the veil and erases the current lights. Called last each frame.
+   * beamOccluders is the walls plus this frame's closed doors.
+   */
+  update(
+    cam: Phaser.Cameras.Scene2D.Camera,
+    player: Player,
+    guards: readonly Guard[],
+    beamOccluders: readonly Rect[]
+  ): void {
+    this.lastFrame = { cam, player, guards, beamOccluders };
     this.draw(this.lastFrame);
   }
 
@@ -99,7 +127,7 @@ export class LightingRenderer {
     return this.rt;
   }
 
-  private draw({ cam, player, guards }: VeilFrame): void {
+  private draw({ cam, player, guards, beamOccluders }: VeilFrame): void {
     const settings = getSettings();
     const veil = Phaser.Math.Clamp(
       1 - LIGHTING.visibilityFloorGlobal - settings.extraBrightness,
@@ -133,10 +161,8 @@ export class LightingRenderer {
       );
     }
 
-    // Each guard's own sightline glows softly, so its cone reads as a torch beam.
-    for (const guard of guards) {
-      this.eraseLight(at(guard.x, guard.y), CONE_RANGE_PX * 0.6, LIGHTING.guardTorchIntensity * 0.7);
-    }
+    // Each guard's torch lights its own vision cone, up to the first wall.
+    this.eraseBeams(guards, beamOccluders, at);
 
     // The player is always lit. Render only, never fed to detection.
     this.eraseLight(at(player.x, player.y), LIGHTING.playerAuraRadiusPx, LIGHTING.playerAuraStrength);
@@ -178,6 +204,58 @@ export class LightingRenderer {
     this.brush.setScale(((radiusPx * 2) / MASK_SIZE) * point.scale);
     this.brush.setAlpha(Phaser.Math.Clamp(intensity, 0, 1));
     this.rt.erase(this.brush, point.x, point.y);
+  }
+
+  /**
+   * Erases every guard's torch beam in one go. Each triangle's corners are
+   * moved from world to veil pixels, and the gradient fill gives each corner
+   * its own alpha, so the beam fades smoothly along its length and at its
+   * edges rather than in flat steps.
+   */
+  private eraseBeams(
+    guards: readonly Guard[],
+    occluders: readonly Rect[],
+    at: (worldX: number, worldY: number) => { x: number; y: number; scale: number }
+  ): void {
+    this.beamGfx.clear();
+    if (guards.length === 0) {
+      return;
+    }
+    for (const guard of guards) {
+      const triangles = torchBeamTriangles({
+        x: guard.x,
+        y: guard.y,
+        facing: guard.facingAngle,
+        halfFovRad: BEAM_HALF_FOV_RAD,
+        rangePx: CONE_RANGE_PX,
+        rays: DETECTION.cone.renderRays,
+        intensity: LIGHTING.torchBeam.intensity,
+        edgeFeatherRad: BEAM_EDGE_FEATHER_RAD,
+        occluders,
+      });
+      for (const t of triangles) {
+        const a = at(t.ax, t.ay);
+        const b = at(t.bx, t.by);
+        const c = at(t.cx, t.cy);
+        const aAlpha = Phaser.Math.Clamp(t.aAlpha, 0, 1);
+        const bAlpha = Phaser.Math.Clamp(t.bAlpha, 0, 1);
+        const cAlpha = Phaser.Math.Clamp(t.cAlpha, 0, 1);
+        // Phaser colours a filled triangle's first, second and third corners
+        // from the top-left, top-right and bottom-left gradient values.
+        this.beamGfx.fillGradientStyle(
+          ERASE_TINT,
+          ERASE_TINT,
+          ERASE_TINT,
+          ERASE_TINT,
+          aAlpha,
+          bAlpha,
+          cAlpha,
+          cAlpha
+        );
+        this.beamGfx.fillTriangle(a.x, a.y, b.x, b.y, c.x, c.y);
+      }
+    }
+    this.rt.erase(this.beamGfx);
   }
 
   /**

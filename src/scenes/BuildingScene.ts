@@ -48,6 +48,7 @@ import { LightBakeCache } from '../systems/LightBakeCache';
 import { LightModel } from '../systems/LightModel';
 import { LightingRenderer } from '../systems/LightingRenderer';
 import { NavGrid } from '../systems/NavGrid';
+import type { Rect } from '../systems/occlusion';
 import type { PickupPoint, WallRect, ZoneRect } from '../world/BuildingMap';
 import {
   getMission,
@@ -134,6 +135,12 @@ export class BuildingScene extends Phaser.Scene {
   private audio!: AudioManager;
   private mapZones: ZoneRect[] = [];
   private mapWalls: WallRect[] = [];
+  /**
+   * What stops the guards' torch beams on screen: the walls plus the doors
+   * that were closed on the last normal frame. Doors do not move while the
+   * game is frozen, so a frozen frame or a resize reuses the last list.
+   */
+  private beamOccluders: readonly Rect[] = [];
   /** The walkable map guards path across. Rebuilt with the level on every restart. */
   private navGrid!: NavGrid;
   private followOffset = new Phaser.Math.Vector2(0, 0);
@@ -277,6 +284,8 @@ export class BuildingScene extends Phaser.Scene {
     const map = new BuildingMap(this, this.mapKey);
     this.mapZones = map.zones;
     this.mapWalls = map.walls;
+    // The first frame's beams need something to stop at before any door is read.
+    this.beamOccluders = map.walls;
     // Phase 20 playtest fix: guards need a real map to walk, not a straight line
     // at whatever they are chasing. Built once here from the wall data, before
     // anything that navigates exists.
@@ -547,6 +556,7 @@ export class BuildingScene extends Phaser.Scene {
     const closedDoors = this.doors.filter((d) => !d.isOpen).map((d) => d.rect);
     this.lightModel.setClosedDoors(closedDoors);
     this.bakeCache.setClosedDoors(closedDoors, now);
+    this.beamOccluders = [...this.mapWalls, ...closedDoors];
 
     // Every guard's sightline lights where it looks; darkness elsewhere is
     // cover, so sample the light at the player and feed it into perception.
@@ -705,7 +715,12 @@ export class BuildingScene extends Phaser.Scene {
 
   /** Redraws the lighting veil over the world camera's current view. */
   private drawVeil(): void {
-    this.lightingRenderer.update(this.cameras.main, this.player, this.guards.guards);
+    this.lightingRenderer.update(
+      this.cameras.main,
+      this.player,
+      this.guards.guards,
+      this.beamOccluders
+    );
   }
 
   /**
