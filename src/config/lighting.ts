@@ -86,4 +86,12 @@ export const LIGHTING = {
    *    to nothing. 0 gives hard edges; larger is softer.
    */
   torchBeam: { intensity: 0.525, edgeFeatherDeg: 8 },
+  /**
+   * Phase 23: the little LED glow on each server rack, drawn above the darkness
+   * so it shines in the dark. Amber or white, never red. Render only.
+   *  - radiusPx: how far the glow spreads from the LED.
+   *  - alpha: how strong it is, 0 to 1.
+   *  - depth: draw order. 25 is the darkness, 26 the vision cones, so 25.5 sits between.
+   */
+  rackGlow: { radiusPx: 9, alpha: 0.6, depth: 25.5 },
 } as const;

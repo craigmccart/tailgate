@@ -47,6 +47,7 @@ import { GuardRoster, type GuardDef } from '../systems/GuardRoster';
 import { LightBakeCache } from '../systems/LightBakeCache';
 import { LightModel } from '../systems/LightModel';
 import { LightingRenderer } from '../systems/LightingRenderer';
+import { addRackGlows } from '../systems/rackGlows';
 import { NavGrid } from '../systems/NavGrid';
 import type { Rect } from '../systems/occlusion';
 import type { PickupPoint, WallRect, ZoneRect } from '../world/BuildingMap';
@@ -299,6 +300,8 @@ export class BuildingScene extends Phaser.Scene {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.bakeCache.destroy());
     // Wet tarmac wherever a lamp's light reaches the outdoor ground.
     drawWetSheen(this, map.zones, this.lightModel.sources);
+    // LED glows on the server racks, above the darkness so they shine in the dark.
+    addRackGlows(this, this.lightModel.sources);
 
     // A detain restarts here: resume from the last checkpoint if there is one.
     // Checkpoints are always indoors, so a checkpoint start begins inside. A
