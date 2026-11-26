@@ -66,23 +66,33 @@ describe('LightModel occlusion', () => {
   });
 
   // Sampled at 32 px grid corners (0, 32, 64 ...), skipping any inside a wall.
+  // Every 8th sampled point also holds four guard torches, one facing each
+  // way, so the torch path is checked as well as the static lights.
   it.each(LEVELS)('%s: occlusion only ever darkens', (_name, raw) => {
     const m = parseMapData(raw);
     const occluded = new LightModel(m.zones, m.lights, m.walls);
     const open = new LightModel(m.zones, m.lights, m.walls, { occlusion: false });
     occluded.setClosedDoors(m.doors);
     open.setClosedDoors(m.doors);
-    let sampled = 0;
+    const points: [number, number][] = [];
     for (let y = 0; y <= m.heightPx; y += 32) {
       for (let x = 0; x <= m.widthPx; x += 32) {
-        if (m.walls.some((w) => rectContains(w, x, y))) {
-          continue;
+        if (!m.walls.some((w) => rectContains(w, x, y))) {
+          points.push([x, y]);
         }
-        sampled++;
-        expect(occluded.computeLightAt(x, y)).toBeLessThanOrEqual(open.computeLightAt(x, y) + 1e-9);
       }
     }
-    expect(sampled).toBeGreaterThan(100);
+    const facings = [0, Math.PI / 2, Math.PI, -Math.PI / 2];
+    const torches = points
+      .filter((_point, i) => i % 8 === 0)
+      .flatMap(([x, y]) => facings.map((facing) => ({ x, y, facing })));
+    occluded.setGuardTorches(torches);
+    open.setGuardTorches(torches);
+    for (const [x, y] of points) {
+      expect(occluded.computeLightAt(x, y)).toBeLessThanOrEqual(open.computeLightAt(x, y) + 1e-9);
+    }
+    expect(points.length).toBeGreaterThan(100);
+    expect(torches.length).toBeGreaterThan(40);
   });
 
   it('data centre: every rack light inside a rack row still lights an aisle beside it', () => {

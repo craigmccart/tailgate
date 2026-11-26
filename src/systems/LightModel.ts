@@ -12,7 +12,8 @@ export interface LightSource {
   intensity: number;
 }
 
-const degToRad = (deg: number): number => (deg * Math.PI) / 180;
+/** The same sum as Phaser's DegToRad, so this half cone matches the vision cone's to the last bit. */
+const degToRad = (deg: number): number => deg * (Math.PI / 180);
 /** Wraps an angle into the range minus pi to pi. */
 const wrapAngle = (a: number): number => {
   const twoPi = Math.PI * 2;

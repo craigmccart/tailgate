@@ -1,11 +1,11 @@
-import Phaser from "phaser";
-import { LIGHTING } from "../config/lighting";
-import { PALETTE_HEX } from "../config/palette";
-import type { LightSource } from "./LightModel";
-import { rackGlowColour } from "./rackGlowColour";
+import Phaser from 'phaser';
+import { LIGHTING } from '../config/lighting';
+import { PALETTE_HEX } from '../config/palette';
+import type { LightSource } from './LightModel';
+import { rackGlowColour } from './rackGlowColour';
 
 /** Texture key for the generated soft glow dot. */
-const GLOW_KEY = "rackGlow";
+const GLOW_KEY = 'rackGlow';
 const GLOW_SIZE = 32;
 
 /** Builds the soft dot once (guarded for restarts). White so the tint sets the colour. */
@@ -20,9 +20,9 @@ function ensureGlowTexture(scene: Phaser.Scene): void {
   const ctx = tex.getContext();
   const r = GLOW_SIZE / 2;
   const gradient = ctx.createRadialGradient(r, r, 0, r, r, r);
-  gradient.addColorStop(0, "rgba(255,255,255,1)");
-  gradient.addColorStop(0.35, "rgba(255,255,255,0.5)");
-  gradient.addColorStop(1, "rgba(255,255,255,0)");
+  gradient.addColorStop(0, 'rgba(255,255,255,1)');
+  gradient.addColorStop(0.35, 'rgba(255,255,255,0.5)');
+  gradient.addColorStop(1, 'rgba(255,255,255,0)');
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, GLOW_SIZE, GLOW_SIZE);
   tex.refresh();
@@ -41,11 +41,11 @@ export function addRackGlows(
   ensureGlowTexture(scene);
   const cfg = LIGHTING.rackGlow;
   for (const source of sources) {
-    if (source.kind !== "rack") {
+    if (source.kind !== 'rack') {
       continue;
     }
     const tint =
-      rackGlowColour(source.x, source.y) === "amber"
+      rackGlowColour(source.x, source.y) === 'amber'
         ? PALETTE_HEX.amber
         : PALETTE_HEX.text;
     scene.add

@@ -76,6 +76,10 @@ describe('coverByZone', () => {
     }
   });
 
+  // Opt-in report. To print it, run exactly:
+  //   COVER_REPORT=1 npx vitest run src/world/coverReport.test.ts --silent=false
+  // From an AI agent session add --reporter=default as well: there Vitest
+  // picks a quieter reporter that hides a passing test's console output.
   it.runIf(process.env.COVER_REPORT === '1')('prints the per-site cover table', () => {
     const pct = (v: number): number => Math.round(v * 1000) / 10;
     for (const [name, raw] of LEVELS) {

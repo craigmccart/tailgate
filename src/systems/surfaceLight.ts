@@ -1,4 +1,4 @@
-import type Phaser from 'phaser';
+import Phaser from 'phaser';
 import { LIGHTING } from '../config/lighting';
 import type { LightSource } from './LightModel';
 
@@ -32,7 +32,13 @@ export class SurfaceLight {
     private readonly scene: Phaser.Scene,
     private readonly sources: readonly LightSource[],
     private readonly objects: readonly Phaser.GameObjects.GameObject[]
-  ) {}
+  ) {
+    // The scene's lights plugin outlives a detain restart and stays switched
+    // on unless told otherwise, so switch it off when the scene shuts down.
+    // Only that: the objects are already destroyed by then, so their
+    // pipelines must not be touched.
+    scene.events.once(Phaser.Scenes.Events.SHUTDOWN, () => scene.lights.disable());
+  }
 
   setEnabled(on: boolean): void {
     if (on === this.on) {
