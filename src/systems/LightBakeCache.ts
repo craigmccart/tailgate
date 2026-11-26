@@ -6,6 +6,7 @@ import {
   changedRects,
   crossfadeAlpha,
   overlapsReach,
+  reversalStartMs,
   splitBakes,
   type BakedLight,
   type TexelCrop,
@@ -46,6 +47,8 @@ interface Variant {
 /** A running crossfade between two variants of one light. */
 interface Crossfade {
   startMs: number;
+  /** The variant the fade started from, so a door reversing mid-fade can be spotted. */
+  fromKey: string;
   /** Light both variants share, shown in full throughout. */
   shared: BakedTexture | null;
   /** True when the shared picture was made for this fade and is freed after it. */
@@ -233,10 +236,20 @@ export class LightBakeCache {
   /**
    * Starts fading a light to another variant. If a door moves while a fade is
    * still running, the new fade starts from the variant the light was heading
-   * to, as if the old fade had already finished.
+   * to, as if the old fade had already finished. The one exception is a door
+   * that reverses mid-fade, heading straight back to where the fade began:
+   * the fade back starts as far through as the old one had left to go, so the
+   * doorway carries on from the brightness it had reached instead of jumping.
    */
   private crossfadeTo(slot: LightSlot, key: string, target: Variant, nowMs: number): void {
-    const from = slot.variants.get(slot.shownKey);
+    const fromKey = slot.shownKey;
+    const from = slot.variants.get(fromKey);
+    // Read how far the running fade had got before ending it.
+    const running = slot.fade;
+    const reversing = running !== null && running.fromKey === key;
+    const progress = running
+      ? crossfadeAlpha(nowMs - running.startMs, LIGHTING.bake.crossfadeMs)
+      : 0;
     this.endFade(slot);
     slot.shownKey = key;
     if (!from || !from.texture || !target.texture) {
@@ -261,7 +274,10 @@ export class LightBakeCache {
       sharedOwned = true;
     }
     slot.fade = {
-      startMs: nowMs,
+      startMs: reversing
+        ? reversalStartMs(nowMs, progress, LIGHTING.bake.crossfadeMs)
+        : nowMs,
+      fromKey,
       shared,
       sharedOwned,
       gained: this.cropTexture(slot, target.bake, split.gained),

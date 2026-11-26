@@ -104,6 +104,17 @@ export function crossfadeAlpha(elapsedMs: number, durationMs: number): number {
   return clamp01(elapsedMs / durationMs);
 }
 
+/**
+ * When a door reverses part way through its fade, the start time for the fade
+ * back. Starting it at this mirrored time puts the new fade exactly as far
+ * through as the old one had left to go, so the doorway carries on from the
+ * brightness it had reached instead of jumping. progress is how far through
+ * the old fade was, 0 to 1.
+ */
+export function reversalStartMs(nowMs: number, progress: number, crossfadeMs: number): number {
+  return nowMs - (1 - clamp01(progress)) * crossfadeMs;
+}
+
 /** A rectangle of texels cut out of a baked square, with its own alpha row by row. */
 export interface TexelCrop {
   /** The crop's top-left texel inside the full square. */

@@ -5,6 +5,7 @@ import {
   crossfadeAlpha,
   lightFalloff,
   overlapsReach,
+  reversalStartMs,
   splitBakes,
   type BakedLight,
   type TexelCrop,
@@ -46,6 +47,22 @@ describe('crossfadeAlpha', () => {
     expect(crossfadeAlpha(150, 300)).toBeCloseTo(0.5);
     expect(crossfadeAlpha(900, 300)).toBe(1);
     expect(crossfadeAlpha(0, 0)).toBe(1);
+  });
+});
+
+describe('reversalStartMs', () => {
+  // A door reverses at 1000 ms, part way through a 300 ms fade.
+  it('finishes the reverse fade at once when the old one had not started', () => {
+    expect(reversalStartMs(1000, 0, 300)).toBe(700);
+    expect(crossfadeAlpha(1000 - reversalStartMs(1000, 0, 300), 300)).toBe(1);
+  });
+  it('carries on from halfway when the old fade was halfway', () => {
+    expect(reversalStartMs(1000, 0.5, 300)).toBe(850);
+    expect(crossfadeAlpha(1000 - reversalStartMs(1000, 0.5, 300), 300)).toBeCloseTo(0.5);
+  });
+  it('starts the reverse fade from the beginning when the old one had finished', () => {
+    expect(reversalStartMs(1000, 1, 300)).toBe(1000);
+    expect(crossfadeAlpha(1000 - reversalStartMs(1000, 1, 300), 300)).toBe(0);
   });
 });
 
