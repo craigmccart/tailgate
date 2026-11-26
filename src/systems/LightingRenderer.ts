@@ -29,9 +29,9 @@ interface VeilFrame {
  * LEDs, plus a soft aura that always follows the player so the character and
  * nearby walls are never lost (the accessibility floor).
  *
- * Phase 23: the static lights come from LightBakeCache, one baked picture per
- * light with its wall and closed-door shadows already drawn in, so the light
- * on screen stops where the guards' light does. The guard glows and the
+ * Phase 23: the static lights come from LightBakeCache, baked pictures with
+ * their wall and closed-door shadows already drawn in, so the light on screen
+ * stops where the guards' light does. The guard glows and the
  * player aura still use the plain round brush, and the aura is never shaded.
  *
  * The veil lives in the world, not on the screen, so the world camera can

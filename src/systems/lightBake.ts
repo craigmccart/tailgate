@@ -104,6 +104,94 @@ export function crossfadeAlpha(elapsedMs: number, durationMs: number): number {
   return clamp01(elapsedMs / durationMs);
 }
 
+/** A rectangle of texels cut out of a baked square, with its own alpha row by row. */
+export interface TexelCrop {
+  /** The crop's top-left texel inside the full square. */
+  x: number;
+  y: number;
+  /** Size of the crop, in texels. */
+  width: number;
+  height: number;
+  alpha: Uint8ClampedArray;
+}
+
+/** Two bakes of one light, split into the part they share and the part that changes. */
+export interface BakeSplit {
+  /** Texel-wise minimum of the two: light both pictures have. A full square. */
+  shared: Uint8ClampedArray;
+  /** Light only the new picture has, cropped tight, or null when there is none. */
+  gained: TexelCrop | null;
+  /** Light only the old picture has, cropped tight, or null when there is none. */
+  lost: TexelCrop | null;
+}
+
+/**
+ * Splits an old and a new bake of the same light for a crossfade. A wall or
+ * door either blocks a texel or it does not, so the two bakes only differ
+ * where one of them is 0: the shared part, the gained part and the lost part
+ * never overlap. The renderer shows the shared part in full and fades only
+ * the gained part in and the lost part out, so light that both pictures have
+ * never dims while a door moves.
+ *
+ * When nothing is lost the shared part is the old bake, and when nothing is
+ * gained it is the new one, so a single door opening or shutting can reuse a
+ * picture that already exists.
+ */
+export function splitBakes(old: BakedLight, next: BakedLight): BakeSplit {
+  if (
+    old.sizeTexels !== next.sizeTexels ||
+    old.originX !== next.originX ||
+    old.originY !== next.originY
+  ) {
+    throw new Error('splitBakes needs two bakes of the same light');
+  }
+  const size = old.sizeTexels;
+  const shared = new Uint8ClampedArray(size * size);
+  const gained = new Uint8ClampedArray(size * size);
+  const lost = new Uint8ClampedArray(size * size);
+  for (let i = 0; i < shared.length; i++) {
+    const before = old.alpha[i];
+    const after = next.alpha[i];
+    shared[i] = Math.min(before, after);
+    if (before === 0) {
+      gained[i] = after;
+    }
+    if (after === 0) {
+      lost[i] = before;
+    }
+  }
+  return { shared, gained: cropToLit(gained, size), lost: cropToLit(lost, size) };
+}
+
+/** Cuts a square of alpha down to the smallest box holding every lit texel, or null for none. */
+function cropToLit(alpha: Uint8ClampedArray, size: number): TexelCrop | null {
+  let minCol = size;
+  let minRow = size;
+  let maxCol = -1;
+  let maxRow = -1;
+  for (let row = 0; row < size; row++) {
+    for (let col = 0; col < size; col++) {
+      if (alpha[row * size + col] > 0) {
+        minCol = Math.min(minCol, col);
+        maxCol = Math.max(maxCol, col);
+        minRow = Math.min(minRow, row);
+        maxRow = Math.max(maxRow, row);
+      }
+    }
+  }
+  if (maxCol < 0) {
+    return null;
+  }
+  const width = maxCol - minCol + 1;
+  const height = maxRow - minRow + 1;
+  const out = new Uint8ClampedArray(width * height);
+  for (let row = 0; row < height; row++) {
+    const start = (minRow + row) * size + minCol;
+    out.set(alpha.subarray(start, start + width), row * width);
+  }
+  return { x: minCol, y: minRow, width, height, alpha: out };
+}
+
 /**
  * True when the rect overlaps the light's reach box, the square from its
  * centre out to its reach on every side. Touching the box edge counts. Only

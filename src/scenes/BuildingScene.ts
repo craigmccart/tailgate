@@ -283,9 +283,10 @@ export class BuildingScene extends Phaser.Scene {
     this.navGrid = new NavGrid(map.widthInPixels, map.heightInPixels, map.walls);
     this.world = new WorldRenderer(this, map, this.level.id);
     this.lightModel = new LightModel(map.zones, map.lights, map.walls);
-    // The light the player sees stops at the same walls. Its textures are
-    // freed on SHUTDOWN, so a detain restart bakes afresh and nothing leaks.
-    this.bakeCache = new LightBakeCache(this, this.lightModel.sources, map.walls);
+    // The light the player sees stops at the same walls and shut doors. Its
+    // textures are freed on SHUTDOWN, so a detain restart bakes afresh and
+    // nothing leaks.
+    this.bakeCache = new LightBakeCache(this, this.lightModel.sources, map.walls, map.doors);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.bakeCache.destroy());
     // Wet tarmac wherever a lamp's light reaches the outdoor ground.
     drawWetSheen(this, map.zones, this.lightModel.sources);
