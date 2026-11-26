@@ -23,7 +23,9 @@ const BEAM_HALF_FOV_RAD = degToRad(DETECTION.cone.fovDegrees) / 2;
 const BEAM_EDGE_FEATHER_RAD = degToRad(LIGHTING.torchBeam.edgeFeatherDeg);
 /**
  * Erasing only reads alpha, so the beam's fill colour never shows on screen.
- * White matches the round brush, which is white too.
+ * White matches the round brush, which is white too. It must stay white:
+ * Phaser's Canvas renderer misreads gradient fill commands, and a tint that is
+ * not white can corrupt its command buffer.
  */
 const ERASE_TINT = 0xffffff;
 
@@ -47,8 +49,8 @@ interface VeilFrame {
  * their wall and closed-door shadows already drawn in, so the light on screen
  * stops where the guards' light does. Each guard's torch is a soft beam the
  * shape of its vision cone, stopped by the same walls and closed doors, fading
- * along its length and at its edges. The player aura still uses the plain
- * round brush, and the aura is never shaded.
+ * along its length and just past its edges. The player aura still uses the
+ * plain round brush, and the aura is never shaded.
  *
  * The veil lives in the world, not on the screen, so the world camera can
  * zoom. It holds one texel per canvas pixel, covers the camera's view plus a
@@ -209,8 +211,8 @@ export class LightingRenderer {
   /**
    * Erases every guard's torch beam in one go. Each triangle's corners are
    * moved from world to veil pixels, and the gradient fill gives each corner
-   * its own alpha, so the beam fades smoothly along its length and at its
-   * edges rather than in flat steps.
+   * its own alpha. Along the beam's length the fade is smooth; across the
+   * soft edge just outside the cone it steps down one ray at a time.
    */
   private eraseBeams(
     guards: readonly Guard[],
