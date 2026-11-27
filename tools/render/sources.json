@@ -1,0 +1,98 @@
+{
+  "_comment": "Every third-party source the render pipeline downloads. fetch_sources.py reads this file. Each entry's licence is also what CREDITS.md records, so keep the two in step.",
+  "kenney_kits": [
+    {
+      "slug": "furniture-kit",
+      "name": "Furniture Kit",
+      "url": "https://kenney.nl/assets/furniture-kit",
+      "author": "Kenney",
+      "licence": "CC0 1.0",
+      "used_for": "office desks, chairs, monitors, cabinets, kitchen, reception seating"
+    },
+    {
+      "slug": "factory-kit",
+      "name": "Factory Kit",
+      "url": "https://kenney.nl/assets/factory-kit",
+      "author": "Kenney",
+      "licence": "CC0 1.0",
+      "used_for": "warehouse shelving, crates, pallets, conveyors, plant room"
+    },
+    {
+      "slug": "city-kit-industrial",
+      "name": "City Kit (Industrial)",
+      "url": "https://kenney.nl/assets/city-kit-industrial",
+      "author": "Kenney",
+      "licence": "CC0 1.0",
+      "used_for": "loading dock, skips, fences, external walls"
+    },
+    {
+      "slug": "city-kit-roads",
+      "name": "City Kit (Roads)",
+      "url": "https://kenney.nl/assets/city-kit-roads",
+      "author": "Kenney",
+      "licence": "CC0 1.0",
+      "used_for": "car park surface markings, kerbs, lamps"
+    },
+    {
+      "slug": "car-kit",
+      "name": "Car Kit",
+      "url": "https://kenney.nl/assets/car-kit",
+      "author": "Kenney",
+      "licence": "CC0 1.0",
+      "used_for": "parked cars and the delivery van in the car park"
+    },
+    {
+      "slug": "mini-market",
+      "name": "Mini Market",
+      "url": "https://kenney.nl/assets/mini-market",
+      "author": "Kenney",
+      "licence": "CC0 1.0",
+      "used_for": "kitchen and break room dressing, bins, trolleys"
+    },
+    {
+      "slug": "animated-characters-1",
+      "name": "Animated Characters Protagonists",
+      "url": "https://kenney.nl/assets/animated-characters-1",
+      "author": "Kenney",
+      "licence": "CC0 1.0",
+      "used_for": "candidate character rig, checked for animations"
+    },
+    {
+      "slug": "animated-characters-2",
+      "name": "Animated Characters Survivors",
+      "url": "https://kenney.nl/assets/animated-characters-2",
+      "author": "Kenney",
+      "licence": "CC0 1.0",
+      "used_for": "guard, staff and hi-vis character rig and walk cycle"
+    },
+    {
+      "slug": "animated-characters-3",
+      "name": "Animated Characters Retro",
+      "url": "https://kenney.nl/assets/animated-characters-3",
+      "author": "Kenney",
+      "licence": "CC0 1.0",
+      "used_for": "candidate character rig, checked for animations"
+    }
+  ],
+  "ambientcg_textures": [
+    { "id": "Carpet012", "resolution": "1K-JPG", "used_for": "office carpet (dark blue, plain)" },
+    { "id": "Carpet001", "resolution": "1K-JPG", "used_for": "alternative office carpet (grey)" },
+    { "id": "Tiles141", "resolution": "1K-JPG", "used_for": "hard floor tile, reception and kitchen (worn rectangular grid)" },
+    { "id": "Tiles040", "resolution": "1K-JPG", "used_for": "terrazzo, lobby alternative, and the raised floor panel face" },
+    { "id": "Concrete034", "resolution": "1K-JPG", "used_for": "smooth concrete, dock and plant room" },
+    { "id": "Concrete031", "resolution": "1K-JPG", "used_for": "weathered concrete, car park" },
+    { "id": "Asphalt033", "resolution": "1K-JPG", "used_for": "car park tarmac" },
+    { "id": "Road013A", "resolution": "1K-JPG", "used_for": "cracked tarmac alternative" },
+    { "id": "Metal009", "resolution": "1K-JPG", "used_for": "brushed steel, racks, shutter, dock leveller" },
+    { "id": "Metal032", "resolution": "1K-JPG", "used_for": "smooth grey metal, data hall wall panel" },
+    { "id": "PaintedPlaster017", "resolution": "1K-JPG", "used_for": "office plaster wall" },
+    { "id": "Bricks088", "resolution": "1K-JPG", "used_for": "warehouse block wall" }
+  ],
+  "ambientcg_licence": {
+    "licence": "CC0 1.0",
+    "url": "https://ambientcg.com/",
+    "author": "ambientCG (Lennart Demes)",
+    "download_pattern": "https://ambientcg.com/get?file={id}_{resolution}.zip",
+    "page_pattern": "https://ambientcg.com/view?id={id}"
+  }
+}
