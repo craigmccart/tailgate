@@ -62,6 +62,7 @@ interface WallShades {
  */
 export class WorldRenderer {
   private readonly grid: Phaser.GameObjects.Graphics;
+  private readonly surfaceList: Phaser.GameObjects.GameObject[] = [];
 
   constructor(scene: Phaser.Scene, map: BuildingMap, levelId: string) {
     const profile = getVenueVisualProfile(levelId);
@@ -74,6 +75,14 @@ export class WorldRenderer {
     this.drawWalls(scene, map, profile);
     this.drawProps(scene, map, profile);
     this.grid = this.drawGrid(scene, map);
+  }
+
+  /**
+   * The floor, wall and prop sprites, for the developer-only surface light
+   * (Light2D). Graphics objects are left out because they cannot take it.
+   */
+  get surfaceObjects(): readonly Phaser.GameObjects.GameObject[] {
+    return this.surfaceList;
   }
 
   /** Show or hide the reference grid. Returns the new visibility. */
@@ -159,6 +168,7 @@ export class WorldRenderer {
     overlay.setTilePosition(Phaser.Math.Wrap(x, 0, size), Phaser.Math.Wrap(y, 0, size));
     overlay.setAlpha(MATERIAL_RENDER.strength);
     overlay.setDepth(depth);
+    this.surfaceList.push(overlay);
   }
 
   private drawRouteSurface(
@@ -177,6 +187,7 @@ export class WorldRenderer {
     route.setTint(profile.routeSurface.colour);
     route.setAlpha(profile.routeSurface.alpha);
     route.setDepth(-5);
+    this.surfaceList.push(route);
 
     // The circulation surface gets a material too, so the corridors between the
     // named zones are not the one flat area left in the building.
@@ -227,6 +238,7 @@ export class WorldRenderer {
       const floor = scene.add.tileSprite(cx, cy, zone.width, zone.height, texture);
       floor.setTileScale(RENDER.tileScale, RENDER.tileScale);
       floor.setDepth(0);
+      this.surfaceList.push(floor);
 
       // The room's material, under the colour wash below so the venue grading
       // still does the room-telling and this only adds surface.
@@ -315,6 +327,7 @@ export class WorldRenderer {
       );
       wallSurface.setTileScale(profile.wall.textureScale, profile.wall.textureScale);
       wallSurface.setDepth(10);
+      this.surfaceList.push(wallSurface);
       WorldRenderer.extrudeWall(extrusion, wall, shades);
     }
   }
@@ -441,6 +454,7 @@ export class WorldRenderer {
     } else if (treatment) {
       sprite.setTint(treatment.colour);
     }
+    this.surfaceList.push(sprite);
     if (decoration.label) {
       scene.add
         .text(decoration.x, decoration.y, decoration.label, {

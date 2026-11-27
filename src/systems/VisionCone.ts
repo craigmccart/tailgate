@@ -1,34 +1,10 @@
 import Phaser from 'phaser';
 import { CONE_RANGE_PX, DETECTION } from '../config/detection';
 import type { WallRect } from '../world/BuildingMap';
+import { rayDistanceToRects } from './occlusion';
 
 /** How the cone outline is drawn, so guard state never reads by colour alone. */
 export type ConeEdge = 'solid' | 'dashed' | 'pulsing';
-
-/** Nearest distance a ray travels from (ox,oy) along unit (dx,dy) before a segment, or Infinity. */
-function rayToSegment(
-  ox: number,
-  oy: number,
-  dx: number,
-  dy: number,
-  ax: number,
-  ay: number,
-  bx: number,
-  by: number
-): number {
-  const sx = bx - ax;
-  const sy = by - ay;
-  const denom = dx * sy - dy * sx;
-  if (Math.abs(denom) < 1e-9) {
-    return Infinity; // parallel
-  }
-  const t = ((ax - ox) * sy - (ay - oy) * sx) / denom; // distance along the ray
-  const u = ((ax - ox) * dy - (ay - oy) * dx) / denom; // position along the segment
-  if (t >= 0 && u >= 0 && u <= 1) {
-    return t;
-  }
-  return Infinity;
-}
 
 /**
  * A guard's vision cone: 7 tiles range and a 70 degree field of view, fully
@@ -43,11 +19,18 @@ export class VisionCone {
   private readonly walls: Phaser.Geom.Rectangle[];
   /** Extra occluders that change frame to frame, e.g. currently-closed doors. */
   private dynamicOccluders: Phaser.Geom.Rectangle[] = [];
+  /**
+   * Walls plus closed doors in one list, for the rays the cone is drawn with.
+   * Built here and in setDynamicOccluders rather than once per ray, so drawing
+   * the cone makes no new arrays.
+   */
+  private rayOccluders: readonly Phaser.Geom.Rectangle[];
   private readonly range = CONE_RANGE_PX;
   private readonly halfFov = Phaser.Math.DegToRad(DETECTION.cone.fovDegrees) / 2;
 
   constructor(scene: Phaser.Scene, walls: WallRect[]) {
     this.walls = walls.map((w) => new Phaser.Geom.Rectangle(w.x, w.y, w.width, w.height));
+    this.rayOccluders = this.walls;
     // Depth 26 keeps cones above the lighting veil (25) so guard and camera
     // state stays fully readable in the dark, per the accessibility rule.
     this.gfx = scene.add.graphics().setDepth(26);
@@ -59,6 +42,7 @@ export class VisionCone {
    */
   setDynamicOccluders(rects: WallRect[]): void {
     this.dynamicOccluders = rects.map((r) => new Phaser.Geom.Rectangle(r.x, r.y, r.width, r.height));
+    this.rayOccluders = [...this.walls, ...this.dynamicOccluders];
   }
 
   /** True if (tx,ty) is inside the cone and not hidden behind a wall. */
@@ -90,24 +74,7 @@ export class VisionCone {
 
   /** Distance from (ox,oy) along unit (dx,dy) to the nearest wall, capped at range. */
   private rayDistance(ox: number, oy: number, dx: number, dy: number): number {
-    let nearest = this.range;
-    for (const w of [...this.walls, ...this.dynamicOccluders]) {
-      const right = w.x + w.width;
-      const bottom = w.y + w.height;
-      const edges: [number, number, number, number][] = [
-        [w.x, w.y, right, w.y],
-        [right, w.y, right, bottom],
-        [right, bottom, w.x, bottom],
-        [w.x, bottom, w.x, w.y],
-      ];
-      for (const [ax, ay, bx, by] of edges) {
-        const t = rayToSegment(ox, oy, dx, dy, ax, ay, bx, by);
-        if (t < nearest) {
-          nearest = t;
-        }
-      }
-    }
-    return nearest;
+    return rayDistanceToRects(ox, oy, dx, dy, this.rayOccluders, this.range);
   }
 
   /**

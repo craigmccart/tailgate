@@ -44,9 +44,13 @@ import { padInputTimeAtStart, pointerIsLive, pointerLookAhead } from '../systems
 import type { FeedTreatment } from '../systems/FeedTreatment';
 import { GuardAwareness } from '../systems/GuardAwareness';
 import { GuardRoster, type GuardDef } from '../systems/GuardRoster';
+import { LightBakeCache } from '../systems/LightBakeCache';
 import { LightModel } from '../systems/LightModel';
 import { LightingRenderer } from '../systems/LightingRenderer';
+import { addRackGlows } from '../systems/rackGlows';
+import { SurfaceLight } from '../systems/surfaceLight';
 import { NavGrid } from '../systems/NavGrid';
+import type { Rect } from '../systems/occlusion';
 import type { PickupPoint, WallRect, ZoneRect } from '../world/BuildingMap';
 import {
   getMission,
@@ -124,6 +128,8 @@ export class BuildingScene extends Phaser.Scene {
   private objectives!: ObjectiveSystem;
   private cameraSystem!: CameraSystem;
   private lightModel!: LightModel;
+  /** Each static light baked with its wall shadows, for the veil to draw. */
+  private bakeCache!: LightBakeCache;
   private lightingRenderer!: LightingRenderer;
   /** Dust, steam, haze and rain. Kept so update can follow SCREEN EFFECTS for the rain. */
   private ambient!: AmbientParticles;
@@ -131,6 +137,12 @@ export class BuildingScene extends Phaser.Scene {
   private audio!: AudioManager;
   private mapZones: ZoneRect[] = [];
   private mapWalls: WallRect[] = [];
+  /**
+   * What stops the guards' torch beams on screen: the walls plus the doors
+   * that were closed on the last normal frame. Doors do not move while the
+   * game is frozen, so a frozen frame or a resize reuses the last list.
+   */
+  private beamOccluders: readonly Rect[] = [];
   /** The walkable map guards path across. Rebuilt with the level on every restart. */
   private navGrid!: NavGrid;
   private followOffset = new Phaser.Math.Vector2(0, 0);
@@ -147,6 +159,9 @@ export class BuildingScene extends Phaser.Scene {
   private gridKey?: Phaser.Input.Keyboard.Key;
   private guardDebugKey?: Phaser.Input.Keyboard.Key;
   private lightingKey?: Phaser.Input.Keyboard.Key;
+  private surfaceKey?: Phaser.Input.Keyboard.Key;
+  private surfaceLight?: SurfaceLight;
+  private surfaceLightOn = false;
   private interactKey?: Phaser.Input.Keyboard.Key;
   private pauseKey?: Phaser.Input.Keyboard.Key;
   /** Last frame's pad A state, so the breaker sees a fresh press not a hold. */
@@ -274,14 +289,23 @@ export class BuildingScene extends Phaser.Scene {
     const map = new BuildingMap(this, this.mapKey);
     this.mapZones = map.zones;
     this.mapWalls = map.walls;
+    // The first frame's beams need something to stop at before any door is read.
+    this.beamOccluders = map.walls;
     // Phase 20 playtest fix: guards need a real map to walk, not a straight line
     // at whatever they are chasing. Built once here from the wall data, before
     // anything that navigates exists.
     this.navGrid = new NavGrid(map.widthInPixels, map.heightInPixels, map.walls);
     this.world = new WorldRenderer(this, map, this.level.id);
-    this.lightModel = new LightModel(map.zones, map.lights);
+    this.lightModel = new LightModel(map.zones, map.lights, map.walls);
+    // The light the player sees stops at the same walls and shut doors. Its
+    // textures are freed on SHUTDOWN, so a detain restart bakes afresh and
+    // nothing leaks.
+    this.bakeCache = new LightBakeCache(this, this.lightModel.sources, map.walls, map.doors);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.bakeCache.destroy());
     // Wet tarmac wherever a lamp's light reaches the outdoor ground.
     drawWetSheen(this, map.zones, this.lightModel.sources);
+    // LED glows on the server racks, above the darkness so they shine in the dark.
+    addRackGlows(this, this.lightModel.sources);
 
     // A detain restarts here: resume from the last checkpoint if there is one.
     // Checkpoints are always indoors, so a checkpoint start begins inside. A
@@ -344,7 +368,7 @@ export class BuildingScene extends Phaser.Scene {
 
     // Lighting and audio. The renderer draws last each frame; audio arms its
     // autoplay unlock on the first input and makes no sound before that.
-    this.lightingRenderer = new LightingRenderer(this);
+    this.lightingRenderer = new LightingRenderer(this, this.bakeCache);
     this.audio = new AudioManager();
     setAudioGameplayPaused(false);
     this.audio.init(this);
@@ -361,6 +385,14 @@ export class BuildingScene extends Phaser.Scene {
       this.gridKey = this.input.keyboard?.addKey('G');
       this.guardDebugKey = this.input.keyboard?.addKey('H');
       this.lightingKey = this.input.keyboard?.addKey('L');
+      // K: Light2D surface lighting, to measure its frame cost (Phase 23 spike).
+      this.surfaceKey = this.input.keyboard?.addKey('K');
+      this.surfaceLight = new SurfaceLight(this, this.lightModel.sources, [
+        ...this.world.surfaceObjects,
+        this.player.sprite,
+        ...this.guards.guards.map((guard) => guard.sprite),
+      ]);
+      this.surfaceLightOn = false;
     }
     this.interactKey = this.input.keyboard?.addKey('E');
     this.pauseKey = this.input.keyboard?.addKey('ESC');
@@ -479,6 +511,10 @@ export class BuildingScene extends Phaser.Scene {
       this.lightingHidden = !this.lightingHidden;
       this.lightingRenderer.setVisible(!this.lightingHidden);
     }
+    if (this.surfaceKey && Phaser.Input.Keyboard.JustDown(this.surfaceKey)) {
+      this.surfaceLightOn = !this.surfaceLightOn;
+      this.surfaceLight?.setEnabled(this.surfaceLightOn);
+    }
 
     const gamepadPlugin = this.input.gamepad;
     const pad =
@@ -537,6 +573,9 @@ export class BuildingScene extends Phaser.Scene {
 
     // Shared occluder set for the guards, cameras and audio this frame.
     const closedDoors = this.doors.filter((d) => !d.isOpen).map((d) => d.rect);
+    this.lightModel.setClosedDoors(closedDoors);
+    this.bakeCache.setClosedDoors(closedDoors, now);
+    this.beamOccluders = [...this.mapWalls, ...closedDoors];
 
     // Every guard's sightline lights where it looks; darkness elsewhere is
     // cover, so sample the light at the player and feed it into perception.
@@ -699,7 +738,7 @@ export class BuildingScene extends Phaser.Scene {
       this.cameras.main,
       this.player,
       this.guards.guards,
-      this.lightModel.sources
+      this.beamOccluders
     );
   }
 

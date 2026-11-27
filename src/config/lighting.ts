@@ -10,6 +10,8 @@
  * that value if low-contrast scenes are hard to parse.
  */
 
+import { PALETTE_HEX } from './palette';
+
 /** Per-zone base analytic light level, 0 (pitch black) to 1 (fully lit). */
 export const AMBIENT_LIGHT: Record<string, number> = {
   // Building C
@@ -66,4 +68,47 @@ export const LIGHTING = {
    * walking towards. Render only, never counted for detection.
    */
   veilMarginPx: 48,
+  /**
+   * Phase 23: each lamp is drawn once into its own small picture with the wall
+   * shadows already in it, so the light you see stops at walls and closed
+   * doors. Render only, never counted for detection.
+   *  - texelPx: world pixels per pixel of that picture. Lower is crisper
+   *    shadow edges but slower to draw when a door moves; 2 looks smooth.
+   *  - crossfadeMs: when a door near a lamp opens or shuts, how long the old
+   *    shadows take to melt into the new ones, so the light never jumps.
+   */
+  bake: { texelPx: 2, crossfadeMs: 300 },
+  /**
+   * Phase 23: how each guard's torch looks on screen. The beam fills the
+   * guard's vision cone, stops at walls and closed doors, and fades to nothing
+   * at full range. Render only, never counted for detection.
+   *  - intensity: how bright the beam is at the guard, 0 to 1. 0.525 matches
+   *    the old round glow, so the beam is as bright as before.
+   *  - edgeFeatherDeg: how many degrees past each side of the guard's cone the
+   *    beam's soft edge reaches as it fades to nothing. The cone itself stays
+   *    at full strength, because guards count full torch light there. 0 gives
+   *    hard edges; larger is softer.
+   *  - turnEaseMs: how quickly a guard's torch beam swings round when the
+   *    guard turns, in milliseconds. 0 snaps it round at once. Only the beam
+   *    on screen swings; what the guard sees, and the vision cone drawn over
+   *    it, turn at once as before.
+   */
+  torchBeam: { intensity: 0.525, edgeFeatherDeg: 8, turnEaseMs: 120 },
+  /**
+   * Phase 23: the little LED glow on each server rack, drawn above the darkness
+   * so it shines in the dark. Amber or white, never red. Render only.
+   *  - radiusPx: how far the glow spreads from the LED.
+   *  - alpha: how strong it is, 0 to 1.
+   *  - depth: draw order. 25 is the darkness, 26 the vision cones, so 25.5 sits between.
+   */
+  rackGlow: { radiusPx: 9, alpha: 0.6, depth: 25.5 },
+  /**
+   * Phase 23 spike: Phaser's Light2D "surface" lighting, behind a developer-only
+   * key (K). It is OFF in shipped builds until Phase 24's normal maps give it
+   * something to do; with flat surfaces it only repeats the veil and leaks
+   * through walls. It exists now to measure its frame cost.
+   *  - ambient: the base colour surfaces get where no light reaches.
+   *  - intensityScale: multiplies each light's own strength. 1 matches the data.
+   */
+  surfaceLight: { ambient: PALETTE_HEX.text, intensityScale: 1 },
 } as const;

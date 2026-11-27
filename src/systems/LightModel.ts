@@ -1,7 +1,7 @@
-import Phaser from 'phaser';
 import { CONE_RANGE_PX, DETECTION } from '../config/detection';
 import { AMBIENT_FALLBACK, AMBIENT_LIGHT, LIGHTING } from '../config/lighting';
 import type { LightRect, ZoneRect } from '../world/BuildingMap';
+import { segmentBlocked, type Rect } from './occlusion';
 
 /** A static light source the renderer draws and the model samples. */
 export interface LightSource {
@@ -12,7 +12,31 @@ export interface LightSource {
   intensity: number;
 }
 
-const GUARD_HALF_FOV = Phaser.Math.DegToRad(DETECTION.cone.fovDegrees) / 2;
+/** The same sum as Phaser's DegToRad, so this half cone matches the vision cone's to the last bit. */
+const degToRad = (deg: number): number => deg * (Math.PI / 180);
+/** Wraps an angle into the range minus pi to pi. */
+const wrapAngle = (a: number): number => {
+  const twoPi = Math.PI * 2;
+  return ((((a + Math.PI) % twoPi) + twoPi) % twoPi) - Math.PI;
+};
+const clamp = (v: number, lo: number, hi: number): number => Math.min(hi, Math.max(lo, v));
+
+const GUARD_HALF_FOV = degToRad(DETECTION.cone.fovDegrees) / 2;
+
+/** A static source plus the walls that could possibly block its light. */
+interface StaticSource extends LightSource {
+  /** Only the walls overlapping this source's reach box, built once. */
+  nearbyWalls: Rect[];
+}
+
+function overlapsReach(wall: Rect, s: LightSource): boolean {
+  return (
+    wall.x <= s.x + s.radiusPx &&
+    wall.x + wall.width >= s.x - s.radiusPx &&
+    wall.y <= s.y + s.radiusPx &&
+    wall.y + wall.height >= s.y - s.radiusPx
+  );
+}
 
 /**
  * The gameplay side of lighting: a pure analytic sampler of how lit a world
@@ -23,16 +47,39 @@ const GUARD_HALF_FOV = Phaser.Math.DegToRad(DETECTION.cone.fovDegrees) / 2;
  * It deliberately does NOT include the player's readability aura, so a player
  * standing in pitch dark still reads as concealed to guards while staying
  * visible to the human on screen. That separation is the whole point.
+ *
+ * Phase 23: light stops at walls and closed doors. That can only make a point
+ * darker than before, never brighter, so it never adds a way to be spotted.
+ * The player aura is not part of this model, so it is never occluded.
  */
 export class LightModel {
   private readonly zones: ZoneRect[];
-  private readonly staticSources: LightSource[];
+  private readonly staticSources: StaticSource[];
+  private readonly walls: readonly Rect[];
+  private readonly occlusion: boolean;
+  /** Doors that are shut this frame; they block light like walls. */
+  private closedDoors: readonly Rect[] = [];
   /** Every guard's sightline this frame. Phase 21: one per guard on site. */
   private torches: { x: number; y: number; facing: number }[] = [];
 
-  constructor(zones: ZoneRect[], lights: LightRect[]) {
-    this.zones = zones;
-    this.staticSources = lights.map((l) => this.toSource(l));
+  constructor(
+    zones: readonly ZoneRect[],
+    lights: readonly LightRect[],
+    walls: readonly Rect[],
+    options: { occlusion: boolean } = { occlusion: true }
+  ) {
+    this.zones = [...zones];
+    this.walls = walls;
+    this.occlusion = options.occlusion;
+    this.staticSources = lights.map((l) => {
+      const source = this.toSource(l);
+      return { ...source, nearbyWalls: walls.filter((w) => overlapsReach(w, source)) };
+    });
+  }
+
+  /** Replaces the set of closed doors used this frame. */
+  setClosedDoors(rects: readonly Rect[]): void {
+    this.closedDoors = rects;
   }
 
   get sources(): readonly LightSource[] {
@@ -51,6 +98,9 @@ export class LightModel {
     for (const s of this.staticSources) {
       const dist = Math.hypot(x - s.x, y - s.y);
       if (dist < s.radiusPx) {
+        if (this.occlusion && this.blocked(s.x, s.y, x, y, s.nearbyWalls)) {
+          continue;
+        }
         const falloff = 1 - dist / s.radiusPx;
         light = Math.max(light, s.intensity * falloff);
       }
@@ -61,15 +111,28 @@ export class LightModel {
       const dy = y - torch.y;
       const dist = Math.hypot(dx, dy);
       if (dist < CONE_RANGE_PX && dist > 1) {
-        const diff = Math.abs(Phaser.Math.Angle.Wrap(Math.atan2(dy, dx) - torch.facing));
+        const diff = Math.abs(wrapAngle(Math.atan2(dy, dx) - torch.facing));
         if (diff <= GUARD_HALF_FOV) {
+          if (this.occlusion && this.blocked(torch.x, torch.y, x, y, this.walls)) {
+            continue;
+          }
           const falloff = 1 - dist / CONE_RANGE_PX;
           light = Math.max(light, LIGHTING.guardTorchIntensity * falloff);
         }
       }
     }
 
-    return Phaser.Math.Clamp(light, 0, 1);
+    return clamp(light, 0, 1);
+  }
+
+  private blocked(
+    ax: number,
+    ay: number,
+    bx: number,
+    by: number,
+    walls: readonly Rect[]
+  ): boolean {
+    return segmentBlocked(ax, ay, bx, by, walls) || segmentBlocked(ax, ay, bx, by, this.closedDoors);
   }
 
   private zoneAmbientAt(x: number, y: number): number {
