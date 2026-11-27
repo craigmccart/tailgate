@@ -8,6 +8,8 @@ import { markBriefingSeen } from '../state/progress';
 import { resetRunStats } from '../state/runStats';
 import { MenuController } from '../ui/MenuController';
 import { fadeIn, fadeToScene } from '../ui/transitions';
+import { fitUiCamera } from '../ui/uiCamera';
+import { UI_HEIGHT, UI_WIDTH } from '../ui/viewport';
 
 /** Sheet geometry, matching the Engagement Report's printed-page framing. */
 const PAGE = { width: 880, height: 500, padX: 28, padTop: 20 } as const;
@@ -44,6 +46,7 @@ export class BriefingScene extends Phaser.Scene {
   }
 
   create(): void {
+    fitUiCamera(this);
     fadeIn(this);
     // Scene instances are reused across restarts, so last visit's lines must
     // not linger in the print list.
@@ -51,10 +54,10 @@ export class BriefingScene extends Phaser.Scene {
     this.printing = false;
     this.printTween = undefined;
 
-    const centreX = this.scale.width / 2;
-    const centreY = this.scale.height / 2;
+    const centreX = UI_WIDTH / 2;
+    const centreY = UI_HEIGHT / 2;
 
-    this.add.rectangle(centreX, centreY, this.scale.width, this.scale.height, PALETTE_HEX.base);
+    this.add.rectangle(centreX, centreY, UI_WIDTH, UI_HEIGHT, PALETTE_HEX.base);
     this.add
       .rectangle(centreX, centreY, PAGE.width, PAGE.height, PALETTE_HEX.sheet)
       .setStrokeStyle(1, PALETTE_HEX.amber, 0.9);
@@ -75,10 +78,12 @@ export class BriefingScene extends Phaser.Scene {
     y += 40;
 
     this.mono(left, y, `CLIENT:     ${this.level.client}`, 11, PALETTE.text);
-    this.mono(left + 440, y, `REF:  ${this.level.ref}`, 11, PALETTE.text);
+    this.mono(left + 440, y, `REF:    ${this.level.ref}`, 11, PALETTE.text);
     y += 15;
     this.mono(left, y, `SITE:       ${this.level.site}`, 11, PALETTE.text);
-    this.mono(left + 440, y, `DATE: ${ENGAGEMENT.date}`, 11, PALETTE.text);
+    this.mono(left + 440, y, `DATE:   ${ENGAGEMENT.date}`, 11, PALETTE.text);
+    y += 15;
+    this.mono(left + 440, y, `ATTEND: ${ENGAGEMENT.attendance}`, 11, PALETTE.text);
     y += 24;
 
     y = this.section(left, y, 'SCOPE', [this.level.scope]);

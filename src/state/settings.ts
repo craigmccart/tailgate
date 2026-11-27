@@ -33,6 +33,14 @@ interface Settings {
    * copy anywhere, per the accessibility design. Default off.
    */
   assistMode: boolean;
+  /**
+   * How many pixels the game draws, as a fraction of what the window could
+   * show: 1 is full sharpness, 0.5 draws a quarter of the pixels and stretches
+   * them up, which is softer but easier on a slower machine. Steps of 0.25
+   * between 0.5 and 1. Always read through normaliseRenderScale, so a bad
+   * stored value cannot reach the canvas.
+   */
+  renderScale: number;
 }
 
 const STORAGE_KEY = 'tailgate.settings';
@@ -45,7 +53,30 @@ const settings: Settings = {
   extraBrightness: 0,
   screenEffects: true,
   assistMode: false,
+  renderScale: 1,
 };
+
+/**
+ * The render scale steps in quarters, so the menu offers 50, 75 and 100 percent.
+ * Exported so the settings row moves by the same amount the normaliser rounds to.
+ */
+export const RENDER_SCALE_STEP = 0.25;
+/** Below this the picture is too blurry to play, so it is the floor. */
+const RENDER_SCALE_MIN = 0.5;
+/** Full sharpness, and also the fallback for anything that is not a number. */
+const RENDER_SCALE_MAX = 1;
+
+/**
+ * Cleans up a render scale from any source (storage, a hand-edited value, the
+ * menu). Anything that is not a finite number gives full sharpness; a number
+ * rounds to the nearest quarter and stays between 50 and 100 percent. Strings
+ * are not accepted, even ones that look like numbers.
+ */
+export function normaliseRenderScale(v: unknown): number {
+  if (typeof v !== 'number' || !Number.isFinite(v)) return RENDER_SCALE_MAX;
+  const snapped = Math.round(v / RENDER_SCALE_STEP) * RENDER_SCALE_STEP;
+  return Math.max(RENDER_SCALE_MIN, Math.min(RENDER_SCALE_MAX, snapped));
+}
 
 // Load any persisted overrides. Guarded so a headless build never throws.
 try {
@@ -56,6 +87,9 @@ try {
 } catch {
   // No storage available; defaults stand.
 }
+// A stored render scale that is missing, mistyped or out of range is cleaned up
+// once here, so nothing downstream has to defend against it.
+settings.renderScale = normaliseRenderScale(settings.renderScale);
 
 function persist(): void {
   try {
@@ -101,5 +135,10 @@ export function setScreenEffects(on: boolean): void {
 
 export function setAssistMode(on: boolean): void {
   settings.assistMode = on;
+  persist();
+}
+
+export function setRenderScale(v: number): void {
+  settings.renderScale = normaliseRenderScale(v);
   persist();
 }

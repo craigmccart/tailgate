@@ -67,7 +67,7 @@ const SEVERITY_ORDER: Record<Severity, number> = {
  * "starts" at OBJECTIVES.reportClockStart, so a finding at 3 minutes 12
  * seconds elapsed reads as the clock time three minutes past the start.
  */
-function stampClock(elapsedMs: number): string {
+export function stampClock(elapsedMs: number): string {
   const { hour, minute } = OBJECTIVES.reportClockStart;
   const totalMinutes = hour * 60 + minute + Math.floor(elapsedMs / 60000);
   const hh = Math.floor(totalMinutes / 60) % 24;

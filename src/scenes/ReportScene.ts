@@ -9,6 +9,8 @@ import { recordCompletion, unlockLevel } from '../state/progress';
 import { getRunStats, resetRunStats } from '../state/runStats';
 import { MenuController } from '../ui/MenuController';
 import { fadeIn, fadeToScene } from '../ui/transitions';
+import { fitUiCamera } from '../ui/uiCamera';
+import { UI_HEIGHT, UI_WIDTH } from '../ui/viewport';
 
 /** Page geometry. The report sits on the near-black like a printed sheet. */
 const PAGE = {
@@ -77,6 +79,7 @@ export class ReportScene extends Phaser.Scene {
   }
 
   create(): void {
+    fitUiCamera(this);
     fadeIn(this);
     // Scene instances are reused across restarts, so nothing from the last
     // report may linger in the print list or the stamp state.
@@ -107,11 +110,11 @@ export class ReportScene extends Phaser.Scene {
       unlockLevel(next.id);
     }
 
-    const centreX = this.scale.width / 2;
-    const centreY = this.scale.height / 2;
+    const centreX = UI_WIDTH / 2;
+    const centreY = UI_HEIGHT / 2;
 
     // Base backdrop and the lighter "sheet of paper" panel with a thin amber border.
-    this.add.rectangle(centreX, centreY, this.scale.width, this.scale.height, PALETTE_HEX.base);
+    this.add.rectangle(centreX, centreY, UI_WIDTH, UI_HEIGHT, PALETTE_HEX.base);
     this.add
       .rectangle(centreX, centreY, PAGE.width, PAGE.height, PALETTE_HEX.sheet)
       .setStrokeStyle(1, PALETTE_HEX.amber, 0.9);
@@ -403,7 +406,7 @@ export class ReportScene extends Phaser.Scene {
 
   /** The end-of-run actions, navigable on pad, keyboard and mouse alike. */
   private buildMenu(centreX: number): void {
-    const top = this.scale.height / 2 + PAGE.height / 2 - SLOTS.menuTop;
+    const top = UI_HEIGHT / 2 + PAGE.height / 2 - SLOTS.menuTop;
     this.menu = new MenuController(
       this,
       [
@@ -456,7 +459,7 @@ export class ReportScene extends Phaser.Scene {
   /** A brief EXPORTED confirmation under the page, fading itself out. */
   private flashExportNote(): void {
     const note = this.add
-      .text(this.scale.width / 2, this.scale.height / 2 + PAGE.height / 2 + 11, 'REPORT EXPORTED', {
+      .text(UI_WIDTH / 2, UI_HEIGHT / 2 + PAGE.height / 2 + 11, 'REPORT EXPORTED', {
         fontFamily: FONTS.mono,
         fontSize: '11px',
         color: PALETTE.amber,
